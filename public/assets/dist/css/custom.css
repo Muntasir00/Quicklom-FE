@@ -1,0 +1,16 @@
+/* for the height of the content page */
+div.content-wrapper {
+    min-height: 85vh !important;
+    padding-bottom: 120px !important; /* Add space for fixed footer */
+}
+
+/* Ensure content sections have proper spacing from footer */
+.content {
+    padding-bottom: 20px !important;
+}
+
+/* Additional spacing for cards to prevent overlap */
+.card:last-child,
+.box:last-child {
+    margin-bottom: 30px !important;
+}

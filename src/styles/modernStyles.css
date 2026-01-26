@@ -1,0 +1,1330 @@
+/* ===================================
+   MATERIAL DESIGN 3 - QuickLocum Admin
+   Blue Professional Theme
+   =================================== */
+
+/* MD3 Design Tokens */
+:root {
+    /* Primary Blue Color System (Tonal Palette) */
+    --md-primary: #3b82f6;
+    --md-primary-light: #60a5fa;
+    --md-primary-dark: #2563eb;
+    --md-primary-container: #dbeafe;
+    --md-on-primary: #ffffff;
+    --md-on-primary-container: #1e3a5f;
+
+    /* Secondary Colors */
+    --md-secondary: #64748b;
+    --md-secondary-light: #94a3b8;
+    --md-secondary-dark: #475569;
+    --md-secondary-container: #f1f5f9;
+    --md-on-secondary: #ffffff;
+
+    /* Tertiary/Accent */
+    --md-tertiary: #8b5cf6;
+    --md-tertiary-light: #a78bfa;
+    --md-tertiary-container: #ede9fe;
+
+    /* Success Colors */
+    --md-success: #10b981;
+    --md-success-light: #34d399;
+    --md-success-dark: #059669;
+    --md-success-container: #d1fae5;
+    --md-on-success: #ffffff;
+
+    /* Warning Colors */
+    --md-warning: #f59e0b;
+    --md-warning-light: #fbbf24;
+    --md-warning-dark: #d97706;
+    --md-warning-container: #fef3c7;
+    --md-on-warning: #ffffff;
+
+    /* Error/Danger Colors */
+    --md-error: #ef4444;
+    --md-error-light: #f87171;
+    --md-error-dark: #dc2626;
+    --md-error-container: #fee2e2;
+    --md-on-error: #ffffff;
+
+    /* Info Colors */
+    --md-info: #0ea5e9;
+    --md-info-light: #38bdf8;
+    --md-info-dark: #0284c7;
+    --md-info-container: #e0f2fe;
+
+    /* Neutral/Surface Colors (MD3 Tonal Elevation) */
+    --md-surface: #ffffff;
+    --md-surface-dim: #f8fafc;
+    --md-surface-bright: #ffffff;
+    --md-surface-container-lowest: #ffffff;
+    --md-surface-container-low: #f8fafc;
+    --md-surface-container: #f1f5f9;
+    --md-surface-container-high: #e2e8f0;
+    --md-surface-container-highest: #cbd5e1;
+
+    /* Background */
+    --md-background: #f8fafc;
+    --md-on-background: #0f172a;
+    --md-on-surface: #1e293b;
+    --md-on-surface-variant: #64748b;
+
+    /* Outline */
+    --md-outline: #cbd5e1;
+    --md-outline-variant: #e2e8f0;
+
+    /* Text Colors */
+    --md-text-primary: #0f172a;
+    --md-text-secondary: #475569;
+    --md-text-tertiary: #64748b;
+    --md-text-disabled: #94a3b8;
+
+    /* MD3 Shape (Corner Radii) */
+    --md-shape-none: 0px;
+    --md-shape-extra-small: 4px;
+    --md-shape-small: 8px;
+    --md-shape-medium: 12px;
+    --md-shape-large: 16px;
+    --md-shape-extra-large: 28px;
+    --md-shape-full: 9999px;
+
+    /* MD3 Elevation (Tonal + Shadow) */
+    --md-elevation-0: none;
+    --md-elevation-1: 0 1px 3px rgba(15, 23, 42, 0.08), 0 1px 2px rgba(15, 23, 42, 0.06);
+    --md-elevation-2: 0 4px 6px rgba(15, 23, 42, 0.07), 0 2px 4px rgba(15, 23, 42, 0.06);
+    --md-elevation-3: 0 10px 15px rgba(15, 23, 42, 0.08), 0 4px 6px rgba(15, 23, 42, 0.05);
+    --md-elevation-4: 0 20px 25px rgba(15, 23, 42, 0.10), 0 8px 10px rgba(15, 23, 42, 0.04);
+    --md-elevation-5: 0 25px 50px rgba(15, 23, 42, 0.12);
+
+    /* Typography */
+    --md-font-family: 'Inter', 'Roboto', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+    --md-font-family-mono: 'JetBrains Mono', 'Fira Code', monospace;
+
+    /* Motion */
+    --md-motion-duration-short: 150ms;
+    --md-motion-duration-medium: 250ms;
+    --md-motion-duration-long: 400ms;
+    --md-motion-easing-standard: cubic-bezier(0.2, 0, 0, 1);
+    --md-motion-easing-emphasized: cubic-bezier(0.2, 0, 0, 1);
+    --md-motion-easing-decelerate: cubic-bezier(0, 0, 0, 1);
+    --md-motion-easing-accelerate: cubic-bezier(0.3, 0, 1, 1);
+
+    /* Spacing (8px Grid) */
+    --md-spacing-0: 0;
+    --md-spacing-1: 4px;
+    --md-spacing-2: 8px;
+    --md-spacing-3: 12px;
+    --md-spacing-4: 16px;
+    --md-spacing-5: 20px;
+    --md-spacing-6: 24px;
+    --md-spacing-8: 32px;
+    --md-spacing-10: 40px;
+    --md-spacing-12: 48px;
+    --md-spacing-16: 64px;
+
+    /* Legacy variables for backward compatibility */
+    --primary-color: var(--md-primary);
+    --primary-dark: var(--md-primary-dark);
+    --primary-light: var(--md-primary-light);
+    --success-color: var(--md-success);
+    --warning-color: var(--md-warning);
+    --danger-color: var(--md-error);
+    --info-color: var(--md-info);
+    --text-primary: var(--md-text-primary);
+    --text-secondary: var(--md-text-secondary);
+    --text-muted: var(--md-text-tertiary);
+    --bg-primary: var(--md-surface);
+    --bg-secondary: var(--md-surface-container-low);
+    --border-color: var(--md-outline);
+    --border-radius-sm: var(--md-shape-small);
+    --border-radius-md: var(--md-shape-medium);
+    --border-radius-lg: var(--md-shape-large);
+    --border-radius-xl: var(--md-shape-extra-large);
+    --shadow-sm: var(--md-elevation-1);
+    --shadow-md: var(--md-elevation-2);
+    --shadow-lg: var(--md-elevation-3);
+    --shadow-xl: var(--md-elevation-4);
+    --transition-fast: var(--md-motion-duration-short) var(--md-motion-easing-standard);
+    --transition-base: var(--md-motion-duration-medium) var(--md-motion-easing-standard);
+    --transition-slow: var(--md-motion-duration-long) var(--md-motion-easing-standard);
+}
+
+/* ===================================
+   BASE STYLES
+   =================================== */
+
+* {
+    box-sizing: border-box;
+}
+
+body {
+    font-family: var(--md-font-family);
+    background-color: var(--md-background);
+    color: var(--md-text-primary);
+    line-height: 1.6;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+}
+
+/* ===================================
+   ADMIN LAYOUT WRAPPER
+   =================================== */
+
+.content-wrapper {
+    background: var(--md-background) !important;
+    min-height: 100vh;
+}
+
+/* ===================================
+   MD3 PAGE HEADER
+   =================================== */
+
+.md3-page-header {
+    background: linear-gradient(135deg, var(--md-primary) 0%, var(--md-primary-dark) 100%);
+    padding: var(--md-spacing-8) var(--md-spacing-6);
+    margin: calc(-1 * var(--md-spacing-4)) calc(-1 * var(--md-spacing-4)) var(--md-spacing-6) calc(-1 * var(--md-spacing-4));
+    border-radius: 0 0 var(--md-shape-extra-large) var(--md-shape-extra-large);
+    box-shadow: var(--md-elevation-3);
+    position: relative;
+    overflow: hidden;
+}
+
+.md3-page-header::before {
+    content: '';
+    position: absolute;
+    top: -50%;
+    right: -20%;
+    width: 60%;
+    height: 200%;
+    background: radial-gradient(circle, rgba(255,255,255,0.1) 0%, transparent 60%);
+    pointer-events: none;
+}
+
+.md3-page-header-content {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: var(--md-spacing-4);
+    position: relative;
+    z-index: 1;
+}
+
+.md3-page-title-section {
+    display: flex;
+    align-items: center;
+    gap: var(--md-spacing-4);
+}
+
+.md3-page-icon {
+    width: 56px;
+    height: 56px;
+    background: rgba(255, 255, 255, 0.2);
+    backdrop-filter: blur(10px);
+    border-radius: var(--md-shape-large);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 24px;
+    color: white;
+}
+
+.md3-page-title {
+    color: white;
+    font-size: 28px;
+    font-weight: 600;
+    margin: 0;
+    letter-spacing: -0.5px;
+}
+
+.md3-page-subtitle {
+    color: rgba(255, 255, 255, 0.85);
+    font-size: 14px;
+    margin: var(--md-spacing-1) 0 0;
+    font-weight: 400;
+}
+
+/* ===================================
+   MD3 CARDS
+   =================================== */
+
+.md3-card {
+    background: var(--md-surface);
+    border-radius: var(--md-shape-large);
+    box-shadow: var(--md-elevation-1);
+    overflow: hidden;
+    transition: box-shadow var(--md-motion-duration-medium) var(--md-motion-easing-standard),
+                transform var(--md-motion-duration-medium) var(--md-motion-easing-standard);
+}
+
+.md3-card:hover {
+    box-shadow: var(--md-elevation-2);
+}
+
+.md3-card-elevated {
+    background: var(--md-surface-container-low);
+    box-shadow: var(--md-elevation-2);
+}
+
+.md3-card-elevated:hover {
+    box-shadow: var(--md-elevation-3);
+    transform: translateY(-2px);
+}
+
+.md3-card-filled {
+    background: var(--md-surface-container);
+    box-shadow: none;
+}
+
+.md3-card-outlined {
+    background: var(--md-surface);
+    box-shadow: none;
+    border: 1px solid var(--md-outline-variant);
+}
+
+.md3-card-header {
+    padding: var(--md-spacing-5) var(--md-spacing-6);
+    border-bottom: 1px solid var(--md-outline-variant);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--md-spacing-4);
+}
+
+.md3-card-title {
+    font-size: 18px;
+    font-weight: 600;
+    color: var(--md-text-primary);
+    margin: 0;
+    display: flex;
+    align-items: center;
+    gap: var(--md-spacing-3);
+}
+
+.md3-card-body {
+    padding: var(--md-spacing-6);
+}
+
+.md3-card-footer {
+    padding: var(--md-spacing-4) var(--md-spacing-6);
+    background: var(--md-surface-container-low);
+    border-top: 1px solid var(--md-outline-variant);
+}
+
+/* ===================================
+   MD3 STAT CARDS
+   =================================== */
+
+.md3-stats-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+    gap: var(--md-spacing-5);
+    margin-bottom: var(--md-spacing-6);
+}
+
+.md3-stat-card {
+    background: var(--md-surface);
+    border-radius: var(--md-shape-large);
+    padding: var(--md-spacing-5);
+    display: flex;
+    align-items: flex-start;
+    gap: var(--md-spacing-4);
+    box-shadow: var(--md-elevation-1);
+    transition: all var(--md-motion-duration-medium) var(--md-motion-easing-standard);
+    position: relative;
+    overflow: hidden;
+}
+
+.md3-stat-card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 4px;
+    height: 100%;
+    border-radius: var(--md-shape-full);
+}
+
+.md3-stat-card:hover {
+    box-shadow: var(--md-elevation-3);
+    transform: translateY(-4px);
+}
+
+.md3-stat-card.primary::before { background: var(--md-primary); }
+.md3-stat-card.success::before { background: var(--md-success); }
+.md3-stat-card.warning::before { background: var(--md-warning); }
+.md3-stat-card.error::before { background: var(--md-error); }
+.md3-stat-card.info::before { background: var(--md-info); }
+
+.md3-stat-icon {
+    width: 48px;
+    height: 48px;
+    border-radius: var(--md-shape-medium);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 22px;
+    flex-shrink: 0;
+}
+
+.md3-stat-card.primary .md3-stat-icon {
+    background: var(--md-primary-container);
+    color: var(--md-primary-dark);
+}
+
+.md3-stat-card.success .md3-stat-icon {
+    background: var(--md-success-container);
+    color: var(--md-success-dark);
+}
+
+.md3-stat-card.warning .md3-stat-icon {
+    background: var(--md-warning-container);
+    color: var(--md-warning-dark);
+}
+
+.md3-stat-card.error .md3-stat-icon {
+    background: var(--md-error-container);
+    color: var(--md-error-dark);
+}
+
+.md3-stat-card.info .md3-stat-icon {
+    background: var(--md-info-container);
+    color: var(--md-info-dark);
+}
+
+.md3-stat-content {
+    flex: 1;
+    min-width: 0;
+}
+
+.md3-stat-value {
+    font-size: 32px;
+    font-weight: 700;
+    color: var(--md-text-primary);
+    line-height: 1;
+    margin-bottom: var(--md-spacing-1);
+    letter-spacing: -1px;
+}
+
+.md3-stat-label {
+    font-size: 14px;
+    color: var(--md-text-secondary);
+    font-weight: 500;
+}
+
+.md3-stat-trend {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--md-spacing-1);
+    font-size: 12px;
+    font-weight: 600;
+    padding: var(--md-spacing-1) var(--md-spacing-2);
+    border-radius: var(--md-shape-full);
+    margin-top: var(--md-spacing-2);
+}
+
+.md3-stat-trend.positive {
+    background: var(--md-success-container);
+    color: var(--md-success-dark);
+}
+
+.md3-stat-trend.negative {
+    background: var(--md-error-container);
+    color: var(--md-error-dark);
+}
+
+/* ===================================
+   MD3 BUTTONS
+   =================================== */
+
+.md3-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: var(--md-spacing-2);
+    padding: var(--md-spacing-3) var(--md-spacing-6);
+    border: none;
+    border-radius: var(--md-shape-full);
+    font-family: var(--md-font-family);
+    font-size: 14px;
+    font-weight: 500;
+    letter-spacing: 0.1px;
+    cursor: pointer;
+    transition: all var(--md-motion-duration-short) var(--md-motion-easing-standard);
+    text-decoration: none;
+    white-space: nowrap;
+}
+
+.md3-btn:disabled {
+    opacity: 0.38;
+    cursor: not-allowed;
+}
+
+/* Filled Button */
+.md3-btn-filled {
+    background: var(--md-primary);
+    color: var(--md-on-primary);
+    box-shadow: var(--md-elevation-1);
+}
+
+.md3-btn-filled:hover:not(:disabled) {
+    box-shadow: var(--md-elevation-2);
+    background: var(--md-primary-dark);
+}
+
+.md3-btn-filled:active:not(:disabled) {
+    box-shadow: var(--md-elevation-1);
+}
+
+/* Filled Tonal Button */
+.md3-btn-tonal {
+    background: var(--md-primary-container);
+    color: var(--md-on-primary-container);
+}
+
+.md3-btn-tonal:hover:not(:disabled) {
+    background: #bfdbfe;
+}
+
+/* Outlined Button */
+.md3-btn-outlined {
+    background: transparent;
+    color: var(--md-primary);
+    border: 1px solid var(--md-outline);
+}
+
+.md3-btn-outlined:hover:not(:disabled) {
+    background: var(--md-primary-container);
+    border-color: var(--md-primary);
+}
+
+/* Text Button */
+.md3-btn-text {
+    background: transparent;
+    color: var(--md-primary);
+    padding: var(--md-spacing-3) var(--md-spacing-4);
+}
+
+.md3-btn-text:hover:not(:disabled) {
+    background: var(--md-primary-container);
+}
+
+/* Button Sizes */
+.md3-btn-sm {
+    padding: var(--md-spacing-2) var(--md-spacing-4);
+    font-size: 13px;
+}
+
+.md3-btn-lg {
+    padding: var(--md-spacing-4) var(--md-spacing-8);
+    font-size: 15px;
+}
+
+/* Icon Button */
+.md3-btn-icon {
+    width: 40px;
+    height: 40px;
+    padding: 0;
+    border-radius: var(--md-shape-full);
+}
+
+.md3-btn-icon.sm {
+    width: 32px;
+    height: 32px;
+}
+
+.md3-btn-icon.lg {
+    width: 48px;
+    height: 48px;
+}
+
+/* FAB */
+.md3-fab {
+    width: 56px;
+    height: 56px;
+    border-radius: var(--md-shape-large);
+    background: var(--md-primary-container);
+    color: var(--md-on-primary-container);
+    box-shadow: var(--md-elevation-3);
+    border: none;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 24px;
+    transition: all var(--md-motion-duration-medium) var(--md-motion-easing-standard);
+}
+
+.md3-fab:hover {
+    box-shadow: var(--md-elevation-4);
+}
+
+/* Color Variants */
+.md3-btn-success {
+    background: var(--md-success);
+    color: var(--md-on-success);
+}
+
+.md3-btn-success:hover:not(:disabled) {
+    background: var(--md-success-dark);
+}
+
+.md3-btn-warning {
+    background: var(--md-warning);
+    color: var(--md-on-warning);
+}
+
+.md3-btn-warning:hover:not(:disabled) {
+    background: var(--md-warning-dark);
+}
+
+.md3-btn-error {
+    background: var(--md-error);
+    color: var(--md-on-error);
+}
+
+.md3-btn-error:hover:not(:disabled) {
+    background: var(--md-error-dark);
+}
+
+/* ===================================
+   MD3 FORM ELEMENTS
+   =================================== */
+
+.md3-form-group {
+    margin-bottom: var(--md-spacing-5);
+}
+
+.md3-label {
+    display: block;
+    font-size: 14px;
+    font-weight: 500;
+    color: var(--md-text-secondary);
+    margin-bottom: var(--md-spacing-2);
+}
+
+.md3-input,
+.md3-select,
+.md3-textarea {
+    width: 100%;
+    padding: var(--md-spacing-4);
+    font-size: 15px;
+    font-family: var(--md-font-family);
+    color: var(--md-text-primary);
+    background: var(--md-surface);
+    border: 1px solid var(--md-outline);
+    border-radius: var(--md-shape-small);
+    transition: all var(--md-motion-duration-short) var(--md-motion-easing-standard);
+    outline: none;
+}
+
+.md3-input:hover,
+.md3-select:hover,
+.md3-textarea:hover {
+    border-color: var(--md-text-secondary);
+}
+
+.md3-input:focus,
+.md3-select:focus,
+.md3-textarea:focus {
+    border-color: var(--md-primary);
+    box-shadow: 0 0 0 2px var(--md-primary-container);
+}
+
+.md3-input.error,
+.md3-select.error,
+.md3-textarea.error {
+    border-color: var(--md-error);
+}
+
+.md3-input.error:focus,
+.md3-select.error:focus,
+.md3-textarea.error:focus {
+    box-shadow: 0 0 0 2px var(--md-error-container);
+}
+
+.md3-textarea {
+    resize: vertical;
+    min-height: 120px;
+}
+
+.md3-helper-text {
+    font-size: 12px;
+    color: var(--md-text-tertiary);
+    margin-top: var(--md-spacing-1);
+}
+
+.md3-error-text {
+    font-size: 12px;
+    color: var(--md-error);
+    margin-top: var(--md-spacing-1);
+    display: flex;
+    align-items: center;
+    gap: var(--md-spacing-1);
+}
+
+/* ===================================
+   MD3 DATA TABLE
+   =================================== */
+
+.md3-table-container {
+    background: var(--md-surface);
+    border-radius: var(--md-shape-large);
+    box-shadow: var(--md-elevation-1);
+    overflow: hidden;
+}
+
+.md3-table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+.md3-table thead {
+    background: var(--md-surface-container);
+}
+
+.md3-table th {
+    padding: var(--md-spacing-4) var(--md-spacing-5);
+    text-align: left;
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--md-text-secondary);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    border-bottom: 1px solid var(--md-outline-variant);
+}
+
+.md3-table td {
+    padding: var(--md-spacing-4) var(--md-spacing-5);
+    font-size: 14px;
+    color: var(--md-text-primary);
+    border-bottom: 1px solid var(--md-outline-variant);
+}
+
+.md3-table tbody tr {
+    transition: background var(--md-motion-duration-short) var(--md-motion-easing-standard);
+}
+
+.md3-table tbody tr:hover {
+    background: var(--md-surface-container-low);
+}
+
+.md3-table tbody tr:last-child td {
+    border-bottom: none;
+}
+
+/* ===================================
+   MD3 CHIPS/BADGES
+   =================================== */
+
+.md3-chip {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--md-spacing-1);
+    padding: var(--md-spacing-1) var(--md-spacing-3);
+    border-radius: var(--md-shape-small);
+    font-size: 12px;
+    font-weight: 500;
+    line-height: 1.4;
+}
+
+.md3-chip-filled {
+    background: var(--md-surface-container-high);
+    color: var(--md-text-primary);
+}
+
+.md3-chip-primary {
+    background: var(--md-primary-container);
+    color: var(--md-on-primary-container);
+}
+
+.md3-chip-success {
+    background: var(--md-success-container);
+    color: var(--md-success-dark);
+}
+
+.md3-chip-warning {
+    background: var(--md-warning-container);
+    color: var(--md-warning-dark);
+}
+
+.md3-chip-error {
+    background: var(--md-error-container);
+    color: var(--md-error-dark);
+}
+
+.md3-chip-info {
+    background: var(--md-info-container);
+    color: var(--md-info-dark);
+}
+
+/* ===================================
+   MD3 SEARCH BAR
+   =================================== */
+
+.md3-search {
+    display: flex;
+    align-items: center;
+    background: var(--md-surface-container);
+    border-radius: var(--md-shape-full);
+    padding: var(--md-spacing-2) var(--md-spacing-4);
+    gap: var(--md-spacing-3);
+    transition: all var(--md-motion-duration-short) var(--md-motion-easing-standard);
+}
+
+.md3-search:focus-within {
+    background: var(--md-surface);
+    box-shadow: var(--md-elevation-2);
+}
+
+.md3-search-icon {
+    color: var(--md-text-tertiary);
+    font-size: 20px;
+}
+
+.md3-search-input {
+    flex: 1;
+    border: none;
+    background: transparent;
+    font-size: 14px;
+    color: var(--md-text-primary);
+    outline: none;
+    font-family: var(--md-font-family);
+}
+
+.md3-search-input::placeholder {
+    color: var(--md-text-tertiary);
+}
+
+/* ===================================
+   MD3 NAVIGATION RAIL (SIDEBAR)
+   =================================== */
+
+.md3-nav-rail {
+    position: fixed;
+    left: 0;
+    top: 0;
+    bottom: 0;
+    width: 280px;
+    background: var(--md-surface);
+    border-right: 1px solid var(--md-outline-variant);
+    display: flex;
+    flex-direction: column;
+    z-index: 1030;
+    transition: transform var(--md-motion-duration-medium) var(--md-motion-easing-standard);
+}
+
+.md3-nav-header {
+    padding: var(--md-spacing-5) var(--md-spacing-5);
+    border-bottom: 1px solid var(--md-outline-variant);
+    display: flex;
+    align-items: center;
+    gap: var(--md-spacing-3);
+}
+
+.md3-nav-logo {
+    width: 40px;
+    height: 40px;
+    background: var(--md-primary);
+    border-radius: var(--md-shape-medium);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    font-weight: 700;
+    font-size: 16px;
+}
+
+.md3-nav-title {
+    font-size: 18px;
+    font-weight: 600;
+    color: var(--md-text-primary);
+}
+
+.md3-nav-title span {
+    color: var(--md-primary);
+}
+
+.md3-nav-content {
+    flex: 1;
+    overflow-y: auto;
+    padding: var(--md-spacing-3);
+}
+
+.md3-nav-section {
+    margin-bottom: var(--md-spacing-2);
+}
+
+.md3-nav-section-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: var(--md-spacing-3) var(--md-spacing-4);
+    cursor: pointer;
+    border-radius: var(--md-shape-medium);
+    transition: background var(--md-motion-duration-short) var(--md-motion-easing-standard);
+}
+
+.md3-nav-section-header:hover {
+    background: var(--md-surface-container);
+}
+
+.md3-nav-section-title {
+    font-size: 11px;
+    font-weight: 600;
+    color: var(--md-text-tertiary);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    display: flex;
+    align-items: center;
+    gap: var(--md-spacing-2);
+}
+
+.md3-nav-item {
+    margin-bottom: 2px;
+}
+
+.md3-nav-item a {
+    display: flex;
+    align-items: center;
+    gap: var(--md-spacing-3);
+    padding: var(--md-spacing-3) var(--md-spacing-4);
+    color: var(--md-text-secondary);
+    text-decoration: none;
+    border-radius: var(--md-shape-full);
+    font-size: 14px;
+    font-weight: 500;
+    transition: all var(--md-motion-duration-short) var(--md-motion-easing-standard);
+    position: relative;
+}
+
+.md3-nav-item a:hover {
+    background: var(--md-surface-container);
+    color: var(--md-text-primary);
+}
+
+.md3-nav-item a.active {
+    background: var(--md-primary-container);
+    color: var(--md-on-primary-container);
+}
+
+.md3-nav-item a.active::before {
+    content: '';
+    position: absolute;
+    left: 0;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 4px;
+    height: 24px;
+    background: var(--md-primary);
+    border-radius: 0 var(--md-shape-full) var(--md-shape-full) 0;
+}
+
+.md3-nav-icon {
+    width: 24px;
+    height: 24px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 18px;
+}
+
+.md3-nav-footer {
+    padding: var(--md-spacing-4);
+    border-top: 1px solid var(--md-outline-variant);
+}
+
+.md3-nav-user {
+    display: flex;
+    align-items: center;
+    gap: var(--md-spacing-3);
+    padding: var(--md-spacing-3);
+    background: var(--md-surface-container);
+    border-radius: var(--md-shape-medium);
+}
+
+.md3-nav-avatar {
+    width: 36px;
+    height: 36px;
+    background: var(--md-primary);
+    border-radius: var(--md-shape-full);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    font-size: 14px;
+}
+
+.md3-nav-user-info {
+    flex: 1;
+    min-width: 0;
+}
+
+.md3-nav-user-name {
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--md-text-primary);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.md3-nav-user-role {
+    font-size: 12px;
+    color: var(--md-text-tertiary);
+}
+
+/* ===================================
+   MD3 TOP APP BAR
+   =================================== */
+
+.md3-app-bar {
+    background: var(--md-surface);
+    padding: var(--md-spacing-3) var(--md-spacing-5);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--md-spacing-4);
+    border-bottom: 1px solid var(--md-outline-variant);
+    position: sticky;
+    top: 0;
+    z-index: 100;
+}
+
+.md3-app-bar-start {
+    display: flex;
+    align-items: center;
+    gap: var(--md-spacing-4);
+}
+
+.md3-app-bar-end {
+    display: flex;
+    align-items: center;
+    gap: var(--md-spacing-2);
+}
+
+.md3-menu-toggle {
+    width: 40px;
+    height: 40px;
+    border: none;
+    background: transparent;
+    border-radius: var(--md-shape-full);
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--md-text-secondary);
+    transition: background var(--md-motion-duration-short) var(--md-motion-easing-standard);
+}
+
+.md3-menu-toggle:hover {
+    background: var(--md-surface-container);
+}
+
+/* ===================================
+   MD3 DIALOGS/MODALS
+   =================================== */
+
+.md3-dialog-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.32);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 1050;
+    animation: fadeIn var(--md-motion-duration-medium) var(--md-motion-easing-decelerate);
+}
+
+.md3-dialog {
+    background: var(--md-surface);
+    border-radius: var(--md-shape-extra-large);
+    box-shadow: var(--md-elevation-5);
+    max-width: 560px;
+    width: 90%;
+    max-height: 85vh;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    animation: scaleIn var(--md-motion-duration-medium) var(--md-motion-easing-decelerate);
+}
+
+.md3-dialog-header {
+    padding: var(--md-spacing-6);
+    padding-bottom: var(--md-spacing-4);
+}
+
+.md3-dialog-title {
+    font-size: 24px;
+    font-weight: 600;
+    color: var(--md-text-primary);
+    margin: 0;
+}
+
+.md3-dialog-content {
+    padding: 0 var(--md-spacing-6);
+    overflow-y: auto;
+    flex: 1;
+}
+
+.md3-dialog-actions {
+    padding: var(--md-spacing-6);
+    padding-top: var(--md-spacing-4);
+    display: flex;
+    justify-content: flex-end;
+    gap: var(--md-spacing-2);
+}
+
+/* ===================================
+   MD3 SNACKBAR/TOAST
+   =================================== */
+
+.md3-snackbar {
+    position: fixed;
+    bottom: var(--md-spacing-6);
+    left: 50%;
+    transform: translateX(-50%);
+    background: var(--md-on-surface);
+    color: var(--md-surface);
+    padding: var(--md-spacing-4) var(--md-spacing-6);
+    border-radius: var(--md-shape-small);
+    box-shadow: var(--md-elevation-3);
+    display: flex;
+    align-items: center;
+    gap: var(--md-spacing-4);
+    font-size: 14px;
+    z-index: 1100;
+    animation: slideUp var(--md-motion-duration-medium) var(--md-motion-easing-decelerate);
+}
+
+/* ===================================
+   LOADING STATES
+   =================================== */
+
+.md3-skeleton {
+    background: linear-gradient(
+        90deg,
+        var(--md-surface-container) 0%,
+        var(--md-surface-container-high) 50%,
+        var(--md-surface-container) 100%
+    );
+    background-size: 200% 100%;
+    animation: shimmer 1.5s infinite;
+    border-radius: var(--md-shape-small);
+}
+
+.md3-spinner {
+    width: 48px;
+    height: 48px;
+    border: 4px solid var(--md-surface-container-high);
+    border-top-color: var(--md-primary);
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+}
+
+.md3-spinner-sm {
+    width: 24px;
+    height: 24px;
+    border-width: 2px;
+}
+
+.md3-loading-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: var(--md-spacing-12);
+    gap: var(--md-spacing-4);
+}
+
+.md3-loading-text {
+    color: var(--md-text-tertiary);
+    font-size: 14px;
+}
+
+/* ===================================
+   EMPTY STATES
+   =================================== */
+
+.md3-empty-state {
+    text-align: center;
+    padding: var(--md-spacing-12) var(--md-spacing-6);
+}
+
+.md3-empty-icon {
+    width: 80px;
+    height: 80px;
+    background: var(--md-surface-container);
+    border-radius: var(--md-shape-full);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto var(--md-spacing-5);
+    font-size: 32px;
+    color: var(--md-text-tertiary);
+}
+
+.md3-empty-title {
+    font-size: 18px;
+    font-weight: 600;
+    color: var(--md-text-primary);
+    margin-bottom: var(--md-spacing-2);
+}
+
+.md3-empty-text {
+    font-size: 14px;
+    color: var(--md-text-tertiary);
+    max-width: 360px;
+    margin: 0 auto var(--md-spacing-5);
+}
+
+/* ===================================
+   ANIMATIONS
+   =================================== */
+
+@keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+}
+
+@keyframes slideUp {
+    from {
+        opacity: 0;
+        transform: translateX(-50%) translateY(20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateX(-50%) translateY(0);
+    }
+}
+
+@keyframes scaleIn {
+    from {
+        opacity: 0;
+        transform: scale(0.92);
+    }
+    to {
+        opacity: 1;
+        transform: scale(1);
+    }
+}
+
+@keyframes spin {
+    from { transform: rotate(0deg); }
+    to { transform: rotate(360deg); }
+}
+
+@keyframes shimmer {
+    0% { background-position: -200% 0; }
+    100% { background-position: 200% 0; }
+}
+
+@keyframes pulse {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.5; }
+}
+
+/* ===================================
+   UTILITY CLASSES
+   =================================== */
+
+.md3-text-primary { color: var(--md-text-primary); }
+.md3-text-secondary { color: var(--md-text-secondary); }
+.md3-text-tertiary { color: var(--md-text-tertiary); }
+.md3-text-error { color: var(--md-error); }
+.md3-text-success { color: var(--md-success); }
+
+.md3-bg-surface { background: var(--md-surface); }
+.md3-bg-container { background: var(--md-surface-container); }
+
+.md3-rounded-sm { border-radius: var(--md-shape-small); }
+.md3-rounded-md { border-radius: var(--md-shape-medium); }
+.md3-rounded-lg { border-radius: var(--md-shape-large); }
+.md3-rounded-xl { border-radius: var(--md-shape-extra-large); }
+.md3-rounded-full { border-radius: var(--md-shape-full); }
+
+.md3-shadow-1 { box-shadow: var(--md-elevation-1); }
+.md3-shadow-2 { box-shadow: var(--md-elevation-2); }
+.md3-shadow-3 { box-shadow: var(--md-elevation-3); }
+
+/* ===================================
+   RESPONSIVE ADJUSTMENTS
+   =================================== */
+
+@media (max-width: 768px) {
+    .md3-page-header {
+        padding: var(--md-spacing-6) var(--md-spacing-4);
+    }
+
+    .md3-page-title {
+        font-size: 22px;
+    }
+
+    .md3-stats-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .md3-nav-rail {
+        transform: translateX(-100%);
+    }
+
+    .md3-nav-rail.open {
+        transform: translateX(0);
+    }
+
+    .content-wrapper {
+        margin-left: 0 !important;
+    }
+}
+
+@media (min-width: 769px) {
+    .content-wrapper {
+        margin-left: 280px !important;
+    }
+}
+
+/* ===================================
+   LEGACY COMPATIBILITY
+   =================================== */
+
+/* Map old classes to new design */
+.modern-card { @extend .md3-card; }
+.stat-card { @extend .md3-stat-card; }
+.btn-modern { @extend .md3-btn; }
+.btn-primary-modern { @extend .md3-btn-filled; }
+
+/* Keep old gradients working but with new colors */
+.stat-card-primary::before,
+.stat-card-success::before,
+.stat-card-warning::before,
+.stat-card-danger::before {
+    background: var(--md-primary);
+}
+
+.stat-card-success::before { background: var(--md-success); }
+.stat-card-warning::before { background: var(--md-warning); }
+.stat-card-danger::before { background: var(--md-error); }
+
+/* Legacy page header */
+.modern-page-header {
+    background: linear-gradient(135deg, var(--md-primary) 0%, var(--md-primary-dark) 100%);
+    box-shadow: var(--md-elevation-3);
+}
+
+/* Legacy buttons */
+.btn-primary-modern {
+    background: var(--md-primary);
+    box-shadow: var(--md-elevation-1);
+}
+
+.btn-primary-modern:hover:not(:disabled) {
+    background: var(--md-primary-dark);
+    box-shadow: var(--md-elevation-2);
+}
+
+/* Legacy form focus */
+.form-input-modern:focus,
+.form-select-modern:focus,
+.form-textarea-modern:focus {
+    border-color: var(--md-primary);
+    box-shadow: 0 0 0 3px var(--md-primary-container);
+}

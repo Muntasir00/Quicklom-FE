@@ -1,0 +1,39 @@
+/* Agreement Template Router Styles */
+
+.agreement-wrapper {
+    padding: 20px;
+    background: #ffffff;
+    border-radius: 8px;
+}
+
+.agreement-type-header {
+    padding-bottom: 15px;
+    border-bottom: 2px solid #e9ecef;
+}
+
+.agreement-type-badge {
+    font-size: 14px;
+    padding: 8px 16px;
+    border-radius: 6px;
+    font-weight: 600;
+    letter-spacing: 0.5px;
+}
+
+.agreement-type-badge.bg-success {
+    background-color: #28a745 !important;
+}
+
+.agreement-type-badge.bg-primary {
+    background-color: #007bff !important;
+}
+
+.agreement-type-badge.bg-warning {
+    background-color: #ffc107 !important;
+    color: #212529 !important;
+}
+
+@media print {
+    .agreement-type-header {
+        display: none;
+    }
+}

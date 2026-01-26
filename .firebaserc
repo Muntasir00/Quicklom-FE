@@ -1,0 +1,7 @@
+{
+  "projects": {
+    "default": "quicklocum-dev-app",
+    "dev": "quicklocum-dev-app",
+    "prod": "quicklocum-prod"
+  }
+}

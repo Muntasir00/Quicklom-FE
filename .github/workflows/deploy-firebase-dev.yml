@@ -1,0 +1,72 @@
+name: Deploy to Development (Firebase Hosting)
+
+on:
+  push:
+    branches:
+      - dev
+      - hamza-dev
+  workflow_dispatch:  # Allows manual trigger
+
+env:
+  NODE_VERSION: '20'
+
+jobs:
+  build-and-deploy-dev:
+    name: Build and Deploy to Development
+    runs-on: ubuntu-latest
+    environment:
+      name: development
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Build application (Development)
+        env:
+          VITE_API_BASE_URL: ${{ secrets.VITE_API_BASE_URL_DEV }}
+          VITE_STRIPE_PUBLIC_KEY: ${{ secrets.VITE_STRIPE_PUBLIC_KEY_TEST }}
+          VITE_ENV: development
+        run: |
+          echo "🔨 Building application for DEVELOPMENT..."
+          echo "📝 API Base URL is set: ${VITE_API_BASE_URL:+YES}"
+          echo "📝 API Base URL length: ${#VITE_API_BASE_URL}"
+          npm run build
+          echo "✅ Development build completed"
+          ls -la dist/
+          echo ""
+          echo "🔍 Checking built files for API URLs..."
+          if grep -r "quicklocum-backend-dev" dist/assets/*.js 2>/dev/null | head -1; then
+            echo "✅ Backend URL found in built files"
+          else
+            echo "❌ Backend URL NOT found in built files"
+          fi
+          if grep -r "localhost:8000" dist/assets/*.js 2>/dev/null | head -1; then
+            echo "⚠️  WARNING: localhost found in built files!"
+          else
+            echo "✅ No localhost in built files"
+          fi
+
+      - name: Deploy to Firebase Hosting (Live Channel)
+        id: firebase-deploy
+        uses: FirebaseExtended/action-hosting-deploy@v0
+        with:
+          repoToken: ${{ secrets.GITHUB_TOKEN }}
+          firebaseServiceAccount: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_DEV }}
+          channelId: live
+          projectId: quicklocum-dev-app
+
+      - name: Deployment Summary
+        run: |
+          echo "✅ DEVELOPMENT deployment successful!"
+          echo "🌐 Live site: https://dev.quicklocum.ca"
+          echo "📝 Firebase Console: https://console.firebase.google.com/project/quicklocum-dev-app/hosting"
+          echo "⚠️  This is a development deployment - uses test Stripe keys"

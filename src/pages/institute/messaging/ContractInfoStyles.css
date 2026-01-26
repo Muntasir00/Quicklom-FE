@@ -1,0 +1,121 @@
+/* ========================================
+   Contract Information Display Styles
+   ======================================== */
+
+/* Contract count badge next to contact name */
+.contract-count-badge {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    background: #007bff;
+    color: white;
+    border-radius: 10px;
+    padding: 1px 6px;
+    font-size: 9px;
+    font-weight: 600;
+    margin-left: 4px;
+    vertical-align: middle;
+}
+
+/* Contract info row in contact item (sidebar) */
+.contact-contract-info {
+    display: flex;
+    align-items: center;
+    margin-bottom: 4px;
+    padding-left: 2px;
+}
+
+.contact-contract-info .contract-name {
+    font-size: 11px;
+    color: #6c757d;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    max-width: 200px;
+}
+
+/* Contract pills in chat header */
+.contract-pills-wrapper {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+    margin-top: 8px;
+}
+
+.contract-pill {
+    display: inline-flex;
+    align-items: center;
+    background: rgba(255, 255, 255, 0.2);
+    color: white;
+    padding: 4px 10px;
+    border-radius: 12px;
+    font-size: 11px;
+    font-weight: 500;
+    white-space: nowrap;
+    border: none; /* Remove default button border */
+}
+
+.contract-pill i {
+    font-size: 9px;
+    margin-right: 5px;
+}
+
+/* ========================================
+   Clickable Contract Elements
+   ======================================== */
+
+.clickable {
+    cursor: pointer !important;
+    transition: all 0.2s ease;
+}
+
+/* Clickable contract pills in chat header */
+.contract-pill.clickable {
+    background: rgba(255, 255, 255, 0.25);
+    border: 1px solid rgba(255, 255, 255, 0.3);
+}
+
+.contract-pill.clickable:hover {
+    background: rgba(255, 255, 255, 0.4);
+    transform: translateY(-1px);
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.contract-pill.clickable:active {
+    transform: translateY(0);
+}
+
+.contract-pill.clickable:focus {
+    outline: none;
+    box-shadow: 0 0 0 2px rgba(255, 255, 255, 0.5);
+}
+
+/* Clickable contract info in sidebar */
+.contact-contract-info.clickable {
+    cursor: pointer;
+    padding: 2px 4px;
+    margin-left: -4px;
+    border-radius: 4px;
+    transition: all 0.2s ease;
+}
+
+.contact-contract-info.clickable:hover {
+    background: rgba(0, 123, 255, 0.1);
+}
+
+.contact-contract-info.clickable:hover .contract-name {
+    color: #007bff !important;
+    text-decoration: underline;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    .contact-contract-info .contract-name {
+        max-width: 150px;
+    }
+
+    .contract-pill {
+        font-size: 10px;
+        padding: 3px 8px;
+    }
+}
