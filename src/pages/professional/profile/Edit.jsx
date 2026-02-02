@@ -12,7 +12,7 @@ const Edit = () => {
     } = useEditProfile();
 
     return (
-        <div className="content-wrapper">
+        <div className="">
             <section className="content-header">
                 <div className="container-fluid">
                     <div className="row mb-2">

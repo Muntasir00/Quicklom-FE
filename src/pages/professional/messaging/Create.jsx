@@ -69,7 +69,7 @@ const Create = () => {
     };
 
     return (
-        <div className="content-wrapper messaging-page-wrapper">
+        <div className=" messaging-page-wrapper">
             <div className="messaging-container-fullpage">
                 <div className="messaging-layout">
                     {/* Left Sidebar - Contacts */}

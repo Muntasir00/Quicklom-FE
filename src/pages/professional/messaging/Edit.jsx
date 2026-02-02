@@ -27,7 +27,7 @@ const Edit = () => {
     } = useUpdateMessaging();
 
     return (
-        <div className="content-wrapper">
+        <div className="">
             <ContentHeader 
                 menu={menu} 
                 action={action}

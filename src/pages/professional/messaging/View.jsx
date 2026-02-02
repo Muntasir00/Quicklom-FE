@@ -86,7 +86,7 @@ const View = () => {
     };
 
     return (
-        <div className="content-wrapper pro-msg-page">
+        <div className=" ">
             <style>{`
                 /* Professional Messaging Page Layout */
                 .pro-msg-page {

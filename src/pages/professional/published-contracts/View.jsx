@@ -1,8 +1,21 @@
-import React, { useState } from "react";
-import { Link } from "react-router-dom";
-import { useViewPublishedContracts } from "@hooks/professional/published-contracts/useViewPublishedContracts";
+import {useEffect, useMemo, useState} from "react";
+import {
+    SlidersHorizontal,
+    LayoutGrid,
+    List,
+    ChevronLeft,
+    ChevronRight,
+    ChevronUp,
+    FilterX,
+    Briefcase, ArrowRight, Search, Inbox
+} from "lucide-react";
+import {useViewPublishedContracts} from "@hooks/professional/published-contracts/useViewPublishedContracts";
 import Filter from "@components/forms/UserContractFilterForm";
-import "./FindJobsStyles.css";
+// import "./FindJobsStyles.css";
+import MetricsGrid from "@pages/professional/published-contracts/metrics-grid.jsx";
+import {JobCard} from "@pages/professional/published-contracts/job-card.jsx";
+import JobListView from "@pages/professional/published-contracts/job-list-view.jsx";
+import {Link} from "react-router-dom";
 
 const View = () => {
     const {
@@ -22,11 +35,16 @@ const View = () => {
     const [showFilters, setShowFilters] = useState(false);
     const [appliedFiltersCount, setAppliedFiltersCount] = useState(0);
     const [viewMode, setViewMode] = useState("cards"); // cards or list
-    const rowsPerPage = 12;
-    const totalPages = Math.ceil(rows.length / rowsPerPage);
-    const startIdx = (currentPage - 1) * rowsPerPage;
-    const endIdx = startIdx + rowsPerPage;
-    const currentRows = rows.slice(startIdx, endIdx);
+    const [itemsPerPage, setItemsPerPage] = useState(10);
+    // const rowsPerPage = 12;
+    const totalPages = Math.ceil(rows.length / itemsPerPage);
+    const startIdx = (currentPage - 1) * itemsPerPage;
+    const endIdx = startIdx + itemsPerPage;
+    // const currentRows = rows.slice(startIdx, endIdx);
+    const currentRows = useMemo(() => {
+        const start = (currentPage - 1) * itemsPerPage;
+        return rows.slice(start, start + itemsPerPage);
+    }, [rows, currentPage, itemsPerPage]);
 
     const totalJobs = rows.length;
     const activeJobs = rows.filter(r => r.status?.toLowerCase() === 'open').length;
@@ -54,12 +72,12 @@ const View = () => {
 
     const getStatusColor = (status) => {
         const colors = {
-            open: { bg: "#ecfdf5", color: "#059669", border: "#a7f3d0" },
-            pending: { bg: "#fffbeb", color: "#d97706", border: "#fde68a" },
-            cancelled: { bg: "#fef2f2", color: "#dc2626", border: "#fecaca" },
-            in_discussion: { bg: "#f3f4f6", color: "#6b7280", border: "#d1d5db" },
-            booked: { bg: "#eff6ff", color: "#2563eb", border: "#bfdbfe" },
-            closed: { bg: "#f3f4f6", color: "#6b7280", border: "#d1d5db" }
+            open: {bg: "#ecfdf5", color: "#059669", border: "#a7f3d0"},
+            pending: {bg: "#fffbeb", color: "#d97706", border: "#fde68a"},
+            cancelled: {bg: "#fef2f2", color: "#dc2626", border: "#fecaca"},
+            in_discussion: {bg: "#f3f4f6", color: "#6b7280", border: "#d1d5db"},
+            booked: {bg: "#eff6ff", color: "#2563eb", border: "#bfdbfe"},
+            closed: {bg: "#f3f4f6", color: "#6b7280", border: "#d1d5db"}
         };
         return colors[status?.toLowerCase()] || colors.closed;
     };
@@ -171,89 +189,92 @@ const View = () => {
         return `${Math.ceil(diffDays / 30)} month${Math.ceil(diffDays / 30) !== 1 ? 's' : ''}`;
     };
 
+    const statsConfig = [
+        {label: "Total Jobs", value: totalJobs},
+        {label: "Open Now", value: activeJobs}, // অথবা আপনার ওপেন কন্টাক্ট লজিক
+        {label: "Applied", value: rows.filter(r => r.user_application?.has_applied).length}, // অথবা এপ্লাইড লজিক
+    ];
+
+    useEffect(() => {
+        setCurrentPage(1);
+    }, [itemsPerPage, rows.length]);
+
     return (
-        <div className="content-wrapper find-jobs-page">
-            {/* Header */}
-            <div className="find-jobs-header">
-                <div className="header-content">
-                    <div className="header-left">
-                        <div className="header-icon">
-                            <i className="fas fa-search"></i>
-                        </div>
-                        <div className="header-text">
-                            <h1>Find Jobs</h1>
-                            <p>{totalJobs} available opportunities</p>
-                        </div>
-                    </div>
-                    <div className="header-actions">
-                        <Link to={`/${sessionUserRole}/contract-applications`} className="my-apps-btn">
-                            <i className="fas fa-paper-plane"></i>
-                            My Applications
-                        </Link>
-                    </div>
-                </div>
+        <div className="">
 
-                {/* Stats */}
-                <div className="stats-row">
-                    <div className="stat-card blue">
-                        <i className="fas fa-briefcase"></i>
-                        <div className="stat-info">
-                            <span className="stat-value">{totalJobs}</span>
-                            <span className="stat-label">Total Jobs</span>
-                        </div>
-                    </div>
-                    <div className="stat-card green">
-                        <i className="fas fa-door-open"></i>
-                        <div className="stat-info">
-                            <span className="stat-value">{activeJobs}</span>
-                            <span className="stat-label">Open Now</span>
-                        </div>
-                    </div>
-                    <div className="stat-card purple">
-                        <i className="fas fa-check-circle"></i>
-                        <div className="stat-info">
-                            <span className="stat-value">{rows.filter(r => r.user_application?.has_applied).length}</span>
-                            <span className="stat-label">Applied</span>
-                        </div>
-                    </div>
-                </div>
-            </div>
+            <MetricsGrid stats={statsConfig} isLoading={false}/>
 
-            {/* Toolbar */}
-            <div className="jobs-toolbar">
-                <div className="toolbar-left">
+            <div className="flex flex-col sm:flex-row items-center justify-between gap-4 py-4 bg-transparent mb-2">
+
+                {/* Left Side: Filter Toggle */}
+                <div className="flex items-center gap-3 w-full sm:w-auto">
                     <button
-                        className={`filter-toggle-btn ${showFilters ? 'active' : ''} ${appliedFiltersCount > 0 ? 'has-filters' : ''}`}
                         onClick={() => setShowFilters(!showFilters)}
+                        className={`
+                    relative flex items-center justify-center gap-2.5 px-5 py-2.5 rounded-xl w-full text-sm font-semibold transition-all duration-300 border cursor-pointer
+                    ${showFilters || appliedFiltersCount > 0
+                            ? 'bg-blue-50 border-blue-200 text-blue-700 shadow-sm'
+                            : 'bg-white border-slate-200 text-slate-600 hover:bg-slate-50 hover:border-slate-300'
+                        }
+                `}
                     >
-                        <i className="fas fa-filter"></i>
-                        {showFilters ? 'Hide Filters' : 'Filters'}
-                        {appliedFiltersCount > 0 && <span className="filter-count">{appliedFiltersCount}</span>}
+                        {appliedFiltersCount > 0 && !showFilters ? (
+                            <SlidersHorizontal className="w-4 h-4 animate-pulse"/>
+                        ) : (
+                            <SlidersHorizontal className="w-4 h-4"/>
+                        )}
+
+                        <span>{showFilters ? 'Hide Filters' : 'Filters'}</span>
+
+                        {/* Applied Filters Count Badge */}
+                        {appliedFiltersCount > 0 && (
+                            <span
+                                className="flex items-center justify-center bg-blue-600 text-white text-[10px] font-bold w-5 h-5 rounded-full shadow-lg shadow-blue-200 ml-1">
+                        {appliedFiltersCount}
+                    </span>
+                        )}
                     </button>
                 </div>
-                <div className="toolbar-right">
-                    <div className="view-toggle">
-                        <button
-                            className={`view-btn ${viewMode === 'cards' ? 'active' : ''}`}
-                            onClick={() => setViewMode('cards')}
-                            title="Card View"
-                        >
-                            <i className="fas fa-th-large"></i>
-                        </button>
-                        <button
-                            className={`view-btn ${viewMode === 'list' ? 'active' : ''}`}
-                            onClick={() => setViewMode('list')}
-                            title="List View"
-                        >
-                            <i className="fas fa-list"></i>
-                        </button>
-                    </div>
+
+                {/* Right Side: View Mode Toggle */}
+                <div
+                    className="flex items-center gap-1 bg-slate-100/80 p-1.5 rounded-xl border border-slate-200/50 w-full sm:w-auto justify-center sm:justify-start">
+                    <button
+                        onClick={() => setViewMode('cards')}
+                        className={`
+                    flex items-center gap-2 px-4 py-2 !rounded-md text-sm font-bold transition-all duration-300 cursor-pointer
+                    ${viewMode === 'cards'
+                            ? 'bg-white text-blue-600 shadow-sm ring-1 ring-slate-200/50'
+                            : 'text-slate-500 hover:text-slate-700 hover:bg-white/50'
+                        }
+                `}
+                        title="Card View"
+                    >
+                        <LayoutGrid className="w-4 h-4"/>
+                        <span className="hidden md:inline">Grid</span>
+                    </button>
+
+                    <button
+                        onClick={() => setViewMode('list')}
+                        className={`
+                    flex items-center gap-2 px-4 py-2 !rounded-md text-sm font-bold transition-all duration-300 cursor-pointer
+                    ${viewMode === 'list'
+                            ? 'bg-white text-blue-600 shadow-sm ring-1 ring-slate-200/50'
+                            : 'text-slate-500 hover:text-slate-700 hover:bg-white/50'
+                        }
+                `}
+                        title="List View"
+                    >
+                        <List className="w-4 h-4"/>
+                        <span className="hidden md:inline">List</span>
+                    </button>
                 </div>
             </div>
+
 
             {/* Filters */}
             {showFilters && (
-                <div className="filters-section">
+                <div className="">
                     <Filter
                         setContracts={setContracts}
                         useFilterHook={useFilterHook}
@@ -262,262 +283,142 @@ const View = () => {
                 </div>
             )}
 
-            {/* Jobs Content */}
-            <div className="jobs-content">
+            <div className="mt-6">
                 {rows.length === 0 ? (
-                    <div className="empty-state">
-                        <div className="empty-icon">
-                            <i className="fas fa-search"></i>
+                    <div className="w-full flex flex-col items-center justify-center py-24 px-6 text-center bg-white border-2 border-dashed border-slate-200 rounded-[32px] transition-all duration-500">
+
+                        {/* আইকন সেকশন - গ্লাস-মর্ফিজম স্টাইল */}
+                        <div className="relative mb-4">
+                            <div className="w-24 h-24 bg-slate-50 rounded-full flex items-center justify-center">
+                                {appliedFiltersCount > 0 ? (
+                                    <Search className="w-10 h-10 text-blue-400" />
+                                ) : (
+                                    <Inbox className="w-10 h-10 text-slate-300" />
+                                )}
+                            </div>
+                            {/* ডেকোরেটিভ ছোট সার্কেল */}
+                            <div className="absolute -top-1 -right-1 w-4 h-4 bg-blue-100 rounded-full border-4 border-white animate-bounce"></div>
                         </div>
-                        <h3>No jobs found</h3>
-                        <p>Try adjusting your filters or check back later for new opportunities</p>
+
+                        {/* টেক্সট কন্টেন্ট */}
+                        <div className="max-w-sm">
+                            <h3 className="text-xl md:text-2xl font-bold text-slate-800 mb-3">
+                                {appliedFiltersCount > 0 ? "No matches found" : "No jobs available right now"}
+                            </h3>
+                            <p className="text-slate-500 text-sm md:text-base leading-relaxed mb-10">
+                                {appliedFiltersCount > 0
+                                    ? `We couldn't find any jobs matching your current filters. Try adjusting your search or clearing the filters.`
+                                    : "There are currently no open contracts in this category. Please check back later or explore other categories."
+                                }
+                            </p>
+                        </div>
                     </div>
                 ) : viewMode === 'cards' ? (
-                    <div className="jobs-grid">
-                        {currentRows.map((job) => {
-                            const hasApplied = job.user_application?.has_applied;
-                            const statusStyle = getStatusColor(job.status);
-                            const contractValue = getContractValue(job);
-                            const location = getLocation(job);
-                            const positions = getPositions(job);
-                            const duration = getDuration(job);
-                            const data = job.data || {};
-
-                            return (
-                                <div key={job.id} className={`job-card ${hasApplied ? 'applied' : ''}`}>
-                                    {/* Card Header */}
-                                    <div className="job-card-header">
-                                        <div className="job-id">#{job.id}</div>
-                                        <div
-                                            className="job-status"
-                                            style={{
-                                                background: statusStyle.bg,
-                                                color: statusStyle.color,
-                                                border: `1px solid ${statusStyle.border}`
-                                            }}
-                                        >
-                                            {job.status?.replace("_", " ")}
-                                        </div>
-                                    </div>
-
-                                    {/* Contract Type */}
-                                    <h3 className="job-title">{job.contract_type?.contract_name || "Contract"}</h3>
-
-                                    {/* Publisher */}
-                                    <div className="job-publisher">
-                                        <i className="fas fa-building"></i>
-                                        <span>{job.published_by?.name || "Unknown Publisher"}</span>
-                                    </div>
-
-                                    {/* Positions */}
-                                    {positions.length > 0 && (
-                                        <div className="job-positions">
-                                            <div className="section-label">
-                                                <i className="fas fa-user-md"></i>
-                                                Positions
-                                            </div>
-                                            <div className="positions-list">
-                                                {positions.slice(0, 3).map((pos, idx) => (
-                                                    <span key={idx} className="position-tag">{pos}</span>
-                                                ))}
-                                                {positions.length > 3 && (
-                                                    <span className="position-tag more">+{positions.length - 3}</span>
-                                                )}
-                                            </div>
-                                        </div>
-                                    )}
-
-                                    {/* Location */}
-                                    {location && (
-                                        <div className="job-location">
-                                            <i className="fas fa-map-marker-alt"></i>
-                                            <span>{location}</span>
-                                        </div>
-                                    )}
-
-                                    {/* Contract Details Grid */}
-                                    <div className="job-details-grid">
-                                        {/* Dates */}
-                                        <div className="detail-item">
-                                            <i className="fas fa-calendar-alt"></i>
-                                            <div className="detail-content">
-                                                <span className="detail-label">Duration</span>
-                                                <span className="detail-value">
-                                                    {formatDate(job.start_date)} - {formatDate(job.end_date)}
-                                                    {duration && <span className="duration-badge">{duration}</span>}
-                                                </span>
-                                            </div>
-                                        </div>
-
-                                        {/* Contract Value */}
-                                        {contractValue && (
-                                            <div className="detail-item highlight">
-                                                <i className="fas fa-dollar-sign"></i>
-                                                <div className="detail-content">
-                                                    <span className="detail-label">Contract Value</span>
-                                                    <span className="detail-value money">{formatCurrency(contractValue) || contractValue}</span>
-                                                </div>
-                                            </div>
-                                        )}
-
-                                        {/* Additional Info from data */}
-                                        {data.work_type && (
-                                            <div className="detail-item">
-                                                <i className="fas fa-clock"></i>
-                                                <div className="detail-content">
-                                                    <span className="detail-label">Work Type</span>
-                                                    <span className="detail-value">{data.work_type}</span>
-                                                </div>
-                                            </div>
-                                        )}
-
-                                        {data.specialty && (
-                                            <div className="detail-item">
-                                                <i className="fas fa-stethoscope"></i>
-                                                <div className="detail-content">
-                                                    <span className="detail-label">Specialty</span>
-                                                    <span className="detail-value">{data.specialty}</span>
-                                                </div>
-                                            </div>
-                                        )}
-                                    </div>
-
-                                    {/* Card Footer */}
-                                    <div className="job-card-footer">
-                                        {hasApplied ? (
-                                            <div className="applied-badge">
-                                                <i className="fas fa-check-circle"></i>
-                                                Applied
-                                            </div>
-                                        ) : (
-                                            <button
-                                                className="apply-btn"
-                                                onClick={() => handleApplyToContract(job.id)}
-                                            >
-                                                <i className="fas fa-paper-plane"></i>
-                                                Apply Now
-                                            </button>
-                                        )}
-                                        <button
-                                            className="view-btn"
-                                            onClick={() => handleShowModal(job.id, job.contract_type?.contract_name)}
-                                        >
-                                            <i className="fas fa-eye"></i>
-                                            View Details
-                                        </button>
-                                    </div>
-                                </div>
-                            );
-                        })}
+                    <div
+                        className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 2xl:grid-cols-5 gap-4">
+                        {currentRows.map((job) => (
+                            <JobCard key={job.id} job={job}
+                                     onViewDetails={() => handleShowModal(job.id, job.contract_type?.contract_name)}
+                                     onApply={() => handleApplyToContract(job.id)}/>
+                        ))}
                     </div>
                 ) : (
-                    /* List View */
-                    <div className="jobs-list">
-                        {currentRows.map((job) => {
-                            const hasApplied = job.user_application?.has_applied;
-                            const statusStyle = getStatusColor(job.status);
-                            const contractValue = getContractValue(job);
-                            const location = getLocation(job);
-                            const positions = getPositions(job);
-
-                            return (
-                                <div key={job.id} className={`job-list-item ${hasApplied ? 'applied' : ''}`}>
-                                    <div className="list-item-main">
-                                        <div className="list-item-header">
-                                            <span className="job-id">#{job.id}</span>
-                                            <h3 className="job-title">{job.contract_type?.contract_name || "Contract"}</h3>
-                                            <div
-                                                className="job-status"
-                                                style={{
-                                                    background: statusStyle.bg,
-                                                    color: statusStyle.color,
-                                                    border: `1px solid ${statusStyle.border}`
-                                                }}
-                                            >
-                                                {job.status?.replace("_", " ")}
-                                            </div>
-                                        </div>
-                                        <div className="list-item-meta">
-                                            <span><i className="fas fa-building"></i> {job.published_by?.name || "-"}</span>
-                                            {location && <span><i className="fas fa-map-marker-alt"></i> {location}</span>}
-                                            <span><i className="fas fa-calendar"></i> {formatDate(job.start_date)} - {formatDate(job.end_date)}</span>
-                                            {contractValue && <span className="value"><i className="fas fa-dollar-sign"></i> {formatCurrency(contractValue) || contractValue}</span>}
-                                        </div>
-                                        {positions.length > 0 && (
-                                            <div className="list-item-positions">
-                                                {positions.slice(0, 4).map((pos, idx) => (
-                                                    <span key={idx} className="position-tag">{pos}</span>
-                                                ))}
-                                                {positions.length > 4 && <span className="position-tag more">+{positions.length - 4}</span>}
-                                            </div>
-                                        )}
-                                    </div>
-                                    <div className="list-item-actions">
-                                        {hasApplied ? (
-                                            <div className="applied-badge">
-                                                <i className="fas fa-check-circle"></i> Applied
-                                            </div>
-                                        ) : (
-                                            <button className="apply-btn" onClick={() => handleApplyToContract(job.id)}>
-                                                <i className="fas fa-paper-plane"></i> Apply
-                                            </button>
-                                        )}
-                                        <button className="view-btn" onClick={() => handleShowModal(job.id, job.contract_type?.contract_name)}>
-                                            <i className="fas fa-eye"></i>
-                                        </button>
-                                    </div>
-                                </div>
-                            );
-                        })}
-                    </div>
-                )}
-
-                {/* Pagination */}
-                {rows.length > 0 && (
-                    <div className="pagination">
-                        <div className="pagination-info">
-                            Showing {startIdx + 1} to {Math.min(endIdx, rows.length)} of {rows.length} jobs
-                        </div>
-                        <div className="pagination-controls">
-                            <button
-                                disabled={currentPage === 1}
-                                onClick={() => setCurrentPage(currentPage - 1)}
-                                className="page-btn"
-                            >
-                                <i className="fas fa-chevron-left"></i>
-                            </button>
-                            {Array.from({ length: Math.min(5, totalPages) }, (_, i) => {
-                                let pageNum;
-                                if (totalPages <= 5) {
-                                    pageNum = i + 1;
-                                } else if (currentPage <= 3) {
-                                    pageNum = i + 1;
-                                } else if (currentPage >= totalPages - 2) {
-                                    pageNum = totalPages - 4 + i;
-                                } else {
-                                    pageNum = currentPage - 2 + i;
-                                }
-                                return (
-                                    <button
-                                        key={pageNum}
-                                        className={`page-btn ${currentPage === pageNum ? 'active' : ''}`}
-                                        onClick={() => setCurrentPage(pageNum)}
-                                    >
-                                        {pageNum}
-                                    </button>
-                                );
-                            })}
-                            <button
-                                disabled={currentPage === totalPages || totalPages === 0}
-                                onClick={() => setCurrentPage(currentPage + 1)}
-                                className="page-btn"
-                            >
-                                <i className="fas fa-chevron-right"></i>
-                            </button>
-                        </div>
+                    /* List View Section */
+                    <div className="flex flex-col gap-4">
+                        <JobListView data={currentRows} handleShowModal={handleShowModal}
+                                     onApply={handleApplyToContract}/>
                     </div>
                 )}
             </div>
+
+                {/* Pagination */}
+                {rows.length > 0 && (
+                    <div
+                        className="flex flex-col sm:flex-row sm:flex-row-reverse items-center justify-between gap-4 px-4 py-4 mt-6 border-t border-[#E6E6EB] bg-white w-full">
+
+                        {/* বাম পাশ: Showing [Select] of [Total] Entries */}
+                        <div className="flex items-center gap-2 text-[13px] text-[#64748B] order-2 sm:order-1">
+                            <span>Showing</span>
+                            <div className="relative group">
+                                <select
+                                    value={itemsPerPage || 10}
+                                    onChange={(e) => setItemsPerPage(Number(e.target.value))}
+                                    className="appearance-none bg-[#F8FAFC] border border-[#E6E6EB] rounded-lg pl-3 pr-8 py-1.5 font-bold text-[#1E293B] cursor-pointer outline-none focus:ring-2 focus:ring-blue-500/10 transition-all"
+                                >
+                                    <option value={10}>10</option>
+                                    <option value={20}>20</option>
+                                    <option value={50}>50</option>
+                                </select>
+                                <div
+                                    className="absolute right-2 top-1/2 -translate-y-1/2 pointer-events-none text-[#64748B]">
+                                    <ChevronUp className="w-3.5 h-3.5"/>
+                                </div>
+                            </div>
+                            <span>of {rows.length} Entries</span>
+                        </div>
+
+                        {/* ডান পাশ: Pagination Controls */}
+                        <div className="flex items-center gap-1 order-1 sm:order-2">
+                            {/* Previous Button */}
+                            <button
+                                disabled={currentPage === 1}
+                                onClick={() => setCurrentPage(currentPage - 1)}
+                                className="flex items-center gap-1 px-2 py-2 text-[13px] font-medium text-[#94A3B8] hover:text-[#1E293B] disabled:opacity-30 disabled:cursor-not-allowed transition-colors cursor-pointer"
+                            >
+                                <ChevronLeft className="w-4 h-4"/>
+                                <span className="hidden md:inline">Previous</span>
+                            </button>
+
+                            {/* Page Numbers */}
+                            <div className="flex items-center gap-1 mx-2">
+                                {Array.from({length: totalPages}, (_, i) => i + 1)
+                                    .filter(pageNum => {
+                                        // লজিক: প্রথম ৩টি, শেষের ৩টি এবং কারেন্ট পেজের আসেপাশের পেজ দেখানো
+                                        if (totalPages <= 7) return true;
+                                        return (
+                                            pageNum === 1 ||
+                                            pageNum === totalPages ||
+                                            Math.abs(pageNum - currentPage) <= 1
+                                        );
+                                    })
+                                    .map((pageNum, index, array) => {
+                                        const isSelected = currentPage === pageNum;
+                                        const showEllipsis = index > 0 && pageNum - array[index - 1] > 1;
+
+                                        return (
+                                            <div key={pageNum} className="flex items-center">
+                                                {showEllipsis && (
+                                                    <span className="px-2 text-[#94A3B8] text-[13px]">...</span>
+                                                )}
+                                                <button
+                                                    onClick={() => setCurrentPage(pageNum)}
+                                                    className={`
+                                        flex items-center justify-center min-w-[32px] h-8 md:min-w-[40px] md:h-10 px-2 rounded-lg text-[13px] font-bold transition-all cursor-pointer
+                                        ${isSelected
+                                                        ? "border border-[#E6E6EB] bg-white text-[#1E293B] shadow-sm"
+                                                        : "text-[#94A3B8] hover:bg-[#F8FAFC] hover:text-[#1E293B]"
+                                                    }
+                                    `}
+                                                >
+                                                    {pageNum}
+                                                </button>
+                                            </div>
+                                        );
+                                    })}
+                            </div>
+
+                            {/* Next Button */}
+                            <button
+                                disabled={currentPage === totalPages || totalPages === 0}
+                                onClick={() => setCurrentPage(currentPage + 1)}
+                                className="flex items-center gap-1 px-2 py-2 text-[13px] font-medium text-[#94A3B8] hover:text-[#1E293B] disabled:opacity-30 disabled:cursor-not-allowed transition-colors cursor-pointer"
+                            >
+                                <span className="hidden md:inline">Next</span>
+                                <ChevronRight className="w-4 h-4"/>
+                            </button>
+                        </div>
+                    </div>
+                )}
 
             {/* Contract Modal */}
             {ContractModel && show && (

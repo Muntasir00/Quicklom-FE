@@ -1,4 +1,21 @@
 import React, { useEffect } from "react";
+import {
+    Search, RotateCcw, Hash, MapPin, Stethoscope,
+     Info, Calendar, DollarSign,
+    AlertTriangle, Loader2
+} from "lucide-react";
+
+// Shadcn UI Components (ধরে নিচ্ছি আপনার প্রোজেক্টে এই পাথে আছে)
+import { Input } from "@components/ui/input";
+import { Button } from "@components/ui/button";
+import { Label } from "@components/ui/label";
+import {
+    Select,
+    SelectContent,
+    SelectItem,
+    SelectTrigger,
+    SelectValue
+} from "@components/ui/select";
 
 const UserContractFilterForm = ({ setContracts, useFilterHook, onFiltersChange }) => {
     const {
@@ -14,7 +31,6 @@ const UserContractFilterForm = ({ setContracts, useFilterHook, onFiltersChange }
         loading,
     } = useFilterHook(setContracts);
 
-    // Count active filters and notify parent
     useEffect(() => {
         if (onFiltersChange) {
             const activeFiltersCount = Object.values(filters).filter(
@@ -24,378 +40,188 @@ const UserContractFilterForm = ({ setContracts, useFilterHook, onFiltersChange }
         }
     }, [filters, onFiltersChange]);
 
+    // Shadcn Select-কে আপনার handleChange এর সাথে মেলানোর জন্য একটি ছোট ফাংশন
+    const handleSelectChange = (name, value) => {
+        handleChange({
+            target: { name, value }
+        });
+    };
+
     if (loading) {
         return (
-            <div className="text-center py-4">
-                <div className="spinner-border text-primary" role="status">
-                    <span className="sr-only">Loading filters...</span>
-                </div>
+            <div className="flex flex-col items-center justify-center py-12">
+                <Loader2 className="w-8 h-8 text-blue-500 animate-spin mb-2" />
+                <p className="text-slate-500 text-sm font-medium">Loading filters...</p>
             </div>
         );
     }
 
-    // Contract status options
-    const statusOptions = [
-        { value: "open", label: "Open" },
-        { value: "pending", label: "Pending" },
-        { value: "booked", label: "Booked" },
-        { value: "in_discussion", label: "In Discussion" },
-        { value: "closed", label: "Closed" },
-        { value: "cancelled", label: "Cancelled" },
-    ];
-
-    // Map contract duration types to readable labels
-    const getContractTypeLabel = (type) => {
-        const labels = {
-            "temporary staffing": "Temporary Staffing",
-            "permanent staffing": "Permanent Staffing",
-            "Permanent_and_Temporary": "Permanent & Temporary"
-        };
-        return labels[type] || type;
-    };
-
     return (
-        <form onSubmit={handleSubmit} className="compact-filter-form">
-            <style>{`
-                .compact-filter-form .form-group {
-                    margin-bottom: 0.5rem;
-                }
-                .compact-filter-form label {
-                    font-size: 11px;
-                    font-weight: 600;
-                    margin-bottom: 0.25rem;
-                    color: #495057;
-                }
-                .compact-filter-form .form-control {
-                    height: 32px;
-                    font-size: 12px;
-                    padding: 0.25rem 0.5rem;
-                }
-                .compact-filter-form .form-text {
-                    display: none;
-                }
-                .compact-filter-form .alert {
-                    padding: 0.5rem 0.75rem;
-                    font-size: 11px;
-                    margin-bottom: 0.5rem;
-                }
-                .compact-filter-form .btn {
-                    padding: 0.35rem 0.75rem;
-                    font-size: 12px;
-                }
-                .compact-filter-form i.fa-lg {
-                    font-size: 1rem;
-                }
-            `}</style>
-            <div className="row">
-                {/* Contract ID Filter */}
-                <div className="col-md-4 col-sm-6 mb-1">
-                    <div className="form-group">
-                        <label className="font-weight-bold">
-                            <i className="fas fa-hashtag mr-2 text-primary"></i>
-                            Contract ID
-                        </label>
-                        <input
-                            type="number"
-                            name="contract_id"
-                            className="form-control"
-                            placeholder="Enter contract ID"
-                            value={filters.contract_id || ''}
-                            onChange={handleChange}
-                            min="1"
-                        />
+        <form onSubmit={handleSubmit} className="bg-white border border-slate-200 rounded-xl p-6 shadow-sm">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-x-6 gap-y-5">
+
+                {/* Contract ID */}
+                <div className="space-y-2">
+                    <div className="text-[11px] font-bold text-slate-500 uppercase flex items-center gap-2">
+                        <Hash className="w-3.5 h-3.5 text-blue-500" /> Contract ID
                     </div>
+                    <Input
+                        type="number"
+                        name="contract_id"
+                        placeholder="e.g. 102"
+                        className="h-10"
+                        value={filters.contract_id || ''}
+                        onChange={handleChange}
+                    />
                 </div>
 
-                {/* Regions Served - Province Filter */}
+                {/* Region/Province Select */}
                 {availableProvinces.length > 0 && (
-                    <div className="col-md-4 col-sm-6 mb-1">
-                        <div className="form-group">
-                            <label className="font-weight-bold">
-                                <i className="fas fa-map-marker-alt mr-2 text-primary"></i>
-                                Region/Province
-                            </label>
-                            <select
-                                name="province"
-                                className="form-control"
-                                value={filters.province}
-                                onChange={handleChange}
-                            >
-                                <option value="">All Regions</option>
-                                {availableProvinces.map((province, index) => (
-                                    <option key={index} value={province}>
-                                        {province}
-                                    </option>
-                                ))}
-                            </select>
-                            <small className="form-text text-muted">
-                                Regions you serve: {availableProvinces.length}
-                            </small>
+                    <div className="space-y-2">
+                        <div className="text-[11px] font-bold text-slate-500 uppercase flex items-center gap-2">
+                            <MapPin className="w-3.5 h-3.5 text-blue-500" /> Province
                         </div>
+                        <Select
+                            value={filters.province || "all"}
+                            onValueChange={(val) => handleSelectChange("province", val === "all" ? "" : val)}
+                        >
+                            <SelectTrigger className="h-10 w-full">
+                                <SelectValue placeholder="All Regions" />
+                            </SelectTrigger >
+                            <SelectContent>
+                                <SelectItem value="all">All Regions</SelectItem>
+                                {availableProvinces.map((p, i) => (
+                                    <SelectItem key={i} value={p}>{p}</SelectItem>
+                                ))}
+                            </SelectContent>
+                        </Select>
                     </div>
                 )}
 
-                {/* Specialties Covered */}
+                {/* Specialty Select */}
                 {availableSpecialties.length > 0 && (
-                    <div className="col-md-4 col-sm-6 mb-1">
-                        <div className="form-group">
-                            <label className="font-weight-bold">
-                                <i className="fas fa-stethoscope mr-2 text-primary"></i>
-                                Specialty
-                            </label>
-                            <select
-                                name="specialty"
-                                className="form-control"
-                                value={filters.specialty}
-                                onChange={handleChange}
-                            >
-                                <option value="">All Specialties</option>
-                                {availableSpecialties.map((specialty, index) => (
-                                    <option key={index} value={specialty}>
-                                        {specialty}
-                                    </option>
-                                ))}
-                            </select>
-                            <small className="form-text text-muted">
-                                Specialties you cover: {availableSpecialties.length}
-                            </small>
+                    <div className="space-y-2">
+                        <div className="text-[11px] font-bold text-slate-500 uppercase flex items-center gap-2">
+                            <Stethoscope className="w-3.5 h-3.5 text-blue-500" /> Specialty
                         </div>
-                    </div>
-                )}
-
-                {/* Positions (filtered by specialties) */}
-                {positions.length > 0 && (
-                    <div className="col-md-4 col-sm-6 mb-1">
-                        <div className="form-group">
-                            <label className="font-weight-bold">
-                                <i className="fas fa-user-md mr-2 text-primary"></i>
-                                Position
-                            </label>
-                            <select
-                                name="position_id"
-                                className="form-control"
-                                value={filters.position_id}
-                                onChange={handleChange}
-                            >
-                                <option value="">All Positions</option>
-                                {positions.map((position) => (
-                                    <option key={position.id} value={position.id}>
-                                        {position.name}
-                                        {position.professional_category?.name &&
-                                            ` (${position.professional_category.name})`
-                                        }
-                                    </option>
-                                ))}
-                            </select>
-                            <small className="form-text text-muted">
-                                Positions in your specialties
-                            </small>
-                        </div>
-                    </div>
-                )}
-
-                {/* Types of Contracts Managed */}
-                {availableContractTypes.length > 0 && (
-                    <div className="col-md-4 col-sm-6 mb-1">
-                        <div className="form-group">
-                            <label className="font-weight-bold">
-                                <i className="fas fa-file-contract mr-2 text-primary"></i>
-                                Contract Type
-                            </label>
-                            <select
-                                name="contract_duration_type"
-                                className="form-control"
-                                value={filters.contract_duration_type}
-                                onChange={handleChange}
-                            >
-                                <option value="">All Contract Types</option>
-                                {availableContractTypes.map((type, index) => (
-                                    <option key={index} value={type}>
-                                        {getContractTypeLabel(type)}
-                                    </option>
-                                ))}
-                            </select>
-                            <small className="form-text text-muted">
-                                Contract types you manage: {availableContractTypes.length}
-                            </small>
-                        </div>
-                    </div>
-                )}
-
-                {/* Contract Status */}
-                <div className="col-md-4 col-sm-6 mb-1">
-                    <div className="form-group">
-                        <label className="font-weight-bold">
-                            <i className="fas fa-info-circle mr-2 text-primary"></i>
-                            Status
-                        </label>
-                        <select
-                            name="status"
-                            className="form-control"
-                            value={filters.status}
-                            onChange={handleChange}
+                        <Select
+                            value={filters.specialty || "all"}
+                            onValueChange={(val) => handleSelectChange("specialty", val === "all" ? "" : val)}
                         >
-                            <option value="">All Statuses</option>
-                            {statusOptions.map((status) => (
-                                <option key={status.value} value={status.value}>
-                                    {status.label}
-                                </option>
+                            <SelectTrigger className="h-10 w-full">
+                                <SelectValue placeholder="All Specialties" />
+                            </SelectTrigger>
+                            <SelectContent>
+                                <SelectItem value="all">All Specialties</SelectItem>
+                                {availableSpecialties.map((s, i) => (
+                                    <SelectItem key={i} value={s}>{s}</SelectItem>
+                                ))}
+                            </SelectContent>
+                        </Select>
+                    </div>
+                )}
+
+                {/* Status Select */}
+                <div className="space-y-2">
+                    <div className="text-[11px] font-bold text-slate-500 uppercase flex items-center gap-2">
+                        <Info className="w-3.5 h-3.5 text-blue-500" /> Status
+                    </div>
+                    <Select
+                        value={filters.status || "all"}
+                        onValueChange={(val) => handleSelectChange("status", val === "all" ? "" : val)}
+                    >
+                        <SelectTrigger className="h-10 w-full">
+                            <SelectValue placeholder="All Status" />
+                        </SelectTrigger>
+                        <SelectContent>
+                            <SelectItem value="all">All Statuses</SelectItem>
+                            {["open", "pending", "booked", "closed", "cancelled"].map(s => (
+                                <SelectItem key={s} value={s}>{s.charAt(0).toUpperCase() + s.slice(1)}</SelectItem>
                             ))}
-                        </select>
-                    </div>
+                        </SelectContent>
+                    </Select>
                 </div>
 
-                {/* Date Range Filters */}
-                <div className="col-md-4 col-sm-6 mb-1">
-                    <div className="form-group">
-                        <label className="font-weight-bold">
-                            <i className="fas fa-calendar-alt mr-2 text-primary"></i>
-                            Start Date From
-                        </label>
-                        <input
-                            type="date"
-                            name="start_date"
-                            className="form-control"
-                            value={filters.start_date}
-                            onChange={handleChange}
-                        />
+                {/* Date Inputs - Shadcn Input (type date) */}
+                <div className="space-y-2">
+                    <div className="text-[11px] font-bold text-slate-500 uppercase flex items-center gap-2">
+                        <Calendar className="w-3.5 h-3.5 text-blue-500" /> Start From
                     </div>
+                    <Input type="date" name="start_date" className="h-10" value={filters.start_date} onChange={handleChange} />
                 </div>
 
-                <div className="col-md-4 col-sm-6 mb-1">
-                    <div className="form-group">
-                        <label className="font-weight-bold">
-                            <i className="fas fa-calendar-check mr-2 text-primary"></i>
-                            End Date Until
-                        </label>
-                        <input
-                            type="date"
-                            name="end_date"
-                            className="form-control"
-                            value={filters.end_date}
-                            onChange={handleChange}
-                        />
+                <div className="space-y-2">
+                    <div className="text-[11px] font-bold text-slate-500 uppercase flex items-center gap-2">
+                        <Calendar className="w-3.5 h-3.5 text-blue-500" /> End Until
                     </div>
+                    <Input type="date" name="end_date" className="h-10" value={filters.end_date} onChange={handleChange} />
                 </div>
 
-                {/* Month Filter */}
-                <div className="col-md-4 col-sm-6 mb-1">
-                    <div className="form-group">
-                        <label className="font-weight-bold">
-                            <i className="fas fa-calendar mr-2 text-primary"></i>
-                            Filter by Month
-                        </label>
-                        <input
-                            type="month"
-                            name="month"
-                            className="form-control"
-                            value={filters.month || ''}
-                            onChange={handleChange}
-                        />
-                        <small className="form-text text-muted" style={{ display: 'block !important' }}>
-                            Show contracts starting in this month
-                        </small>
+                {/* Rates */}
+                <div className="space-y-2">
+                    <div className="text-[11px] font-bold text-slate-500 uppercase flex items-center gap-2">
+                        <DollarSign className="w-3.5 h-3.5 text-blue-500" /> Min Rate ($)
                     </div>
+                    <Input
+                        type="number"
+                        name="min_rate"
+                        placeholder="0.00"
+                        className="h-10"
+                        value={filters.min_rate}
+                        onChange={handleChange}
+                    />
                 </div>
 
-                {/* Rate Range Filters */}
-                <div className="col-md-4 col-sm-6 mb-1">
-                    <div className="form-group">
-                        <label className="font-weight-bold">
-                            <i className="fas fa-dollar-sign mr-2 text-primary"></i>
-                            Min Rate ($)
-                        </label>
-                        <input
-                            type="number"
-                            name="min_rate"
-                            className="form-control"
-                            placeholder="e.g., 50"
-                            value={filters.min_rate}
-                            onChange={handleChange}
-                            min="0"
-                            step="0.01"
-                        />
+                {/* Special Filter with Warning Highlight */}
+                <div className="space-y-2">
+                    <div className="text-[11px] font-bold text-slate-500 uppercase flex items-center gap-2">
+                        <AlertTriangle className="w-3.5 h-3.5 text-amber-500" /> Special Filter
                     </div>
+                    <Select
+                        value={filters.filter || "none"}
+                        onValueChange={(val) => handleSelectChange("filter", val === "none" ? "" : val)}
+                    >
+                        <SelectTrigger className={`h-10 w-full ${filters.filter === 'no_applications' ? 'border-amber-400 bg-amber-50' : ''}`}>
+                            <SelectValue placeholder="None" />
+                        </SelectTrigger>
+                        <SelectContent>
+                            <SelectItem value="none">None</SelectItem>
+                            <SelectItem value="no_applications">No Applications (7+ days)</SelectItem>
+                        </SelectContent>
+                    </Select>
                 </div>
 
-                <div className="col-md-4 col-sm-6 mb-1">
-                    <div className="form-group">
-                        <label className="font-weight-bold">
-                            <i className="fas fa-dollar-sign mr-2 text-primary"></i>
-                            Max Rate ($)
-                        </label>
-                        <input
-                            type="number"
-                            name="max_rate"
-                            className="form-control"
-                            placeholder="e.g., 200"
-                            value={filters.max_rate}
-                            onChange={handleChange}
-                            min="0"
-                            step="0.01"
-                        />
-                    </div>
-                </div>
-
-                {/* Special Filter: No Applications */}
-                <div className="col-md-4 col-sm-6 mb-1">
-                    <div className="form-group">
-                        <label className="font-weight-bold">
-                            <i className="fas fa-exclamation-triangle mr-2 text-warning"></i>
-                            Special Filter
-                        </label>
-                        <select
-                            name="filter"
-                            className={`form-control ${filters.filter === 'no_applications' ? 'border-warning' : ''}`}
-                            value={filters.filter || ''}
-                            onChange={handleChange}
-                            style={filters.filter === 'no_applications' ? { borderWidth: '2px', backgroundColor: '#fff8e1' } : {}}
-                        >
-                            <option value="">None</option>
-                            <option value="no_applications">No Applications (7+ days)</option>
-                        </select>
-                        <small className="form-text text-muted" style={{ display: 'block', fontSize: '10px' }}>
-                            Open contracts with no applications
-                        </small>
-                    </div>
-                </div>
             </div>
 
             {/* Profile Info Banner */}
             {profile && (
-                <div className="alert alert-info mb-3" role="alert">
-                    <div className="d-flex align-items-center">
-                        <i className="fas fa-info-circle fa-lg mr-2"></i>
-                        <div>
-                            <strong>Profile-Based Filters:</strong>
-                            <span className="ml-2">
-                                Showing filters for {availableSpecialties.length} {availableSpecialties.length === 1 ? 'specialty' : 'specialties'},
-                                {' '}{availableProvinces.length} {availableProvinces.length === 1 ? 'region' : 'regions'},
-                                and {availableContractTypes.length} contract {availableContractTypes.length === 1 ? 'type' : 'types'}
-                            </span>
-                        </div>
+                <div className="mt-8 p-4 bg-blue-50 border border-blue-100 rounded-xl flex items-start gap-3">
+                    <Info className="w-5 h-5 text-blue-500 mt-0.5" />
+                    <div>
+                        <h4 className="text-sm font-bold text-blue-900 leading-none">Profile-Based Filters Active</h4>
+                        <p className="text-[11px] text-blue-700 mt-1.5 opacity-80">
+                            Showing filters for {availableSpecialties.length} specialties and {availableProvinces.length} regions.
+                        </p>
                     </div>
                 </div>
             )}
 
             {/* Action Buttons */}
-            <div className="row">
-                <div className="col-12">
-                    <div className="d-flex justify-content-end">
-                        <button
-                            type="button"
-                            className="btn btn-outline-secondary mr-2"
-                            onClick={handleClear}
-                        >
-                            <i className="fas fa-times mr-2"></i>
-                            Clear Filters
-                        </button>
-                        <button type="submit" className="btn btn-primary">
-                            <i className="fas fa-search mr-2"></i>
-                            Apply Filters
-                        </button>
-                    </div>
-                </div>
+            <div className="flex flex-col sm:flex-row justify-end items-center gap-3 mt-4 pt-3 border-t border-slate-100">
+                <Button
+                    type="button"
+                    variant="ghost"
+                    onClick={handleClear}
+                    className="w-full sm:w-auto text-slate-600 font-semibold !rounded-md gap-2 h-11 px-6 hover:bg-slate-100 transition-all cursor-pointer"
+                >
+                    <RotateCcw className="w-4 h-4" /> Clear All
+                </Button>
+                <Button
+                    type="submit"
+                    className="w-full sm:w-auto bg-blue-600 !rounded-md hover:bg-blue-700 text-white font-semibold gap-2 h-11 px-10 shadow-lg shadow-blue-200 transition-all cursor-pointer"
+                >
+                    <Search className="w-4 h-4" /> Apply Filters
+                </Button>
             </div>
         </form>
     );

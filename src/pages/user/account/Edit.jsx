@@ -1,19 +1,39 @@
-import { useEffect, useState } from "react";
+import React, { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
+import {
+    ShieldCheck,
+    Lock,
+    User,
+    Upload,
+    Trash2,
+    Mail,
+    KeyRound,
+    Eye,
+    EyeOff,
+    Check,
+    X,
+    Save
+} from "lucide-react";
 
-import Form from "./Form";
 import { getAccountService, updateAccount } from "../../../services/user/AccountService";
 import { editAccountSchema } from "../../../schemas/user/AccountSchema";
 import UpdateEmailModelComponent from "@components/modals/user/UpdateEmailModelComponent";
-
+import {Avatar, AvatarFallback, AvatarImage} from "@components/ui/avatar.jsx";
 
 const Edit = () => {
-    const role = sessionStorage.getItem("role")
+    const role = sessionStorage.getItem("role") || "Professional";
     const [show, setShow] = useState(false);
     const [isSubmitting, setIsSubmitting] = useState(false);
     const [saveSuccess, setSaveSuccess] = useState(false);
+    const [showPassword, setShowPassword] = useState({current: false, new: false, confirm: false});
+
+    // প্রোফাইল ফটোর জন্য স্টেট
+    const [profileImage, setProfileImage] = useState(null);
+
+    // আপনার সার্ভারের বেস ইউআরএল (যেমন: https://api.quicklocum.com/)
+    const IMAGE_BASE_URL = import.meta.env.VITE_API_BASE_URL || "http://localhost:8000/";
 
     const {
         register,
@@ -23,14 +43,24 @@ const Edit = () => {
         formState: { errors, isDirty },
     } = useForm({
         resolver: zodResolver(editAccountSchema),
-        defaultValues: { email: "", name: "", password: "", confirm_password: "", current_password: "" },
+        defaultValues: { email: "", first_name: "", last_name: "", password: "", confirm_password: "", current_password: "" },
     });
 
     useEffect(() => {
         const fetchAccount = async () => {
             try {
-                const accountData = await getAccountService();
-                Object.keys(accountData).forEach((key) => setValue(key, accountData[key]));
+                const response = await getAccountService();
+
+                // ইমেইল এবং অন্যান্য ফ্ল্যাট ডাটা সেট করা
+                setValue("email", response.email);
+
+                // প্রোফাইল ডাটা সেট করা (first_name, last_name, photo)
+                if (response.profiles && response.profiles.length > 0) {
+                    const profileInfo = response.profiles[0].data;
+                    setValue("first_name", profileInfo.first_name);
+                    setValue("last_name", profileInfo.last_name);
+                    setProfileImage(profileInfo.profile_photo);
+                }
             } catch (err) {
                 console.error("Error fetching account:", err);
             }
@@ -41,7 +71,6 @@ const Edit = () => {
 
     const onSubmit = async (data) => {
         setIsSubmitting(true);
-        setSaveSuccess(false);
         try {
             await updateAccount(data);
             setSaveSuccess(true);
@@ -52,758 +81,261 @@ const Edit = () => {
                 Object.keys(serverErrors).forEach((field) => {
                     setError(field, { type: "server", message: serverErrors[field] });
                 });
-            } else {
-                console.error("Unexpected error:", err);
             }
         } finally {
             setIsSubmitting(false);
         }
     };
 
+
     return (
-        <div className="content-wrapper account-page-wrapper">
-            {/* Modern Healthcare Header */}
-            <div className="account-header">
-                <div className="header-background"></div>
-                <div className="container-fluid">
-                    <div className="header-content">
-                        <div className="header-left">
-                            <div className="account-avatar">
-                                <i className="fas fa-user-cog"></i>
-                            </div>
-                            <div className="header-info">
-                                <h1 className="account-title">Account Settings</h1>
-                                <p className="account-subtitle">
-                                    Manage your personal information and security settings
-                                </p>
-                            </div>
+        <div className="">
+            <div className="space-y-6">
+
+                {/* Top Stat Cards Row */}
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-2">
+                    <div className="p-3 rounded-lg flex items-center justify-between border border-[#E6E6EB]">
+                        <div className="space-y-1">
+                            <p className="text-sm  text-[#194185] uppercase tracking-wider !mb-0">Security Status</p>
+                            <h3 className="text-lg font-medium text-[#194185] !mb-0">Protected</h3>
                         </div>
-                        <div className="header-actions">
-                            <Link to={`/${role}/dashboard`} className="btn-back">
-                                <i className="fas fa-arrow-left"></i>
-                                <span>Back to Dashboard</span>
-                            </Link>
+                        <div className="p-3 bg-[#EAF5FE] rounded-lg">
+                            <ShieldCheck className="w-6 h-6 text-blue-500" />
+                        </div>
+                    </div>
+                    <div className="p-3 rounded-lg flex items-center justify-between border border-[#E6E6EB]">
+                        <div className="space-y-1">
+                            <p className="text-sm  text-[#194185]  uppercase tracking-wider !mb-0">Connection</p>
+                            <h3 className="text-lg font-medium text-[#1e293b] !mb-0">Encrypted</h3>
+                        </div>
+                        <div className="p-3 bg-[#EBFFEE] rounded-lg">
+                            <Lock className="w-6 h-6 text-[#19B28A]" />
+                        </div>
+                    </div>
+                    <div className="p-3 rounded-lg flex items-center justify-between border border-[#E6E6EB]">
+                        <div className="space-y-1">
+                            <p className="text-sm  text-[#194185]  uppercase tracking-wider !mb-0">Account Type</p>
+                            <h3 className="text-lg font-medium text-[#1e293b] capitalize !mb-0">{role}</h3>
+                        </div>
+                        <div className="p-3 bg-[#FBF1E7] rounded-lg">
+                            <User className="w-6 h-6 text-[#F0A33A]" />
                         </div>
                     </div>
                 </div>
-            </div>
 
-            {/* Main Content */}
-            <section className="account-content">
-                <div className="container-fluid">
-                    {/* Quick Info Cards */}
-                    <div className="quick-info-row">
-                        <div className="info-card">
-                            <div className="info-icon security">
-                                <i className="fas fa-shield-alt"></i>
-                            </div>
-                            <div className="info-details">
-                                <span className="info-label">Security Status</span>
-                                <span className="info-value">Protected</span>
-                            </div>
+                {/* Main Settings Card */}
+                <div
+                    className="rounded-[12px] border border-[#F3F4F6] bg-card p-6 shadow-[0px_9px_24px_0px_rgba(0,0,0,0.03)]">
+                    <div className="space-y-8">
+                        {/* Header */}
+                        <div>
+                            <h2 className="text-xl font-bold text-[#194185]">Account Setting</h2>
+                            <p className="text-sm text-[#194185]">
+                                Manage your personal information and security settings
+                            </p>
                         </div>
-                        <div className="info-card">
-                            <div className="info-icon encryption">
-                                <i className="fas fa-lock"></i>
-                            </div>
-                            <div className="info-details">
-                                <span className="info-label">Connection</span>
-                                <span className="info-value">Encrypted</span>
-                            </div>
-                        </div>
-                        <div className="info-card">
-                            <div className="info-icon account">
-                                <i className="fas fa-user-check"></i>
-                            </div>
-                            <div className="info-details">
-                                <span className="info-label">Account Type</span>
-                                <span className="info-value capitalize">{role}</span>
-                            </div>
-                        </div>
-                    </div>
 
-                    {/* Main Settings Card */}
-                    <div className="settings-main-card">
-                        {/* Personal Information Section */}
-                        <div className="settings-section">
-                            <div className="section-header">
-                                <div className="section-icon personal">
-                                    <i className="fas fa-user-circle"></i>
+                        {/* Header */}
+                        {/*<div className="flex justify-between items-start mb-10">*/}
+                        {/*    <div>*/}
+                        {/*        <h1 className="text-2xl font-bold text-[#1e293b] mb-1">Account Setting</h1>*/}
+                        {/*        <p className="text-sm text-slate-500 font-medium">Manage your personal information and security settings</p>*/}
+                        {/*    </div>*/}
+                        {/*    <Link to={`/${role}/dashboard`} className="flex items-center gap-2 text-sm font-bold text-slate-500 hover:text-indigo-600 transition-colors">*/}
+                        {/*        <ChevronLeft className="w-4 h-4" /> Back to Dashboard*/}
+                        {/*    </Link>*/}
+                        {/*</div>*/}
+
+                        {/* Profile Picture Section */}
+                        <div
+                            className="space-y-4 bg-[#F3F9FE] p-3 rounded-[8px] flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+                            <div className="flex items-center gap-4 mb-0">
+                                <Avatar className="h-12 w-12">
+                                    <AvatarImage src={profileImage ? `${IMAGE_BASE_URL}${profileImage}` : "https://ui-avatars.com/api/?name=User&background=random"} alt="Profile"/>
+                                    <AvatarFallback>RA</AvatarFallback>
+                                </Avatar>
+                                <div>
+                                    <h3 className="!text-base font-medium text-[#194185] !mb-0">Profile Picture</h3>
+                                    <p className="!text-sm text-[#194185]">PNG, JPEG Under 12MB</p>
                                 </div>
-                                <div className="section-title-group">
-                                    <h3 className="section-title">Personal Information</h3>
-                                    <p className="section-description">Update your email and name details</p>
+                            </div>
+
+                            <div className="flex flex-wrap gap-3">
+                                <button className="flex items-center gap-2 px-4 py-2.5 bg-[#e2eafc] text-[#3b82f6] rounded-xl font-bold text-sm hover:bg-[#d0dbf8] transition-all">
+                                    <Upload className="w-4 h-4" /> Upload Image
+                                </button>
+                                <button className="flex items-center gap-2 px-4 py-2.5 bg-red-50 text-red-500 rounded-xl font-bold text-sm hover:bg-red-100 transition-all">
+                                    <Trash2 className="w-4 h-4" /> Delete
+                                </button>
+                            </div>
+                        </div>
+
+                        {/* Personal Info Section */}
+                        <div className="space-y-5">
+                            <div className="space-y-[6px]">
+                                <h3 className="text-base font-medium text-[#4B5563]">Personal Information</h3>
+                                <p className="text-sm font-medium text-[#4B5563]">Upload your email and name
+                                    details</p>
+                            </div>
+
+                            <div className="grid grid-cols-1 md:grid-cols-3 gap-6 items-baseline">
+                                <div className="space-y-2">
+                                    <label className="text-sm font-bold text-slate-600">First Name</label>
+                                    <input
+                                        {...register("first_name")}
+                                        className="w-full bg-[#f3f4f6] border-none rounded-lg p-3.5 text-slate-700 font-medium focus:ring-2 focus:ring-indigo-500/20 transition-all outline-none"
+                                        placeholder="Enter first name"
+                                    />
+                                    {errors.first_name && <p className="text-xs text-red-500 font-bold">{errors.first_name.message}</p>}
+                                </div>
+                                <div className="space-y-2">
+                                    <label className="text-sm font-bold text-slate-600">Last Name</label>
+                                    <input
+                                        {...register("last_name")}
+                                        className="w-full bg-[#f3f4f6] border-none rounded-lg p-3.5 text-slate-700 font-medium focus:ring-2 focus:ring-indigo-500/20 transition-all outline-none"
+                                        placeholder="Enter last name"
+                                    />
+                                    {errors.last_name && <p className="text-xs text-red-500 font-bold">{errors.last_name.message}</p>}
+                                </div>
+                                <div className="space-y-2 relative">
+                                    <div className="flex justify-between items-center">
+                                        <label className="text-sm font-bold text-slate-600 !mb-[2px]">Email</label>
+                                        <button onClick={() => setShow(true)} type="button" className="text-xs font-bold text-blue-500 hover:underline">Change</button>
+                                    </div>
+                                    <div className="relative">
+                                        <Mail className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
+                                        <input
+                                            {...register("email")}
+                                            readOnly
+                                            className="w-full bg-[#f3f4f6] border-none rounded-lg p-3.5 pl-11 text-slate-500 font-medium cursor-not-allowed outline-none"
+                                        />
+                                    </div>
                                 </div>
                             </div>
                         </div>
 
                         {/* Security Section */}
-                        <div className="settings-section">
-                            <div className="section-header">
-                                <div className="section-icon security">
-                                    <i className="fas fa-shield-alt"></i>
+                        <div className="space-y-5">
+                            <div className="space-y-[6px]">
+                                <h3 className="text-base font-medium text-[#4B5563]">Security & Password</h3>
+                                <p className="text-sm text-[#4B5563]">Modify your current password</p>
+                            </div>
+
+                            {/* Password Security Tips */}
+                            <div className="rounded-[8px] bg-[#FCF1F1] p-3 gap-2">
+                                <h4 className="mb-3 text-sm font-medium text-[#18202A]">Password Security Tips</h4>
+                                <ul className="space-y-2">
+                                    <li className="flex items-start gap-1 text-sm">
+                                        <Check className="h-4 w-4 shrink-0 text-[#34C759]" strokeWidth="1.5px"/>
+                                        <span className="text-xs text-[#2A394B]">
+                                          Use a combination of uppercase, lowercase, numbers, and special characters
+                                        </span>
+                                    </li>
+                                    <li className="flex items-start gap-2 text-sm">
+                                        <X className="h-4 w-4 shrink-0 text-[#ED354A]"/>
+                                        <span className="text-xs text-[#2A394B]">Avoid using personal information in your password</span>
+                                    </li>
+                                    <li className="flex items-start gap-2 text-sm">
+                                        <X className="h-4 w-4 shrink-0 text-[#ED354A]"/>
+                                        <span className="text-xs text-[#2A394B]">Change your password regularly for enhanced security</span>
+                                    </li>
+                                </ul>
+                            </div>
+
+                            <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-10">
+                                <div className="space-y-2 relative">
+                                    <label className="text-sm font-bold text-slate-600">Current Password</label>
+                                    <div className="relative">
+                                        <Lock className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
+                                        <input
+                                            {...register("current_password")}
+                                            type={showPassword.current ? "text" : "password"}
+                                            className="w-full bg-[#f3f4f6] border-none rounded-lg p-3.5 pl-11 text-slate-700 font-medium focus:ring-2 focus:ring-indigo-500/20 outline-none"
+                                        />
+                                        <button
+                                            type="button"
+                                            onClick={() => setShowPassword(p => ({...p, current: !p.current}))}
+                                            className="absolute right-4 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600"
+                                        >
+                                            {showPassword.current ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                                        </button>
+                                    </div>
+                                    {errors.current_password && <p className="text-xs text-red-500 font-bold">{errors.current_password.message}</p>}
                                 </div>
-                                <div className="section-title-group">
-                                    <h3 className="section-title">Security & Password</h3>
-                                    <p className="section-description">Manage your password and security preferences</p>
+                                <div className="space-y-2 relative">
+                                    <label className="text-sm font-bold text-slate-600">New Password</label>
+                                    <div className="relative">
+                                        <KeyRound className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
+                                        <input
+                                            {...register("password")}
+                                            type={showPassword.new ? "text" : "password"}
+                                            className="w-full bg-[#f3f4f6] border-none rounded-lg p-3.5 pl-11 text-slate-700 font-medium focus:ring-2 focus:ring-indigo-500/20 outline-none"
+                                        />
+                                        <button
+                                            type="button"
+                                            onClick={() => setShowPassword(p => ({...p, new: !p.new}))}
+                                            className="absolute right-4 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600"
+                                        >
+                                            {showPassword.new ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                                        </button>
+                                    </div>
+                                    {errors.password && <p className="text-xs text-red-500 font-bold">{errors.password.message}</p>}
+                                </div>
+                                <div className="space-y-2 relative">
+                                    <label className="text-sm font-bold text-slate-600">Confirm New Password</label>
+                                    <div className="relative">
+                                        <KeyRound className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
+                                        <input
+                                            {...register("confirm_password")}
+                                            type={showPassword.confirm ? "text" : "password"}
+                                            className="w-full bg-[#f3f4f6] border-none rounded-lg p-3.5 pl-11 text-slate-700 font-medium focus:ring-2 focus:ring-indigo-500/20 outline-none"
+                                        />
+                                        <button
+                                            type="button"
+                                            onClick={() => setShowPassword(p => ({...p, confirm: !p.confirm}))}
+                                            className="absolute right-4 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600"
+                                        >
+                                            {showPassword.confirm ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                                        </button>
+                                    </div>
+                                    {errors.confirm_password && <p className="text-xs text-red-500 font-bold">{errors.confirm_password.message}</p>}
                                 </div>
                             </div>
                         </div>
 
-                        {/* Form */}
-                        <div className="settings-form-wrapper">
-                            <Form register={register} errors={errors} setShow={setShow} />
-                            <UpdateEmailModelComponent show={show} setShow={setShow} setValue={setValue} />
-                        </div>
-
-                        {/* Card Footer */}
-                        <div className="settings-card-footer">
-                            <div className="footer-left">
-                                <div className="security-badges">
-                                    <div className="security-badge success">
-                                        <i className="fas fa-check-circle"></i>
-                                        <span>256-bit SSL</span>
-                                    </div>
-                                    <div className="security-badge info">
-                                        <i className="fas fa-fingerprint"></i>
-                                        <span>Secure Auth</span>
-                                    </div>
-                                </div>
-                                {isDirty && (
-                                    <div className="unsaved-indicator">
-                                        <i className="fas fa-exclamation-circle"></i>
-                                        <span>You have unsaved changes</span>
-                                    </div>
-                                )}
-                            </div>
-                            <div className="footer-right">
-                                {saveSuccess && (
-                                    <div className="save-success-message">
-                                        <i className="fas fa-check-circle"></i>
-                                        <span>Changes saved successfully!</span>
-                                    </div>
-                                )}
-                                <button
-                                    className={`btn-save ${isSubmitting ? 'loading' : ''}`}
-                                    onClick={handleSubmit(onSubmit)}
-                                    disabled={isSubmitting}
-                                >
-                                    {isSubmitting ? (
-                                        <>
-                                            <span className="spinner"></span>
-                                            <span>Saving...</span>
-                                        </>
-                                    ) : (
-                                        <>
-                                            <i className="fas fa-save"></i>
-                                            <span>Save Changes</span>
-                                        </>
-                                    )}
-                                </button>
-                            </div>
-                        </div>
-                    </div>
-
-                    {/* Additional Info Card */}
-                    <div className="info-tip-card">
-                        <div className="tip-icon">
-                            <i className="fas fa-lightbulb"></i>
-                        </div>
-                        <div className="tip-content">
-                            <h4>Password Security Tips</h4>
-                            <ul>
-                                <li>Use a combination of uppercase, lowercase, numbers, and special characters</li>
-                                <li>Avoid using personal information in your password</li>
-                                <li>Change your password regularly for enhanced security</li>
-                            </ul>
+                        {/* Action Buttons */}
+                        <div className="flex justify-end gap-3 pt-6 border-t border-slate-50">
+                            {isDirty && (
+                                <span className="mr-auto self-center text-xs font-bold text-amber-500 animate-pulse">
+                                    ● You have unsaved changes
+                                </span>
+                            )}
+                            {saveSuccess && (
+                                <span className="mr-4 self-center text-sm font-bold text-emerald-500 flex items-center gap-1">
+                                    <Check className="w-4 h-4" /> Changes saved!
+                                </span>
+                            )}
+                            <button
+                                type="button"
+                                className="px-8 py-3 bg-[#f1f5f9] text-slate-600 font-bold rounded-xl hover:bg-slate-200 transition-all"
+                                onClick={() => window.location.reload()}
+                            >
+                                Cancel
+                            </button>
+                            <button
+                                disabled={isSubmitting}
+                                onClick={handleSubmit(onSubmit)}
+                                className={`px-8 py-3 bg-[#3b82f6] text-white font-bold rounded-xl hover:bg-blue-600 shadow-lg shadow-blue-200 transition-all flex items-center gap-2 ${isSubmitting ? 'opacity-70' : ''}`}
+                            >
+                                {isSubmitting ? <span className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin"></span> : <Save className="w-4 h-4" />}
+                                Save Changes
+                            </button>
                         </div>
                     </div>
                 </div>
-            </section>
+            </div>
 
-            <style>{`
-                /* Healthcare Theme Variables */
-                .account-page-wrapper {
-                    --primary: #0d9488;
-                    --primary-dark: #0f766e;
-                    --primary-light: #14b8a6;
-                    --secondary: #0f172a;
-                    --accent: #f0fdfa;
-                    --success: #10b981;
-                    --warning: #f59e0b;
-                    --danger: #ef4444;
-                    --info: #0ea5e9;
-                    --gray-50: #f8fafc;
-                    --gray-100: #f1f5f9;
-                    --gray-200: #e2e8f0;
-                    --gray-300: #cbd5e1;
-                    --gray-400: #94a3b8;
-                    --gray-500: #64748b;
-                    --gray-600: #475569;
-                    --gray-700: #334155;
-                    --gray-800: #1e293b;
-                    --gray-900: #0f172a;
-
-                    min-height: calc(100vh - 60px);
-                    background: linear-gradient(180deg, var(--gray-50) 0%, #e2e8f0 100%);
-                }
-
-                /* Header Styles */
-                .account-header {
-                    position: relative;
-                    padding: 2.5rem 0;
-                    margin-bottom: 2rem;
-                    overflow: hidden;
-                }
-
-                .header-background {
-                    position: absolute;
-                    inset: 0;
-                    background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 50%, var(--secondary) 100%);
-                    opacity: 0.97;
-                }
-
-                .header-background::before {
-                    content: '';
-                    position: absolute;
-                    inset: 0;
-                    background: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23ffffff' fill-opacity='0.05'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
-                }
-
-                .header-content {
-                    position: relative;
-                    z-index: 1;
-                    display: flex;
-                    justify-content: space-between;
-                    align-items: center;
-                    flex-wrap: wrap;
-                    gap: 1.5rem;
-                }
-
-                .header-left {
-                    display: flex;
-                    align-items: center;
-                    gap: 1.25rem;
-                }
-
-                .account-avatar {
-                    width: 72px;
-                    height: 72px;
-                    background: rgba(255, 255, 255, 0.15);
-                    backdrop-filter: blur(10px);
-                    border-radius: 18px;
-                    display: flex;
-                    align-items: center;
-                    justify-content: center;
-                    font-size: 1.85rem;
-                    color: white;
-                    border: 2px solid rgba(255, 255, 255, 0.25);
-                    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
-                    transition: all 0.3s ease;
-                }
-
-                .account-avatar:hover {
-                    transform: scale(1.05);
-                    border-color: rgba(255, 255, 255, 0.4);
-                }
-
-                .header-info {
-                    color: white;
-                }
-
-                .account-title {
-                    font-size: 1.85rem;
-                    font-weight: 700;
-                    margin: 0 0 0.35rem 0;
-                    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-                }
-
-                .account-subtitle {
-                    margin: 0;
-                    font-size: 1rem;
-                    color: rgba(255, 255, 255, 0.85);
-                }
-
-                .btn-back {
-                    display: flex;
-                    align-items: center;
-                    gap: 0.6rem;
-                    padding: 0.75rem 1.5rem;
-                    background: rgba(255, 255, 255, 0.15);
-                    backdrop-filter: blur(10px);
-                    color: white;
-                    border-radius: 12px;
-                    font-weight: 600;
-                    font-size: 0.9rem;
-                    text-decoration: none;
-                    border: 1px solid rgba(255, 255, 255, 0.25);
-                    transition: all 0.3s ease;
-                }
-
-                .btn-back:hover {
-                    background: rgba(255, 255, 255, 0.25);
-                    color: white;
-                    text-decoration: none;
-                    transform: translateY(-2px);
-                }
-
-                /* Quick Info Row */
-                .quick-info-row {
-                    display: grid;
-                    grid-template-columns: repeat(3, 1fr);
-                    gap: 1.25rem;
-                    margin-bottom: 1.75rem;
-                }
-
-                .info-card {
-                    background: white;
-                    border-radius: 16px;
-                    padding: 1.25rem 1.5rem;
-                    display: flex;
-                    align-items: center;
-                    gap: 1rem;
-                    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.04);
-                    border: 1px solid var(--gray-100);
-                    transition: all 0.3s ease;
-                }
-
-                .info-card:hover {
-                    transform: translateY(-3px);
-                    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.08);
-                }
-
-                .info-icon {
-                    width: 52px;
-                    height: 52px;
-                    border-radius: 14px;
-                    display: flex;
-                    align-items: center;
-                    justify-content: center;
-                    font-size: 1.25rem;
-                    flex-shrink: 0;
-                }
-
-                .info-icon.security {
-                    background: linear-gradient(135deg, var(--success) 0%, #059669 100%);
-                    color: white;
-                }
-
-                .info-icon.encryption {
-                    background: linear-gradient(135deg, var(--info) 0%, #0284c7 100%);
-                    color: white;
-                }
-
-                .info-icon.account {
-                    background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
-                    color: white;
-                }
-
-                .info-details {
-                    display: flex;
-                    flex-direction: column;
-                }
-
-                .info-label {
-                    font-size: 0.8rem;
-                    color: var(--gray-500);
-                    font-weight: 500;
-                    text-transform: uppercase;
-                    letter-spacing: 0.5px;
-                }
-
-                .info-value {
-                    font-size: 1.05rem;
-                    color: var(--gray-800);
-                    font-weight: 700;
-                }
-
-                .info-value.capitalize {
-                    text-transform: capitalize;
-                }
-
-                /* Main Settings Card */
-                .settings-main-card {
-                    background: white;
-                    border-radius: 24px;
-                    box-shadow: 0 4px 25px rgba(0, 0, 0, 0.06);
-                    border: 1px solid var(--gray-100);
-                    overflow: hidden;
-                }
-
-                .settings-section {
-                    padding: 1.5rem 2rem;
-                    border-bottom: 1px solid var(--gray-100);
-                }
-
-                .settings-section:last-of-type {
-                    border-bottom: none;
-                    padding-bottom: 0;
-                }
-
-                .section-header {
-                    display: flex;
-                    align-items: center;
-                    gap: 1rem;
-                }
-
-                .section-icon {
-                    width: 48px;
-                    height: 48px;
-                    border-radius: 12px;
-                    display: flex;
-                    align-items: center;
-                    justify-content: center;
-                    font-size: 1.2rem;
-                    flex-shrink: 0;
-                }
-
-                .section-icon.personal {
-                    background: linear-gradient(135deg, #6366f1 0%, #4f46e5 100%);
-                    color: white;
-                }
-
-                .section-icon.security {
-                    background: linear-gradient(135deg, var(--warning) 0%, #d97706 100%);
-                    color: white;
-                }
-
-                .section-title-group {
-                    flex: 1;
-                }
-
-                .section-title {
-                    font-size: 1.15rem;
-                    font-weight: 700;
-                    color: var(--gray-800);
-                    margin: 0 0 0.25rem 0;
-                }
-
-                .section-description {
-                    font-size: 0.875rem;
-                    color: var(--gray-500);
-                    margin: 0;
-                }
-
-                /* Form Wrapper */
-                .settings-form-wrapper {
-                    padding: 0 2rem 2rem 2rem;
-                }
-
-                /* Card Footer */
-                .settings-card-footer {
-                    display: flex;
-                    justify-content: space-between;
-                    align-items: center;
-                    padding: 1.5rem 2rem;
-                    background: linear-gradient(180deg, var(--gray-50) 0%, var(--gray-100) 100%);
-                    border-top: 1px solid var(--gray-200);
-                    flex-wrap: wrap;
-                    gap: 1rem;
-                }
-
-                .footer-left {
-                    display: flex;
-                    align-items: center;
-                    gap: 1.5rem;
-                    flex-wrap: wrap;
-                }
-
-                .footer-right {
-                    display: flex;
-                    align-items: center;
-                    gap: 1rem;
-                }
-
-                .security-badges {
-                    display: flex;
-                    gap: 0.75rem;
-                }
-
-                .security-badge {
-                    display: flex;
-                    align-items: center;
-                    gap: 0.4rem;
-                    padding: 0.5rem 0.85rem;
-                    border-radius: 8px;
-                    font-size: 0.8rem;
-                    font-weight: 600;
-                }
-
-                .security-badge.success {
-                    background: #d1fae5;
-                    color: #059669;
-                }
-
-                .security-badge.info {
-                    background: #dbeafe;
-                    color: #0284c7;
-                }
-
-                .security-badge i {
-                    font-size: 0.75rem;
-                }
-
-                .unsaved-indicator {
-                    display: flex;
-                    align-items: center;
-                    gap: 0.5rem;
-                    padding: 0.5rem 1rem;
-                    background: #fef3c7;
-                    color: #d97706;
-                    border-radius: 8px;
-                    font-size: 0.85rem;
-                    font-weight: 600;
-                    animation: pulse-subtle 2s infinite;
-                }
-
-                @keyframes pulse-subtle {
-                    0%, 100% { opacity: 1; }
-                    50% { opacity: 0.7; }
-                }
-
-                .save-success-message {
-                    display: flex;
-                    align-items: center;
-                    gap: 0.5rem;
-                    padding: 0.5rem 1rem;
-                    background: #d1fae5;
-                    color: #059669;
-                    border-radius: 8px;
-                    font-size: 0.85rem;
-                    font-weight: 600;
-                    animation: fadeIn 0.3s ease;
-                }
-
-                @keyframes fadeIn {
-                    from { opacity: 0; transform: translateX(10px); }
-                    to { opacity: 1; transform: translateX(0); }
-                }
-
-                .btn-save {
-                    display: flex;
-                    align-items: center;
-                    gap: 0.6rem;
-                    padding: 0.85rem 2rem;
-                    background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
-                    color: white;
-                    border: none;
-                    border-radius: 12px;
-                    font-weight: 600;
-                    font-size: 0.95rem;
-                    cursor: pointer;
-                    transition: all 0.3s ease;
-                    box-shadow: 0 4px 15px rgba(13, 148, 136, 0.3);
-                }
-
-                .btn-save:hover:not(:disabled) {
-                    transform: translateY(-2px);
-                    box-shadow: 0 6px 25px rgba(13, 148, 136, 0.4);
-                }
-
-                .btn-save:disabled {
-                    opacity: 0.7;
-                    cursor: not-allowed;
-                }
-
-                .btn-save.loading {
-                    background: linear-gradient(135deg, var(--gray-400) 0%, var(--gray-500) 100%);
-                }
-
-                .spinner {
-                    width: 18px;
-                    height: 18px;
-                    border: 2px solid rgba(255, 255, 255, 0.3);
-                    border-top-color: white;
-                    border-radius: 50%;
-                    animation: spin 0.8s linear infinite;
-                }
-
-                @keyframes spin {
-                    to { transform: rotate(360deg); }
-                }
-
-                /* Info Tip Card */
-                .info-tip-card {
-                    background: linear-gradient(135deg, #fef3c7 0%, #fde68a 100%);
-                    border-radius: 16px;
-                    padding: 1.5rem;
-                    display: flex;
-                    gap: 1.25rem;
-                    margin-top: 1.75rem;
-                    border: 1px solid #fcd34d;
-                }
-
-                .tip-icon {
-                    width: 48px;
-                    height: 48px;
-                    background: white;
-                    border-radius: 12px;
-                    display: flex;
-                    align-items: center;
-                    justify-content: center;
-                    font-size: 1.35rem;
-                    color: #d97706;
-                    flex-shrink: 0;
-                    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.08);
-                }
-
-                .tip-content h4 {
-                    font-size: 1rem;
-                    font-weight: 700;
-                    color: #92400e;
-                    margin: 0 0 0.75rem 0;
-                }
-
-                .tip-content ul {
-                    margin: 0;
-                    padding-left: 1.25rem;
-                }
-
-                .tip-content li {
-                    font-size: 0.9rem;
-                    color: #78350f;
-                    margin-bottom: 0.35rem;
-                    line-height: 1.5;
-                }
-
-                .tip-content li:last-child {
-                    margin-bottom: 0;
-                }
-
-                /* Account Content */
-                .account-content {
-                    padding: 0 0 2.5rem 0;
-                }
-
-                /* Responsive Design */
-                @media (max-width: 992px) {
-                    .quick-info-row {
-                        grid-template-columns: repeat(2, 1fr);
-                    }
-
-                    .quick-info-row .info-card:last-child {
-                        grid-column: span 2;
-                        max-width: 50%;
-                        margin: 0 auto;
-                    }
-                }
-
-                @media (max-width: 768px) {
-                    .account-header {
-                        padding: 1.75rem 0;
-                    }
-
-                    .header-content {
-                        flex-direction: column;
-                        text-align: center;
-                    }
-
-                    .header-left {
-                        flex-direction: column;
-                    }
-
-                    .account-title {
-                        font-size: 1.5rem;
-                    }
-
-                    .btn-back {
-                        width: 100%;
-                        justify-content: center;
-                    }
-
-                    .quick-info-row {
-                        grid-template-columns: 1fr;
-                    }
-
-                    .quick-info-row .info-card:last-child {
-                        grid-column: span 1;
-                        max-width: 100%;
-                    }
-
-                    .settings-section {
-                        padding: 1.25rem 1.25rem;
-                    }
-
-                    .settings-form-wrapper {
-                        padding: 0 1.25rem 1.25rem 1.25rem;
-                    }
-
-                    .settings-card-footer {
-                        flex-direction: column;
-                        padding: 1.25rem;
-                    }
-
-                    .footer-left {
-                        width: 100%;
-                        justify-content: center;
-                        flex-direction: column;
-                    }
-
-                    .footer-right {
-                        width: 100%;
-                        flex-direction: column;
-                    }
-
-                    .btn-save {
-                        width: 100%;
-                        justify-content: center;
-                    }
-
-                    .security-badges {
-                        justify-content: center;
-                    }
-
-                    .info-tip-card {
-                        flex-direction: column;
-                        text-align: center;
-                    }
-
-                    .tip-icon {
-                        margin: 0 auto;
-                    }
-
-                    .tip-content ul {
-                        text-align: left;
-                    }
-                }
-
-                @media (max-width: 480px) {
-                    .account-avatar {
-                        width: 60px;
-                        height: 60px;
-                        font-size: 1.5rem;
-                    }
-
-                    .account-title {
-                        font-size: 1.35rem;
-                    }
-
-                    .info-card {
-                        padding: 1rem;
-                    }
-
-                    .info-icon {
-                        width: 44px;
-                        height: 44px;
-                        font-size: 1.1rem;
-                    }
-
-                    .section-icon {
-                        width: 42px;
-                        height: 42px;
-                        font-size: 1rem;
-                    }
-
-                    .section-title {
-                        font-size: 1rem;
-                    }
-
-                    .security-badges {
-                        flex-direction: column;
-                        gap: 0.5rem;
-                    }
-                }
-            `}</style>
+            <UpdateEmailModelComponent show={show} setShow={setShow} setValue={setValue} />
         </div>
     );
 };

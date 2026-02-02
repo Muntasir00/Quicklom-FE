@@ -1,7 +1,10 @@
-import React, { useState, useEffect } from "react";
+import { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import axios from "axios";
 import Swal from "sweetalert2";
+import EmptyFeesState from "@pages/professional/cancellation-fees/EmptyFeesState.jsx";
+import LoadingState from "@pages/professional/cancellation-fees/LoadingState.jsx";
+import CancellationFeesView from "@pages/professional/cancellation-fees/CancellationFeesView.jsx";
 
 const View = () => {
     const [pendingFees, setPendingFees] = useState(null);
@@ -49,7 +52,7 @@ const View = () => {
     };
 
     return (
-        <div className="content-wrapper">
+        <div className="">
             <style>{`
                 .fees-page {
                     padding: 24px;
@@ -388,91 +391,79 @@ const View = () => {
                 }
             `}</style>
 
-            <div className="fees-page">
+            <div>
                 {loading ? (
-                    <div className="loading-state">
-                        <div className="loading-spinner"></div>
-                        <p>Loading fees...</p>
-                    </div>
+                    <LoadingState />
                 ) : pendingFees?.has_outstanding_fees ? (
                     <>
-                        <div className="fees-header">
-                            <div className="fees-header-content">
-                                <div className="fees-header-icon">
-                                    <i className="fas fa-exclamation-triangle"></i>
-                                </div>
-                                <div className="fees-header-text">
-                                    <h1>Cancellation Fees</h1>
-                                    <p>Outstanding fees that must be paid before applying to new contracts</p>
-                                </div>
-                            </div>
-                            <div className="fees-header-total">
-                                <span className="label">Total Outstanding</span>
-                                <span className="amount">${pendingFees.total_amount?.toFixed(2)} CAD</span>
-                            </div>
-                        </div>
+                        <CancellationFeesView pendingFees={pendingFees}  formatDate={formatDate} handlePayFee={handlePayFee} />
+                        {/*<div className="fees-header">*/}
+                        {/*    <div className="fees-header-content">*/}
+                        {/*        <div className="fees-header-icon">*/}
+                        {/*            <i className="fas fa-exclamation-triangle"></i>*/}
+                        {/*        </div>*/}
+                        {/*        <div className="fees-header-text">*/}
+                        {/*            <h1>Cancellation Fees</h1>*/}
+                        {/*            <p>Outstanding fees that must be paid before applying to new contracts</p>*/}
+                        {/*        </div>*/}
+                        {/*    </div>*/}
+                        {/*    <div className="fees-header-total">*/}
+                        {/*        <span className="label">Total Outstanding</span>*/}
+                        {/*        <span className="amount">${pendingFees.total_amount?.toFixed(2)} CAD</span>*/}
+                        {/*    </div>*/}
+                        {/*</div>*/}
 
-                        <div className="info-box">
-                            <i className="fas fa-info-circle"></i>
-                            <div className="info-box-content">
-                                <h4>Why do I have cancellation fees?</h4>
-                                <p>Cancellation fees are applied when you withdraw from a booked contract within 48 hours of the start date. This helps ensure reliability for healthcare facilities.</p>
-                            </div>
-                        </div>
+                        {/*<div className="info-box">*/}
+                        {/*    <i className="fas fa-info-circle"></i>*/}
+                        {/*    <div className="info-box-content">*/}
+                        {/*        <h4>Why do I have cancellation fees?</h4>*/}
+                        {/*        <p>Cancellation fees are applied when you withdraw from a booked contract within 48 hours of the start date. This helps ensure reliability for healthcare facilities.</p>*/}
+                        {/*    </div>*/}
+                        {/*</div>*/}
 
-                        <div className="fees-list">
-                            {pendingFees.fees.map((fee) => (
-                                <div key={fee.id} className="fee-card">
-                                    <div className="fee-card-header">
-                                        <div className="fee-contract-info">
-                                            <div className="fee-contract-icon">
-                                                <i className="fas fa-file-contract"></i>
-                                            </div>
-                                            <div className="fee-contract-details">
-                                                <h3>{fee.contract_title || `Contract #${fee.contract_id}`}</h3>
-                                                <span>Application #{fee.application_id}</span>
-                                            </div>
-                                        </div>
-                                        <span className="fee-status pending">Pending Payment</span>
-                                    </div>
-                                    <div className="fee-card-body">
-                                        <div className="fee-details">
-                                            <div className="fee-detail-item">
-                                                <span className="label">Fee Amount</span>
-                                                <span className="value amount">${fee.amount?.toFixed(2)} CAD</span>
-                                            </div>
-                                            <div className="fee-detail-item">
-                                                <span className="label">Fee Rate</span>
-                                                <span className="value">{fee.percentage}%</span>
-                                            </div>
-                                            <div className="fee-detail-item">
-                                                <span className="label">Date Incurred</span>
-                                                <span className="value">{formatDate(fee.created_at)}</span>
-                                            </div>
-                                        </div>
-                                        <div className="fee-actions">
-                                            <button className="pay-btn" onClick={() => handlePayFee(fee)}>
-                                                <i className="fas fa-credit-card"></i>
-                                                Pay Now
-                                            </button>
-                                        </div>
-                                    </div>
-                                </div>
-                            ))}
-                        </div>
+                        {/*<div className="fees-list">*/}
+                        {/*    {pendingFees.fees.map((fee) => (*/}
+                        {/*        <div key={fee.id} className="fee-card">*/}
+                        {/*            <div className="fee-card-header">*/}
+                        {/*                <div className="fee-contract-info">*/}
+                        {/*                    <div className="fee-contract-icon">*/}
+                        {/*                        <i className="fas fa-file-contract"></i>*/}
+                        {/*                    </div>*/}
+                        {/*                    <div className="fee-contract-details">*/}
+                        {/*                        <h3>{fee.contract_title || `Contract #${fee.contract_id}`}</h3>*/}
+                        {/*                        <span>Application #{fee.application_id}</span>*/}
+                        {/*                    </div>*/}
+                        {/*                </div>*/}
+                        {/*                <span className="fee-status pending">Pending Payment</span>*/}
+                        {/*            </div>*/}
+                        {/*            <div className="fee-card-body">*/}
+                        {/*                <div className="fee-details">*/}
+                        {/*                    <div className="fee-detail-item">*/}
+                        {/*                        <span className="label">Fee Amount</span>*/}
+                        {/*                        <span className="value amount">${fee.amount?.toFixed(2)} CAD</span>*/}
+                        {/*                    </div>*/}
+                        {/*                    <div className="fee-detail-item">*/}
+                        {/*                        <span className="label">Fee Rate</span>*/}
+                        {/*                        <span className="value">{fee.percentage}%</span>*/}
+                        {/*                    </div>*/}
+                        {/*                    <div className="fee-detail-item">*/}
+                        {/*                        <span className="label">Date Incurred</span>*/}
+                        {/*                        <span className="value">{formatDate(fee.created_at)}</span>*/}
+                        {/*                    </div>*/}
+                        {/*                </div>*/}
+                        {/*                <div className="fee-actions">*/}
+                        {/*                    <button className="pay-btn" onClick={() => handlePayFee(fee)}>*/}
+                        {/*                        <i className="fas fa-credit-card"></i>*/}
+                        {/*                        Pay Now*/}
+                        {/*                    </button>*/}
+                        {/*                </div>*/}
+                        {/*            </div>*/}
+                        {/*        </div>*/}
+                        {/*    ))}*/}
+                        {/*</div>*/}
                     </>
                 ) : (
-                    <div className="empty-state">
-                        <div className="empty-icon">
-                            <i className="fas fa-check-circle"></i>
-                        </div>
-                        <h3>No Outstanding Fees</h3>
-                        <p>You don't have any pending cancellation fees. You're all set!</p>
-                        <Link to={`/${sessionUserRole}/published-contracts`} className="browse-btn">
-                            <i className="fas fa-search"></i>
-                            Browse Available Jobs
-                        </Link>
-                    </div>
+                    <EmptyFeesState sessionUserRole={sessionUserRole} />
                 )}
             </div>
         </div>

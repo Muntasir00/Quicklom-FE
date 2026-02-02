@@ -4,6 +4,16 @@ import { getUpcomingContractsService } from "@services/professional/UpcomingCont
 import { withdrawApplicationService } from "@services/professional/ApplicationWithdrawalService";
 import CancelConfirmationModal from "@components/modals/CancelConfirmationModal";
 import "./UpcomingWorkStyles.css";
+import {StatsCard} from "@pages/professional/upcoming_contracts/StatsCard.jsx";
+import FilterSelect from "@pages/professional/upcoming_contracts/FilterSelect.jsx";
+import {
+    LayoutGrid, Plus, Search, Calendar,
+    ChevronDown, Filter, SearchIcon
+} from "lucide-react";
+import { Button } from "@components/ui/button";
+import { Input } from "@components/ui/input";
+import {InputGroup, InputGroupAddon, InputGroupInput} from "@components/ui/input-group.jsx";
+import WorkCard from "@pages/professional/upcoming_contracts/WorkCard.jsx";
 
 const ProfessionalUpcomingContracts = () => {
     const [loading, setLoading] = useState(true);
@@ -235,7 +245,7 @@ const ProfessionalUpcomingContracts = () => {
 
     if (loading) {
         return (
-            <div className="content-wrapper upcoming-work-page">
+            <div className=" upcoming-work-page">
                 <div className="loading-state">
                     <div className="spinner"></div>
                     <p>Loading your upcoming work...</p>
@@ -262,151 +272,170 @@ const ProfessionalUpcomingContracts = () => {
     const { stats, contracts, timeline_view } = contractsData;
 
     return (
-        <div className="content-wrapper upcoming-work-page">
-            {/* Header */}
-            <div className="upcoming-header">
-                <div className="header-content">
-                    <div className="header-left">
-                        <div className="header-icon">
-                            <i className="fas fa-briefcase"></i>
-                        </div>
-                        <div className="header-text">
-                            <h1>Upcoming Work</h1>
-                            <p>Your scheduled contracts and assignments</p>
-                        </div>
+        <div className="">
+
+            <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
+                <div className="flex items-start gap-4">
+                    <div className="p-2 bg-white rounded-md border border-slate-100 shadow-sm text-blue-500">
+                        <LayoutGrid className="w-5 h-5" />
                     </div>
-                    <div className="header-actions">
-                        <Link to="/professional/published-contracts" className="find-jobs-btn">
-                            <i className="fas fa-search"></i>
-                            Find More Jobs
-                        </Link>
+                    <div>
+                        <h1 className="!text-base font-semibold text-slate-800 !mb-0">Upcoming Work</h1>
+                        <p className="text-slate-500 text-sm !mb-0">Manage your scheduled contracts and assignments</p>
                     </div>
+                </div>
+                <Button className="bg-[#2D8FE3] hover:bg-blue-600 h-11 px-6 !rounded-lg font-bold transition-all flex gap-2">
+                    <Plus className="w-5 h-5" />
+                    Add New Contract
+                </Button>
+            </div>
+
+            {/* Stats Grid */}
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-2 my-4">
+                <StatsCard title="Upcoming Work" value={stats?.total_upcoming || 0} percentage="20" subText="Currently Running" />
+                <StatsCard title="Starting Soon" value={stats?.imminent_count || 0} percentage="20" subText="Currently Running" />
+                <StatsCard title="This Week" value={stats?.this_week || 0} percentage="20" subText="7days details" isNegative />
+                <StatsCard title="This Month" value={formatCurrency(stats?.total_projected_earnings) || '$0'} percentage="20" subText="30days reports" />
+            </div>
+
+            {/* Filter Bar */}
+            <div className="mb-4 flex flex-col lg:flex-row gap-4 items-center w-full border border-[#E5E7EB] p-3 rounded-lg">
+
+                <InputGroup className="max-w-sm w-full">
+                    <InputGroupInput placeholder="Search..." />
+                    <InputGroupAddon>
+                        <Search />
+                    </InputGroupAddon>
+                </InputGroup>
+
+                {/* Action Buttons Group */}
+                <div className="flex flex-wrap items-center gap-2 w-full lg:w-auto">
+                    <Button variant="outline" className="bg-white border-slate-100 rounded-lg text-slate-500 flex gap-2">
+                        <Calendar className="w-4 h-4" /> Daily
+                    </Button>
+
+                    <FilterSelect placeholder="All Levels" />
+                    <FilterSelect placeholder="All Statuses" />
+                    <FilterSelect placeholder="All Contracts" />
+
+                    <Button variant="outline" className=" bg-white border-slate-100 rounded-lg text-slate-500 flex gap-2 font-semibold">
+                        Adv Filters <Filter className="w-4 h-4" />
+                    </Button>
+
                 </div>
 
-                {/* Stats */}
-                <div className="stats-row">
-                    <div className="stat-card blue">
-                        <i className="fas fa-calendar-alt"></i>
-                        <div className="stat-info">
-                            <span className="stat-value">{stats?.total_upcoming || 0}</span>
-                            <span className="stat-label">Total Upcoming</span>
-                        </div>
-                    </div>
-                    <div className="stat-card red">
-                        <i className="fas fa-exclamation-circle"></i>
-                        <div className="stat-info">
-                            <span className="stat-value">{stats?.imminent_count || 0}</span>
-                            <span className="stat-label">Imminent (3 days)</span>
-                        </div>
-                    </div>
-                    <div className="stat-card purple">
-                        <i className="fas fa-calendar-week"></i>
-                        <div className="stat-info">
-                            <span className="stat-value">{stats?.this_week || 0}</span>
-                            <span className="stat-label">This Week</span>
-                        </div>
-                    </div>
-                    <div className="stat-card green">
-                        <i className="fas fa-dollar-sign"></i>
-                        <div className="stat-info">
-                            <span className="stat-value">{formatCurrency(stats?.total_projected_earnings) || '$0'}</span>
-                            <span className="stat-label">Projected Earnings</span>
-                        </div>
-                    </div>
+            </div>
+
+            {/* Empty State Section */}
+            <div className="bg-[#F3F9FE] border border-slate-100 rounded-xl p-8 h-auto flex flex-col items-center justify-center text-center shadow-sm">
+                <div className="w-20 h-20 bg-white rounded-full flex items-center justify-center">
+                    <SearchIcon className="w-10 h-10 text-[#2D8FE3]" />
                 </div>
+                <h3 className="text-base font-semibold text-[#2A394B] mb-2">No Contracts Found</h3>
+                <p className="text-[#374151] text-sm">
+                    {/* eslint-disable-next-line react/no-unescaped-entities */}
+                    You don't have upcoming contracts at the moment
+                </p>
+            </div>
+
+
+            <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-3 mt-5">
+                {[1,2,3].map((_, index) => (
+                    <WorkCard key={index} job={{}} />
+                ))}
             </div>
 
             {/* Toolbar */}
-            <div className="upcoming-toolbar">
-                <div className="toolbar-left">
-                    <span className="results-info">
-                        {contracts?.length || 0} contract{(contracts?.length || 0) !== 1 ? 's' : ''} scheduled
-                    </span>
-                </div>
-                <div className="toolbar-right">
-                    <div className="view-toggle">
-                        <button
-                            className={`view-btn ${viewMode === 'timeline' ? 'active' : ''}`}
-                            onClick={() => setViewMode('timeline')}
-                        >
-                            <i className="fas fa-stream"></i>
-                            Timeline
-                        </button>
-                        <button
-                            className={`view-btn ${viewMode === 'all' ? 'active' : ''}`}
-                            onClick={() => setViewMode('all')}
-                        >
-                            <i className="fas fa-th-large"></i>
-                            All Contracts
-                        </button>
-                    </div>
-                </div>
-            </div>
+            {/*<div className="upcoming-toolbar">*/}
+            {/*    <div className="toolbar-left">*/}
+            {/*        <span className="results-info">*/}
+            {/*            {contracts?.length || 0} contract{(contracts?.length || 0) !== 1 ? 's' : ''} scheduled*/}
+            {/*        </span>*/}
+            {/*    </div>*/}
+            {/*    <div className="toolbar-right">*/}
+            {/*        <div className="view-toggle">*/}
+            {/*            <button*/}
+            {/*                className={`view-btn ${viewMode === 'timeline' ? 'active' : ''}`}*/}
+            {/*                onClick={() => setViewMode('timeline')}*/}
+            {/*            >*/}
+            {/*                <i className="fas fa-stream"></i>*/}
+            {/*                Timeline*/}
+            {/*            </button>*/}
+            {/*            <button*/}
+            {/*                className={`view-btn ${viewMode === 'all' ? 'active' : ''}`}*/}
+            {/*                onClick={() => setViewMode('all')}*/}
+            {/*            >*/}
+            {/*                <i className="fas fa-th-large"></i>*/}
+            {/*                All Contracts*/}
+            {/*            </button>*/}
+            {/*        </div>*/}
+            {/*    </div>*/}
+            {/*</div>*/}
 
-            {/* Content */}
-            <div className="upcoming-content">
-                {contracts?.length === 0 ? (
-                    <div className="empty-state">
-                        <div className="empty-icon">
-                            <i className="fas fa-calendar-times"></i>
-                        </div>
-                        <h3>No upcoming work</h3>
-                        <p>You don't have any scheduled contracts yet. Start applying to jobs!</p>
-                        <Link to="/professional/published-contracts" className="browse-btn">
-                            <i className="fas fa-search"></i>
-                            Browse Available Jobs
-                        </Link>
-                    </div>
-                ) : viewMode === 'timeline' ? (
-                    <div className="timeline-view">
-                        {/* Pending Signature - Top Priority */}
-                        <TimelineSection
-                            title="Pending Your Signature"
-                            icon="fas fa-file-signature"
-                            contracts={timeline_view?.pending_signature}
-                            type="signature"
-                        />
+            {/*/!* Content *!/*/}
+            {/*<div className="upcoming-content">*/}
+            {/*    {contracts?.length === 0 ? (*/}
+            {/*        <div className="empty-state">*/}
+            {/*            <div className="empty-icon">*/}
+            {/*                <i className="fas fa-calendar-times"></i>*/}
+            {/*            </div>*/}
+            {/*            <h3>No upcoming work</h3>*/}
+            {/*            <p>You don't have any scheduled contracts yet. Start applying to jobs!</p>*/}
+            {/*            <Link to="/professional/published-contracts" className="browse-btn">*/}
+            {/*                <i className="fas fa-search"></i>*/}
+            {/*                Browse Available Jobs*/}
+            {/*            </Link>*/}
+            {/*        </div>*/}
+            {/*    ) : viewMode === 'timeline' ? (*/}
+            {/*        <div className="timeline-view">*/}
+            {/*            /!* Pending Signature - Top Priority *!/*/}
+            {/*            <TimelineSection*/}
+            {/*                title="Pending Your Signature"*/}
+            {/*                icon="fas fa-file-signature"*/}
+            {/*                contracts={timeline_view?.pending_signature}*/}
+            {/*                type="signature"*/}
+            {/*            />*/}
 
-                        {/* Imminent */}
-                        <TimelineSection
-                            title="Starting Soon"
-                            icon="fas fa-exclamation-circle"
-                            contracts={timeline_view?.imminent}
-                            type="imminent"
-                        />
+            {/*            /!* Imminent *!/*/}
+            {/*            <TimelineSection*/}
+            {/*                title="Starting Soon"*/}
+            {/*                icon="fas fa-exclamation-circle"*/}
+            {/*                contracts={timeline_view?.imminent}*/}
+            {/*                type="imminent"*/}
+            {/*            />*/}
 
-                        {/* This Week */}
-                        <TimelineSection
-                            title="This Week"
-                            icon="fas fa-calendar-week"
-                            contracts={timeline_view?.this_week}
-                            type="this-week"
-                        />
+            {/*            /!* This Week *!/*/}
+            {/*            <TimelineSection*/}
+            {/*                title="This Week"*/}
+            {/*                icon="fas fa-calendar-week"*/}
+            {/*                contracts={timeline_view?.this_week}*/}
+            {/*                type="this-week"*/}
+            {/*            />*/}
 
-                        {/* This Month */}
-                        <TimelineSection
-                            title="This Month"
-                            icon="fas fa-calendar-alt"
-                            contracts={timeline_view?.this_month}
-                            type="this-month"
-                        />
+            {/*            /!* This Month *!/*/}
+            {/*            <TimelineSection*/}
+            {/*                title="This Month"*/}
+            {/*                icon="fas fa-calendar-alt"*/}
+            {/*                contracts={timeline_view?.this_month}*/}
+            {/*                type="this-month"*/}
+            {/*            />*/}
 
-                        {/* Future */}
-                        <TimelineSection
-                            title="Future Contracts"
-                            icon="fas fa-calendar-plus"
-                            contracts={timeline_view?.future}
-                            type="future"
-                        />
-                    </div>
-                ) : (
-                    <div className="all-contracts">
-                        {contracts.map(contract => (
-                            <ContractCard key={contract.id} contract={contract} />
-                        ))}
-                    </div>
-                )}
-            </div>
+            {/*            /!* Future *!/*/}
+            {/*            <TimelineSection*/}
+            {/*                title="Future Contracts"*/}
+            {/*                icon="fas fa-calendar-plus"*/}
+            {/*                contracts={timeline_view?.future}*/}
+            {/*                type="future"*/}
+            {/*            />*/}
+            {/*        </div>*/}
+            {/*    ) : (*/}
+            {/*        <div className="all-contracts">*/}
+            {/*            {contracts.map(contract => (*/}
+            {/*                <ContractCard key={contract.id} contract={contract} />*/}
+            {/*            ))}*/}
+            {/*        </div>*/}
+            {/*    )}*/}
+            {/*</div>*/}
 
             {/* Details Modal */}
             {showDetailsModal && selectedContract && (

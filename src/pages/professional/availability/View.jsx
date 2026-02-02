@@ -1,5 +1,19 @@
-import React, { useState, useEffect } from "react";
-import { format, startOfMonth, endOfMonth, eachDayOfInterval, isSameMonth, isToday, startOfWeek, endOfWeek, startOfDay, parseISO, isWithinInterval, getDay, getDate } from "date-fns";
+import {useState, useEffect} from "react";
+import {
+    format,
+    startOfMonth,
+    endOfMonth,
+    eachDayOfInterval,
+    isSameMonth,
+    isToday,
+    startOfWeek,
+    endOfWeek,
+    startOfDay,
+    parseISO,
+    isWithinInterval,
+    getDay,
+    getDate
+} from "date-fns";
 import {
     getAvailabilityCalendarService,
     deleteAvailabilityService
@@ -7,6 +21,20 @@ import {
 import AddAvailabilityModal from "./AddAvailabilityModal";
 import EditAvailabilityModal from "./EditAvailabilityModal";
 import "./AvailabilityStyles.css";
+import {MetricsCard} from "@pages/professional/availability/metrics-card.jsx";
+import {Button} from "@components/ui/button.jsx";
+import {
+    ChevronLeft,
+    ChevronRight,
+    Plus,
+    RotateCcw,
+    Briefcase,
+    X,
+    CircleCheckBig,
+    PencilLine
+} from "lucide-react";
+import {cn} from "../../../lib/utils.js";
+import {Skeleton} from "@components/ui/skeleton.jsx";
 
 function View() {
     const [currentDate, setCurrentDate] = useState(new Date());
@@ -80,9 +108,9 @@ function View() {
                 const start = startOfDay(parseISO(avail.start_date));
                 const end = startOfDay(parseISO(avail.end_date));
 
-                const isInRange = isWithinInterval(dayStart, { start, end }) ||
-                                 dayStart.getTime() === start.getTime() ||
-                                 dayStart.getTime() === end.getTime();
+                const isInRange = isWithinInterval(dayStart, {start, end}) ||
+                    dayStart.getTime() === start.getTime() ||
+                    dayStart.getTime() === end.getTime();
 
                 if (!isInRange) return false;
 
@@ -103,332 +131,203 @@ function View() {
             try {
                 const start = startOfDay(parseISO(contract.start_date));
                 const end = startOfDay(parseISO(contract.end_date));
-                return isWithinInterval(dayStart, { start, end }) ||
-                       dayStart.getTime() === start.getTime() ||
-                       dayStart.getTime() === end.getTime();
+                return isWithinInterval(dayStart, {start, end}) ||
+                    dayStart.getTime() === start.getTime() ||
+                    dayStart.getTime() === end.getTime();
             } catch (e) {
                 return false;
             }
         });
 
-        return { availabilities: availabilitiesForDay, contracts: contractsForDay };
+        return {availabilities: availabilitiesForDay, contracts: contractsForDay};
     };
 
     const monthStart = startOfMonth(currentDate);
     const monthEnd = endOfMonth(currentDate);
     const calendarStart = startOfWeek(monthStart);
     const calendarEnd = endOfWeek(monthEnd);
-    const calendarDays = eachDayOfInterval({ start: calendarStart, end: calendarEnd });
+    const calendarDays = eachDayOfInterval({start: calendarStart, end: calendarEnd});
 
     // Statistics
     const totalAvailabilities = availabilities.length;
     const totalBooked = bookedContracts.length;
     const upcomingAvailabilities = availabilities.filter(a => new Date(a.start_date) > new Date()).length;
 
+    const stats = [
+        {label: "Total Slots", value: totalAvailabilities},
+        {label: "Upcoming", value: upcomingAvailabilities},
+        {label: "Booked", value: totalBooked},
+    ];
+
+    const weekDays = ["SUN", "MON", "TUE", "WED", "THU", "FRI", "SAT"];
+
+    if (loading) {
+        return <CalendarSkeleton />;
+    }
+
     return (
-        <div className="content-wrapper availability-page">
-            {/* Header */}
-            <div className="availability-header">
-                <div className="header-content">
-                    <div className="header-left">
-                        <div className="header-icon">
-                            <i className="fas fa-calendar-check"></i>
-                        </div>
-                        <div className="header-text">
-                            <h1>My Availability</h1>
-                            <p>Manage your schedule and availability slots</p>
-                        </div>
-                    </div>
-                    <div className="header-actions">
-                        <button
-                            className="add-availability-btn"
-                            onClick={() => {
-                                setSelectedDate(null);
-                                setShowAddModal(true);
-                            }}
-                        >
-                            <i className="fas fa-plus"></i>
-                            Add Availability
-                        </button>
-                    </div>
-                </div>
-
-                {/* Stats */}
-                <div className="stats-row">
-                    <div className="stat-card blue">
-                        <i className="fas fa-calendar-alt"></i>
-                        <div className="stat-info">
-                            <span className="stat-value">{totalAvailabilities}</span>
-                            <span className="stat-label">Total Slots</span>
-                        </div>
-                    </div>
-                    <div className="stat-card green">
-                        <i className="fas fa-clock"></i>
-                        <div className="stat-info">
-                            <span className="stat-value">{upcomingAvailabilities}</span>
-                            <span className="stat-label">Upcoming</span>
-                        </div>
-                    </div>
-                    <div className="stat-card yellow">
-                        <i className="fas fa-briefcase"></i>
-                        <div className="stat-info">
-                            <span className="stat-value">{totalBooked}</span>
-                            <span className="stat-label">Booked</span>
-                        </div>
-                    </div>
-                </div>
+        <div>
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
+                {stats.map((stat, idx) => (
+                    <MetricsCard key={idx} label={stat.label} value={stat.value}/>
+                ))}
             </div>
 
-            {/* Calendar Toolbar */}
-            <div className="calendar-toolbar">
-                <div className="toolbar-left">
-                    <div className="month-nav">
-                        <button className="nav-btn" onClick={handlePreviousMonth}>
-                            <i className="fas fa-chevron-left"></i>
-                        </button>
-                        <h2 className="current-month">{format(currentDate, 'MMMM yyyy')}</h2>
-                        <button className="nav-btn" onClick={handleNextMonth}>
-                            <i className="fas fa-chevron-right"></i>
-                        </button>
+            {/* ২. Navigation & Action Bar */}
+            <div className="flex flex-col sm:flex-row justify-between items-center gap-4 my-4">
+                <div className="flex items-center gap-2">
+                    <Button variant="outline" size="icon" className="h-9 w-9 border-[#E2E8F0] rounded-lg"
+                            onClick={handlePreviousMonth}>
+                        <ChevronLeft className="h-4 w-4 text-[#64748B]"/>
+                    </Button>
+
+                    <div
+                        className="px-6 py-1.5 border border-[#E2E8F0] rounded-lg bg-white text-sm font-semibold text-[#1E293B] min-w-[150px] text-center">
+                        {format(currentDate, 'MMMM yyyy')}
                     </div>
-                    <button className="today-btn" onClick={handleToday}>
-                        Today
-                    </button>
+
+                    <Button variant="outline" size="icon" className="h-9 w-9 border-[#E2E8F0] rounded-lg"
+                            onClick={handleNextMonth}>
+                        <ChevronRight className="h-4 w-4 text-[#64748B]"/>
+                    </Button>
                 </div>
-                <div className="toolbar-right">
-                    <div className="view-toggle">
-                        <button
-                            className={`view-btn ${viewMode === 'month' ? 'active' : ''}`}
-                            onClick={() => setViewMode('month')}
-                        >
-                            <i className="fas fa-calendar"></i>
-                            Month
-                        </button>
-                        <button
-                            className={`view-btn ${viewMode === 'list' ? 'active' : ''}`}
-                            onClick={() => setViewMode('list')}
-                        >
-                            <i className="fas fa-list"></i>
-                            List
-                        </button>
-                    </div>
-                </div>
+
+                <Button
+                    className="bg-[#2D8FE3] hover:bg-[#2476BA] text-white py-1 rounded-lg font-bold text-sm flex items-center gap-2 shadow-sm"
+                    onClick={() => setShowAddModal(true)}>
+                    <Plus className="h-5 w-5"/>
+                    Add Availability
+                </Button>
             </div>
 
-            {/* Calendar Content */}
-            <div className="calendar-content">
-                {loading ? (
-                    <div className="loading-state">
-                        <div className="spinner"></div>
-                        <p>Loading your calendar...</p>
-                    </div>
-                ) : viewMode === 'month' ? (
-                    <div className="calendar-container">
-                        {/* Weekday Headers */}
-                        <div className="weekday-headers">
-                            {['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'].map(day => (
-                                <div key={day} className="weekday-header">{day}</div>
-                            ))}
+            <div className="border border-[#E2E8F0] rounded-xl overflow-hidden shadow-sm bg-white transition-all">
+
+                {/* ১. Calendar Header: Weekdays */}
+                <div className="grid grid-cols-7 bg-[#F1F5F9] border-b border-[#E2E8F0]">
+                    {weekDays.map((day) => (
+                        <div key={day}
+                             className="py-3 text-center text-[11px] font-bold text-[#64748B] tracking-widest uppercase">
+                            {day}
                         </div>
+                    ))}
+                </div>
 
-                        {/* Calendar Grid */}
-                        <div className="calendar-grid">
-                            {calendarDays.map((day) => {
-                                const events = getEventsForDay(day);
-                                const isCurrentMonth = isSameMonth(day, currentDate);
-                                const isTodayDate = isToday(day);
-                                const hasEvents = events.availabilities.length > 0 || events.contracts.length > 0;
+                {/* ২. Calendar Body Grid */}
+                <div className="grid grid-cols-7 bg-[#E2E8F0] gap-[1px]"> {/* gap[1px] দিয়ে শার্প বর্ডার তৈরি */}
+                    {calendarDays.map((day) => {
+                        const events = getEventsForDay(day);
+                        const isCurrentMonth = isSameMonth(day, currentDate);
+                        const isTodayDate = isToday(day);
+                        const hasEvents = events.availabilities.length > 0 || events.contracts.length > 0;
 
-                                return (
-                                    <div
-                                        key={day.toString()}
-                                        className={`calendar-day ${!isCurrentMonth ? 'other-month' : ''} ${isTodayDate ? 'today' : ''} ${hasEvents ? 'has-events' : ''}`}
-                                        onClick={() => isCurrentMonth && handleDayClick(day)}
-                                    >
-                                        <div className="day-header">
-                                            <span className={`day-number ${isTodayDate ? 'today-number' : ''}`}>
-                                                {format(day, 'd')}
-                                            </span>
+                        return (
+                            <div
+                                key={day.toString()}
+                                onClick={() => isCurrentMonth && handleDayClick(day)}
+                                className={cn(
+                                    "min-h-[130px] bg-white p-2 relative group transition-all duration-200",
+                                    !isCurrentMonth ? "bg-slate-50/50" : "cursor-pointer hover:bg-slate-50/30"
+                                )}
+                            >
+                                {/* দিন সংখ্যা এবং Today মার্কার */}
+                                <div className="flex justify-between items-start mb-2 ">
+                                    <span className={cn(
+                                        "text-sm font-semibold flex items-center justify-center rounded-full transition-all",
+                                        isTodayDate
+                                            ? "w-7 h-7 bg-[#2D8FE3] text-white shadow-sm"
+                                            : isCurrentMonth ? "text-[#64748B]" : "text-[#CBD5E1]"
+                                    )}>
+                                        {format(day, 'd')}
+                                    </span>
+
+                                    {/* Empty Day Plus Icon (Hover করলে দেখাবে) */}
+                                    {!hasEvents && isCurrentMonth && (
+                                        <div
+                                            className="absolute inset-0 flex items-center justify-center pointer-events-none opacity-0 group-hover:opacity-100 transition-opacity">
+                                            <Plus className="w-10 h-10 text-[#2D8FE3]"/>
                                         </div>
+                                    )}
+                                </div>
 
-                                        <div className="day-events">
-                                            {events.contracts.map(contract => (
-                                                <div key={`contract-${contract.id}`} className="event booked">
-                                                    <i className="fas fa-briefcase"></i>
-                                                    <span>Booked</span>
-                                                </div>
-                                            ))}
-                                            {events.availabilities.map(avail => (
-                                                <div key={`avail-${avail.id}`} className="event available">
-                                                    <div className="event-info">
-                                                        <i className="fas fa-check-circle"></i>
-                                                        <span className="event-time">
-                                                            {format(parseISO(avail.start_date), 'h:mma')}
-                                                        </span>
-                                                        {avail.is_recurring && (
-                                                            <i className="fas fa-sync-alt recurring" title={avail.recurrence_pattern}></i>
-                                                        )}
-                                                    </div>
-                                                    <div className="event-actions">
-                                                        <button
-                                                            className="action-btn edit"
-                                                            onClick={(e) => handleEdit(avail, e)}
-                                                            title="Edit"
-                                                        >
-                                                            <i className="fas fa-pen"></i>
-                                                        </button>
-                                                        <button
-                                                            className="action-btn delete"
-                                                            onClick={(e) => handleDelete(avail.id, e)}
-                                                            title="Delete"
-                                                        >
-                                                            <i className="fas fa-times"></i>
-                                                        </button>
-                                                    </div>
-                                                </div>
-                                            ))}
+                                {/* ইভেন্ট লিস্ট (স্লটগুলো) */}
+                                <div className="space-y-1.5 overflow-hidden">
+                                    {/* ১. Booked (Contracts) - Blue Style */}
+                                    {events.contracts.map(contract => (
+                                        <div
+                                            key={`contract-${contract.id}`}
+                                            className="flex items-center gap-1.5 bg-[#EFF6FF] border border-[#BFDBFE] rounded-md px-2 py-1"
+                                        >
+                                            <Briefcase className="w-3 h-3 text-[#2563EB]"/>
+                                            <span
+                                                className="text-[11px] font-bold text-[#2563EB] truncate">Booked</span>
                                         </div>
+                                    ))}
 
-                                        {!hasEvents && isCurrentMonth && (
-                                            <div className="empty-day">
-                                                <i className="fas fa-plus"></i>
-                                            </div>
-                                        )}
-                                    </div>
-                                );
-                            })}
-                        </div>
-
-                        {/* Legend */}
-                        <div className="calendar-legend">
-                            <div className="legend-item">
-                                <span className="legend-dot available"></span>
-                                <span>Available</span>
-                            </div>
-                            <div className="legend-item">
-                                <span className="legend-dot booked"></span>
-                                <span>Booked</span>
-                            </div>
-                            <div className="legend-item">
-                                <span className="legend-dot today"></span>
-                                <span>Today</span>
-                            </div>
-                        </div>
-                    </div>
-                ) : (
-                    /* List View */
-                    <div className="list-container">
-                        {/* Available Slots */}
-                        <div className="list-section">
-                            <h3 className="section-title">
-                                <i className="fas fa-check-circle"></i>
-                                Available Slots
-                                <span className="count">{availabilities.length}</span>
-                            </h3>
-                            {availabilities.length > 0 ? (
-                                <div className="list-items">
-                                    {availabilities.map(avail => (
-                                        <div key={avail.id} className="list-item available">
-                                            <div className="item-icon">
-                                                <i className="fas fa-calendar-check"></i>
-                                            </div>
-                                            <div className="item-content">
-                                                <div className="item-title">
-                                                    {format(new Date(avail.start_date), 'EEEE, MMM dd, yyyy')}
-                                                </div>
-                                                <div className="item-meta">
-                                                    <span>
-                                                        <i className="fas fa-clock"></i>
-                                                        {format(new Date(avail.start_date), 'h:mm a')} - {format(new Date(avail.end_date), 'h:mm a')}
+                                    {/* ২. Availabilities - Green Style */}
+                                    {events.availabilities.map(avail => (
+                                        <div
+                                            key={`avail-${avail.id}`}
+                                            className="bg-[#E1F7F3] border border-[#B2E7DD] rounded-md px-2 py-1 group/item transition-all hover:border-[#19B28A]/40"
+                                        >
+                                            <div className="flex items-center justify-between gap-1">
+                                                <div className="flex items-center gap-1.5 flex-1 overflow-hidden">
+                                                    <CircleCheckBig className="w-3 h-3 text-[#19B28A] flex-shrink-0"/>
+                                                    <span className="text-[10px] font-bold text-[#19B28A] truncate">
+                                                        {format(parseISO(avail.start_date), 'h:mma')}
                                                     </span>
                                                     {avail.is_recurring && (
-                                                        <span className="recurring-badge">
-                                                            <i className="fas fa-sync-alt"></i>
-                                                            {avail.recurrence_pattern}
-                                                        </span>
-                                                    )}
-                                                    {avail.notes && (
-                                                        <span>
-                                                            <i className="fas fa-sticky-note"></i>
-                                                            {avail.notes}
-                                                        </span>
+                                                        <RotateCcw
+                                                            className="w-2.5 h-2.5 text-[#19B28A] animate-reverse-spin"/>
                                                     )}
                                                 </div>
-                                            </div>
-                                            <div className="item-actions">
-                                                <button
-                                                    className="btn-edit"
-                                                    onClick={() => handleEdit(avail)}
-                                                >
-                                                    <i className="fas fa-pen"></i>
-                                                </button>
-                                                <button
-                                                    className="btn-delete"
-                                                    onClick={() => handleDelete(avail.id)}
-                                                >
-                                                    <i className="fas fa-trash"></i>
-                                                </button>
-                                            </div>
-                                        </div>
-                                    ))}
-                                </div>
-                            ) : (
-                                <div className="empty-list">
-                                    <i className="fas fa-calendar-times"></i>
-                                    <p>No availability slots added yet</p>
-                                    <button
-                                        className="add-btn"
-                                        onClick={() => {
-                                            setSelectedDate(null);
-                                            setShowAddModal(true);
-                                        }}
-                                    >
-                                        <i className="fas fa-plus"></i>
-                                        Add Availability
-                                    </button>
-                                </div>
-                            )}
-                        </div>
 
-                        {/* Booked Contracts */}
-                        <div className="list-section">
-                            <h3 className="section-title">
-                                <i className="fas fa-briefcase"></i>
-                                Booked Contracts
-                                <span className="count">{bookedContracts.length}</span>
-                            </h3>
-                            {bookedContracts.length > 0 ? (
-                                <div className="list-items">
-                                    {bookedContracts.map(contract => (
-                                        <div key={contract.id} className="list-item booked">
-                                            <div className="item-icon booked">
-                                                <i className="fas fa-briefcase"></i>
-                                            </div>
-                                            <div className="item-content">
-                                                <div className="item-title">
-                                                    {contract.title || `Contract #${contract.id}`}
-                                                </div>
-                                                <div className="item-meta">
-                                                    <span>
-                                                        <i className="fas fa-calendar"></i>
-                                                        {format(new Date(contract.start_date), 'MMM dd')} - {format(new Date(contract.end_date), 'MMM dd, yyyy')}
-                                                    </span>
+                                                {/* এডিট এবং ডিলিট বাটন */}
+                                                <div
+                                                    className="flex items-center gap-1 opacity-0 group-hover/item:opacity-100 transition-opacity">
+                                                    <button
+                                                        onClick={(e) => {
+                                                            e.stopPropagation();
+                                                            handleEdit(avail, e);
+                                                        }}
+                                                        className="p-0.5 rounded text-[#64748B] hover:text-[#1E293B]"
+                                                    >
+                                                        <PencilLine className="w-4 h-4"/>
+                                                    </button>
+                                                    <button
+                                                        onClick={(e) => {
+                                                            e.stopPropagation();
+                                                            handleDelete(avail.id, e);
+                                                        }}
+                                                        className="p-0.5 rounded text-[#64748B] hover:text-red-500"
+                                                    >
+                                                        <X className="w-4 h-4"/>
+                                                    </button>
                                                 </div>
                                             </div>
-                                            <span className="status-badge booked">Booked</span>
                                         </div>
                                     ))}
                                 </div>
-                            ) : (
-                                <div className="empty-list">
-                                    <i className="fas fa-inbox"></i>
-                                    <p>No booked contracts yet</p>
-                                </div>
-                            )}
-                        </div>
-                    </div>
-                )}
+                            </div>
+                        );
+                    })}
+                </div>
             </div>
+
+            {/* ৩. Legend Section */}
+            {/*<div className="flex flex-wrap items-center justify-center gap-6 px-2 py-1">*/}
+            {/*    <div className="flex items-center gap-2">*/}
+            {/*        <div className="w-3 h-3 rounded-full bg-[#E1F7F3] border border-[#B2E7DD]"></div>*/}
+            {/*        <span className="text-[12px] font-semibold text-[#64748B]">Available</span>*/}
+            {/*    </div>*/}
+            {/*    <div className="flex items-center gap-2">*/}
+            {/*        <div className="w-3 h-3 rounded-full bg-[#EFF6FF] border border-[#BFDBFE]"></div>*/}
+            {/*        <span className="text-[12px] font-semibold text-[#64748B]">Booked</span>*/}
+            {/*    </div>*/}
+            {/*    <div className="flex items-center gap-2">*/}
+            {/*        <div className="w-3 h-3 rounded-full bg-[#2D8FE3]"></div>*/}
+            {/*        <span className="text-[12px] font-semibold text-[#64748B]">Today</span>*/}
+            {/*    </div>*/}
+            {/*</div>*/}
 
             {/* Modals */}
             <AddAvailabilityModal
@@ -452,3 +351,48 @@ function View() {
 }
 
 export default View;
+
+
+const CalendarSkeleton = () => (
+    <div className="space-y-6">
+        {/* Metrics Cards Skeleton */}
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
+            {[1, 2, 3].map((i) => (
+                <div key={i} className="h-24 bg-white border border-[#E2E8F0] rounded-xl p-4 flex flex-col justify-center gap-2 shadow-sm">
+                    <Skeleton className="h-4 w-20" />
+                    <Skeleton className="h-8 w-12" />
+                </div>
+            ))}
+        </div>
+
+        {/* Navigation Skeleton */}
+        <div className="flex flex-col sm:flex-row justify-between items-center gap-4 my-4">
+            <div className="flex items-center gap-2">
+                <Skeleton className="h-9 w-9 rounded-lg" />
+                <Skeleton className="h-9 w-[150px] rounded-lg" />
+                <Skeleton className="h-9 w-9 rounded-lg" />
+            </div>
+            <Skeleton className="h-10 w-40 rounded-lg" />
+        </div>
+
+        {/* Calendar Grid Skeleton */}
+        <div className="border border-[#E2E8F0] rounded-xl overflow-hidden bg-white shadow-sm">
+            <div className="grid grid-cols-7 bg-[#F1F5F9] border-b border-[#E2E8F0]">
+                {[1, 2, 3, 4, 5, 6, 7].map((i) => (
+                    <div key={i} className="py-3 flex justify-center">
+                        <Skeleton className="h-3 w-10" />
+                    </div>
+                ))}
+            </div>
+            <div className="grid grid-cols-7 gap-[1px] bg-[#E2E8F0]">
+                {[...Array(35)].map((_, i) => (
+                    <div key={i} className="min-h-[130px] bg-white p-3 space-y-2">
+                        <Skeleton className="h-6 w-6 rounded-full" />
+                        <Skeleton className="h-10 w-full rounded-md" />
+                        <Skeleton className="h-10 w-full rounded-md" />
+                    </div>
+                ))}
+            </div>
+        </div>
+    </div>
+);

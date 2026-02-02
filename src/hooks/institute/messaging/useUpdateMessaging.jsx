@@ -102,6 +102,5 @@ export const useUpdateMessaging = () => {
         messages,
         SESSION_USER_ID,
         initializeStateHelper,
-        initializeStateHelper,
     };
 };
