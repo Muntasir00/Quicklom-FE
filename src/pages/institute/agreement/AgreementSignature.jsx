@@ -261,7 +261,7 @@ const AgreementSignature = () => {
 
     if (loading) {
         return (
-            <div className="content-wrapper" style={{ marginTop: '15px' }}>
+            <div className="" style={{ marginTop: '15px' }}>
                 <section className="content">
                     <div className="container-fluid">
                         <div className="text-center py-5">
@@ -281,7 +281,7 @@ const AgreementSignature = () => {
     // ========================================
     if (myRole === 'client') {
         return (
-            <div className="content-wrapper" style={{ marginTop: '15px' }}>
+            <div className="" style={{ marginTop: '15px' }}>
                 <div className="content-header">
                     <div className="container-fluid">
                         <div className="d-flex justify-content-between align-items-center">
@@ -564,7 +564,7 @@ const AgreementSignature = () => {
     // APPLICANT VIEW
     // ========================================
     return (
-        <div className="content-wrapper" style={{ marginTop: '15px' }}>
+        <div className="" style={{ marginTop: '15px' }}>
             <div className="content-header">
                 <div className="container-fluid">
                     <div className="d-flex justify-content-between align-items-center">

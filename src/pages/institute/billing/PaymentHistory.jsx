@@ -6,6 +6,7 @@ import {FeatureCard} from "@pages/institute/billing/PaymentHistory/feature-card.
 import {CreditCard, FileTextIcon, FolderOpen, Info} from "lucide-react";
 import InvoiceHistoryTable from "@pages/institute/billing/PaymentHistory/InvoiceHistoryTable.jsx";
 import ChargeHistoryTable from "@pages/institute/billing/PaymentHistory/ChargeHistoryTable.jsx";
+import PaymentHistorySkeleton from "@pages/institute/billing/PaymentHistory/PaymentHistorySkeleton.jsx";
 
 const PaymentHistory = () => {
     const navigate = useNavigate();
@@ -182,16 +183,8 @@ const PaymentHistory = () => {
 
     if (loading) {
         return (
-            <div className="" style={{marginTop: '15px', background: '#f8fafc', minHeight: 'calc(100vh - 57px)'}}>
-                <div style={{display: 'flex', justifyContent: 'center', alignItems: 'center', minHeight: '400px'}}>
-                    <div style={{textAlign: 'center'}}>
-                        <div className="spinner-border text-primary" role="status"
-                             style={{width: '3rem', height: '3rem'}}>
-                            <span className="sr-only">Loading...</span>
-                        </div>
-                        <p style={{marginTop: '16px', color: '#64748b'}}>Loading payment history...</p>
-                    </div>
-                </div>
+            <div className="p-1">
+                <PaymentHistorySkeleton />
             </div>
         );
     }
