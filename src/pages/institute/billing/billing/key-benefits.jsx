@@ -10,6 +10,7 @@ export default function KeyBenefits() {
                     "Posting contracts is always FREE",
                     "Access to all platform features",
                 ].map((benefit, i) => (
+                    // eslint-disable-next-line react/jsx-key
                     <KeyBenefit benefit={benefit} index={i}/>
                 ))}
             </ul>
@@ -17,6 +18,7 @@ export default function KeyBenefits() {
     )
 }
 
+// eslint-disable-next-line react/prop-types
 function KeyBenefit({index, benefit}) {
     return (
         <li key={index}
