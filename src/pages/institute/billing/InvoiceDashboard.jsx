@@ -1,8 +1,27 @@
-import React, { useState, useEffect } from 'react';
-import { useNavigate, useSearchParams } from 'react-router-dom';
+import {useState, useEffect} from 'react';
+import {useNavigate, useSearchParams} from 'react-router-dom';
 import InvoiceService from '@services/institute/InvoiceService';
 import axios from 'axios';
 import Swal from 'sweetalert2';
+import {
+    FileText, FolderOpen, CreditCard, WalletCards, ListFilter, Hash,
+    Tag,
+    CalendarDays,
+    X,
+    CalendarCheck
+} from 'lucide-react';
+import {
+    Select,
+    SelectContent,
+    SelectItem,
+    SelectTrigger,
+    SelectValue,
+} from "@components/ui/select";
+import InvoiceTable from "@pages/institute/billing/Invoice/InvoiceTable.jsx";
+import {Label} from "@components/ui/label.jsx";
+import {Input} from "@components/ui/input.jsx";
+import {Button} from "@components/ui/button.jsx";
+import InvoicesSkeleton from "@pages/institute/billing/Invoice/InvoicesSkeleton.jsx";
 
 const InvoiceDashboard = () => {
     const navigate = useNavigate();
@@ -33,7 +52,7 @@ const InvoiceDashboard = () => {
         const invoiceIdParam = searchParams.get('invoice_id');
         if (invoiceIdParam) {
             setHighlightedInvoiceId(parseInt(invoiceIdParam));
-            setSearchFilters(prev => ({ ...prev, invoice_id: invoiceIdParam }));
+            setSearchFilters(prev => ({...prev, invoice_id: invoiceIdParam}));
             setShowFilters(true);
         }
         loadInvoices();
@@ -104,17 +123,22 @@ const InvoiceDashboard = () => {
         const isOverdue = invoice.due_date && new Date(invoice.due_date) < new Date() && statusLower === 'open';
 
         if (isOverdue) {
-            return { label: 'OVERDUE', color: '#ef4444', bg: '#fef2f2', icon: 'fa-exclamation-circle' };
+            return {label: 'OVERDUE', color: '#ef4444', bg: '#fef2f2', icon: 'fa-exclamation-circle'};
         }
 
         const statuses = {
-            open: { label: 'OPEN', color: '#f59e0b', bg: '#fffbeb', icon: 'fa-clock' },
-            paid: { label: 'PAID', color: '#10b981', bg: '#ecfdf5', icon: 'fa-check-circle' },
-            void: { label: 'VOID', color: '#6b7280', bg: '#f3f4f6', icon: 'fa-ban' },
-            draft: { label: 'DRAFT', color: '#3b82f6', bg: '#eff6ff', icon: 'fa-file' },
-            uncollectible: { label: 'UNCOLLECTIBLE', color: '#ef4444', bg: '#fef2f2', icon: 'fa-times-circle' }
+            open: {label: 'OPEN', color: '#f59e0b', bg: '#fffbeb', icon: 'fa-clock'},
+            paid: {label: 'PAID', color: '#10b981', bg: '#ecfdf5', icon: 'fa-check-circle'},
+            void: {label: 'VOID', color: '#6b7280', bg: '#f3f4f6', icon: 'fa-ban'},
+            draft: {label: 'DRAFT', color: '#3b82f6', bg: '#eff6ff', icon: 'fa-file'},
+            uncollectible: {label: 'UNCOLLECTIBLE', color: '#ef4444', bg: '#fef2f2', icon: 'fa-times-circle'}
         };
-        return statuses[statusLower] || { label: statusLower?.toUpperCase() || 'N/A', color: '#6b7280', bg: '#f3f4f6', icon: 'fa-file' };
+        return statuses[statusLower] || {
+            label: statusLower?.toUpperCase() || 'N/A',
+            color: '#6b7280',
+            bg: '#f3f4f6',
+            icon: 'fa-file'
+        };
     };
 
     const getInvoiceTypeInfo = (invoice) => {
@@ -212,7 +236,7 @@ const InvoiceDashboard = () => {
             };
         }
 
-        return { contractId: null, contractType: null };
+        return {contractId: null, contractType: null};
     };
 
     const handlePayInvoice = (invoice) => {
@@ -233,8 +257,8 @@ const InvoiceDashboard = () => {
     ).length;
 
     const handleSearchFilterChange = (e) => {
-        const { name, value } = e.target;
-        setSearchFilters(prev => ({ ...prev, [name]: value }));
+        const {name, value} = e.target;
+        setSearchFilters(prev => ({...prev, [name]: value}));
     };
 
     const handleClearFilters = () => {
@@ -312,988 +336,226 @@ const InvoiceDashboard = () => {
     });
 
     if (loading) {
-        return (
-            <div className="content-wrapper" style={{ marginTop: '15px', background: '#f8fafc', minHeight: 'calc(100vh - 57px)' }}>
-                <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', minHeight: '400px' }}>
-                    <div style={{ textAlign: 'center' }}>
-                        <div className="spinner-border text-primary" role="status" style={{ width: '3rem', height: '3rem' }}>
-                            <span className="sr-only">Loading...</span>
-                        </div>
-                        <p style={{ marginTop: '16px', color: '#64748b' }}>Loading invoices...</p>
-                    </div>
-                </div>
-            </div>
-        );
+        return <InvoicesSkeleton/>
     }
 
+    const tabs = [
+        {id: 'all', label: 'Total Invoices', icon: FileText, count: stats.total || 0},
+        {id: 'open', label: 'Open', icon: FolderOpen, count: stats.open || 0},
+        {id: 'paid', label: 'Paid', icon: CreditCard, count: stats.paid || 0},
+        {id: 'overdue', label: 'Overdue', icon: WalletCards, count: stats.overdue || 0},
+    ];
+
     return (
-        <div className="content-wrapper" style={{ marginTop: '15px', background: '#f8fafc', minHeight: 'calc(100vh - 57px)' }}>
-            <style>{`
-                .invoice-page {
-                    padding: 24px;
-                    width: 100%;
-                }
-
-                .invoice-header {
-                    background: linear-gradient(135deg, #1e3a8a 0%, #3b82f6 50%, #6366f1 100%);
-                    border-radius: 20px;
-                    padding: 32px;
-                    margin-bottom: 24px;
-                    color: white;
-                    display: flex;
-                    justify-content: space-between;
-                    align-items: center;
-                    position: relative;
-                    overflow: hidden;
-                }
-
-                .invoice-header::before {
-                    content: '';
-                    position: absolute;
-                    inset: 0;
-                    background: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23ffffff' fill-opacity='0.05'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
-                }
-
-                .invoice-header-content {
-                    position: relative;
-                    z-index: 1;
-                }
-
-                .invoice-header h1 {
-                    font-size: 2rem;
-                    font-weight: 800;
-                    margin: 0 0 8px 0;
-                }
-
-                .invoice-header p {
-                    opacity: 0.9;
-                    margin: 0;
-                    font-size: 0.95rem;
-                }
-
-                .back-btn {
-                    position: relative;
-                    z-index: 1;
-                    background: rgba(255, 255, 255, 0.2);
-                    border: 1px solid rgba(255, 255, 255, 0.3);
-                    color: white;
-                    padding: 10px 20px;
-                    border-radius: 10px;
-                    font-weight: 600;
-                    cursor: pointer;
-                    transition: all 0.2s ease;
-                    display: flex;
-                    align-items: center;
-                    gap: 8px;
-                }
-
-                .back-btn:hover {
-                    background: rgba(255, 255, 255, 0.3);
-                }
-
-                .stats-grid {
-                    display: grid;
-                    grid-template-columns: repeat(4, 1fr);
-                    gap: 16px;
-                    margin-bottom: 24px;
-                }
-
-                .stat-card {
-                    background: white;
-                    border-radius: 16px;
-                    padding: 20px;
-                    border: 1px solid #e2e8f0;
-                    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.03);
-                    cursor: pointer;
-                    transition: all 0.2s ease;
-                }
-
-                .stat-card:hover {
-                    transform: translateY(-2px);
-                    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.08);
-                }
-
-                .stat-card.active {
-                    border-color: #6366f1;
-                    box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.1);
-                }
-
-                .stat-icon {
-                    width: 48px;
-                    height: 48px;
-                    border-radius: 12px;
-                    display: flex;
-                    align-items: center;
-                    justify-content: center;
-                    font-size: 1.25rem;
-                    margin-bottom: 12px;
-                }
-
-                .stat-value {
-                    font-size: 1.75rem;
-                    font-weight: 700;
-                    color: #1e293b;
-                    margin-bottom: 4px;
-                }
-
-                .stat-label {
-                    font-size: 0.85rem;
-                    color: #64748b;
-                    font-weight: 500;
-                }
-
-                .invoice-table-card {
-                    background: white;
-                    border-radius: 20px;
-                    border: 1px solid #e2e8f0;
-                    overflow: hidden;
-                }
-
-                .invoice-table-header {
-                    padding: 20px 24px;
-                    border-bottom: 1px solid #e2e8f0;
-                    display: flex;
-                    justify-content: space-between;
-                    align-items: center;
-                }
-
-                .invoice-table-header h2 {
-                    margin: 0;
-                    font-size: 1.25rem;
-                    font-weight: 700;
-                    color: #1e293b;
-                }
-
-                .invoice-table {
-                    width: 100%;
-                    border-collapse: collapse;
-                }
-
-                .invoice-table th {
-                    background: #f8fafc;
-                    padding: 14px 20px;
-                    text-align: left;
-                    font-weight: 600;
-                    color: #64748b;
-                    font-size: 0.8rem;
-                    text-transform: uppercase;
-                    letter-spacing: 0.5px;
-                    border-bottom: 1px solid #e2e8f0;
-                }
-
-                .invoice-table td {
-                    padding: 16px 20px;
-                    border-bottom: 1px solid #f1f5f9;
-                    vertical-align: middle;
-                }
-
-                .invoice-table tr:last-child td {
-                    border-bottom: none;
-                }
-
-                .invoice-table tr:hover td {
-                    background: #fafafa;
-                }
-
-                .invoice-id {
-                    font-family: 'SF Mono', 'Monaco', monospace;
-                    font-size: 0.8rem;
-                    color: #475569;
-                    background: #f1f5f9;
-                    padding: 4px 8px;
-                    border-radius: 6px;
-                    display: inline-block;
-                }
-
-                .type-badge {
-                    display: inline-flex;
-                    align-items: center;
-                    gap: 6px;
-                    padding: 6px 12px;
-                    border-radius: 8px;
-                    font-size: 0.75rem;
-                    font-weight: 600;
-                }
-
-                .status-badge {
-                    display: inline-flex;
-                    align-items: center;
-                    gap: 6px;
-                    padding: 6px 12px;
-                    border-radius: 20px;
-                    font-size: 0.75rem;
-                    font-weight: 700;
-                }
-
-                .amount-value {
-                    font-weight: 700;
-                    color: #1e293b;
-                    font-size: 0.95rem;
-                }
-
-                .date-value {
-                    color: #475569;
-                    font-size: 0.85rem;
-                }
-
-                .due-date-overdue {
-                    color: #ef4444;
-                    font-weight: 600;
-                }
-
-                .contract-link {
-                    display: inline-flex;
-                    align-items: center;
-                    gap: 4px;
-                    color: #6366f1;
-                    font-size: 0.85rem;
-                    text-decoration: none;
-                    font-weight: 500;
-                }
-
-                .contract-link:hover {
-                    text-decoration: underline;
-                }
-
-                .actions-cell {
-                    text-align: right;
-                    white-space: nowrap;
-                }
-
-                .actions-cell a,
-                .actions-cell button {
-                    display: inline-block;
-                    padding: 5px 10px;
-                    margin-left: 6px;
-                    font-size: 12px;
-                    font-weight: 500;
-                    border-radius: 4px;
-                    text-decoration: none;
-                    cursor: pointer;
-                    border: none;
-                }
-
-                .btn-pay {
-                    background-color: #22c55e;
-                    color: white;
-                }
-
-                .btn-pay:hover {
-                    background-color: #16a34a;
-                }
-
-                .btn-pdf {
-                    background-color: #3b82f6;
-                    color: white;
-                }
-
-                .btn-pdf:hover {
-                    background-color: #2563eb;
-                }
-
-                .btn-view {
-                    background-color: #6b7280;
-                    color: white;
-                }
-
-                .btn-view:hover {
-                    background-color: #4b5563;
-                }
-
-                .empty-state {
-                    text-align: center;
-                    padding: 60px 20px;
-                }
-
-                .empty-state-icon {
-                    width: 80px;
-                    height: 80px;
-                    border-radius: 50%;
-                    background: #f1f5f9;
-                    display: flex;
-                    align-items: center;
-                    justify-content: center;
-                    margin: 0 auto 20px;
-                    font-size: 2rem;
-                    color: #94a3b8;
-                }
-
-                .empty-state h3 {
-                    margin: 0 0 8px 0;
-                    color: #475569;
-                    font-size: 1.1rem;
-                }
-
-                .empty-state p {
-                    margin: 0;
-                    color: #94a3b8;
-                    font-size: 0.9rem;
-                }
-
-                .filter-toggle-btn {
-                    display: inline-flex;
-                    align-items: center;
-                    gap: 8px;
-                    padding: 10px 16px;
-                    border-radius: 10px;
-                    font-weight: 600;
-                    cursor: pointer;
-                    transition: all 0.2s ease;
-                    border: 1px solid #e2e8f0;
-                    background: white;
-                    color: #475569;
-                    position: relative;
-                }
-
-                .filter-toggle-btn:hover {
-                    background: #f8fafc;
-                }
-
-                .filter-toggle-btn.active {
-                    background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
-                    color: white;
-                    border-color: transparent;
-                }
-
-                .filter-badge {
-                    position: absolute;
-                    top: -8px;
-                    right: -8px;
-                    background: #ef4444;
-                    color: white;
-                    font-size: 0.7rem;
-                    font-weight: 700;
-                    min-width: 18px;
-                    height: 18px;
-                    border-radius: 50%;
-                    display: flex;
-                    align-items: center;
-                    justify-content: center;
-                }
-
-                .filter-panel {
-                    background: #f8fafc;
-                    border-radius: 12px;
-                    padding: 20px;
-                    margin-bottom: 16px;
-                    border: 1px solid #e2e8f0;
-                }
-
-                .filter-row {
-                    display: grid;
-                    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-                    gap: 16px;
-                    margin-bottom: 16px;
-                }
-
-                .filter-group {
-                    display: flex;
-                    flex-direction: column;
-                    gap: 6px;
-                }
-
-                .filter-group label {
-                    font-size: 0.8rem;
-                    font-weight: 600;
-                    color: #475569;
-                }
-
-                .filter-group input,
-                .filter-group select {
-                    padding: 10px 14px;
-                    border: 1px solid #e2e8f0;
-                    border-radius: 8px;
-                    font-size: 0.9rem;
-                    background: white;
-                    transition: all 0.2s ease;
-                }
-
-                .filter-group input:focus,
-                .filter-group select:focus {
-                    outline: none;
-                    border-color: #6366f1;
-                    box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.1);
-                }
-
-                .filter-actions {
-                    display: flex;
-                    justify-content: flex-end;
-                    gap: 12px;
-                }
-
-                .filter-clear-btn {
-                    padding: 10px 20px;
-                    border: 1px solid #e2e8f0;
-                    background: white;
-                    color: #64748b;
-                    border-radius: 8px;
-                    font-weight: 600;
-                    cursor: pointer;
-                    transition: all 0.2s ease;
-                }
-
-                .filter-clear-btn:hover {
-                    background: #f1f5f9;
-                }
-
-                .invoice-row-highlighted {
-                    animation: highlightFade 3s ease-out;
-                }
-
-                @keyframes highlightFade {
-                    0% { background: rgba(99, 102, 241, 0.2); }
-                    100% { background: transparent; }
-                }
-
-                @media (max-width: 1024px) {
-                    .stats-grid {
-                        grid-template-columns: repeat(2, 1fr);
-                    }
-
-                    .invoice-table {
-                        display: block;
-                        overflow-x: auto;
-                    }
-                }
-
-                @media (max-width: 640px) {
-                    .stats-grid {
-                        grid-template-columns: 1fr 1fr;
-                    }
-
-                    .invoice-page {
-                        padding: 16px;
-                    }
-
-                    .invoice-header {
-                        flex-direction: column;
-                        gap: 16px;
-                        text-align: center;
-                        padding: 24px;
-                    }
-
-                    .invoice-header h1 {
-                        font-size: 1.5rem;
-                    }
-                }
-
-                /* Outstanding Fees Card */
-                .outstanding-fees-card {
-                    background: linear-gradient(135deg, #fef3c7 0%, #fde68a 100%);
-                    border: 2px solid #f59e0b;
-                    border-radius: 16px;
-                    margin-bottom: 24px;
-                    overflow: hidden;
-                    box-shadow: 0 4px 12px rgba(245, 158, 11, 0.2);
-                }
-
-                .fees-header {
-                    display: flex;
-                    align-items: center;
-                    padding: 20px 24px;
-                    background: rgba(245, 158, 11, 0.1);
-                    border-bottom: 1px solid rgba(245, 158, 11, 0.2);
-                    gap: 16px;
-                }
-
-                .fees-header-icon {
-                    width: 52px;
-                    height: 52px;
-                    background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
-                    border-radius: 12px;
-                    display: flex;
-                    align-items: center;
-                    justify-content: center;
-                    color: white;
-                    font-size: 1.4rem;
-                    flex-shrink: 0;
-                }
-
-                .fees-header-content {
-                    flex: 1;
-                }
-
-                .fees-header-content h3 {
-                    margin: 0;
-                    font-size: 1.15rem;
-                    font-weight: 700;
-                    color: #92400e;
-                }
-
-                .fees-header-content p {
-                    margin: 4px 0 0 0;
-                    font-size: 0.875rem;
-                    color: #b45309;
-                }
-
-                .fees-header-total {
-                    text-align: right;
-                }
-
-                .fees-header-total .total-label {
-                    display: block;
-                    font-size: 0.75rem;
-                    color: #92400e;
-                    text-transform: uppercase;
-                    font-weight: 600;
-                    letter-spacing: 0.5px;
-                }
-
-                .fees-header-total .total-value {
-                    display: block;
-                    font-size: 1.75rem;
-                    font-weight: 800;
-                    color: #b45309;
-                }
-
-                .fees-body {
-                    padding: 16px 24px;
-                }
-
-                .fee-row {
-                    display: flex;
-                    align-items: center;
-                    justify-content: space-between;
-                    background: white;
-                    border-radius: 12px;
-                    padding: 16px 20px;
-                    margin-bottom: 10px;
-                    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
-                    transition: all 0.2s ease;
-                }
-
-                .fee-row:last-child {
-                    margin-bottom: 0;
-                }
-
-                .fee-row:hover {
-                    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-                    transform: translateY(-1px);
-                }
-
-                .fee-info {
-                    flex: 1;
-                }
-
-                .fee-contract-name {
-                    display: flex;
-                    align-items: center;
-                    gap: 8px;
-                    font-weight: 600;
-                    color: #1e293b;
-                    font-size: 0.95rem;
-                }
-
-                .fee-contract-name i {
-                    color: #6b7280;
-                }
-
-                .fee-details-meta {
-                    display: flex;
-                    gap: 16px;
-                    margin-top: 6px;
-                    font-size: 0.8rem;
-                    color: #64748b;
-                }
-
-                .fee-details-meta i {
-                    margin-right: 4px;
-                }
-
-                .fee-rate {
-                    color: #b45309;
-                    font-weight: 500;
-                }
-
-                .fee-actions {
-                    display: flex;
-                    align-items: center;
-                    gap: 16px;
-                }
-
-                .fee-amount-display {
-                    font-size: 1.15rem;
-                    font-weight: 700;
-                    color: #b45309;
-                }
-
-                .pay-btn {
-                    display: inline-flex;
-                    align-items: center;
-                    gap: 8px;
-                    padding: 10px 20px;
-                    background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
-                    color: white;
-                    border: none;
-                    border-radius: 10px;
-                    font-size: 0.9rem;
-                    font-weight: 600;
-                    cursor: pointer;
-                    transition: all 0.2s ease;
-                }
-
-                .pay-btn:hover {
-                    background: linear-gradient(135deg, #d97706 0%, #b45309 100%);
-                    transform: translateY(-2px);
-                    box-shadow: 0 4px 12px rgba(217, 119, 6, 0.4);
-                }
-
-                @media (max-width: 768px) {
-                    .fees-header {
-                        flex-direction: column;
-                        text-align: center;
-                    }
-
-                    .fees-header-total {
-                        text-align: center;
-                        margin-top: 8px;
-                    }
-
-                    .fee-row {
-                        flex-direction: column;
-                        gap: 12px;
-                    }
-
-                    .fee-actions {
-                        width: 100%;
-                        justify-content: space-between;
-                    }
-                }
-            `}</style>
-
-            <div className="invoice-page">
-                {/* Header */}
-                <div className="invoice-header">
-                    <div className="invoice-header-content">
-                        <h1><i className="fas fa-file-invoice mr-3"></i>Invoices</h1>
-                        <p>View and manage all your invoices</p>
-                    </div>
-                    <button className="back-btn" onClick={() => navigate('/institute/billing')}>
-                        <i className="fas fa-arrow-left"></i>
-                        Back to Billing
+        <>
+            <div className="flex items-center gap-2">
+                <div className="pr-4 py-2">
+                    <button
+                        onClick={() => setShowFilters(!showFilters)}
+                        className={`relative !p-2.5 !rounded-md border transition-all duration-200 ${
+                            showFilters
+                                ? "bg-[#EEF7FF] border-[#BDD7ED] text-[#2D8FE3]"
+                                : "border-gray-200 hover:bg-gray-50 text-gray-500"
+                        }`}
+                    >
+                        {/* Main Icon */}
+                        <ListFilter size={20} strokeWidth={1.5}/>
+
+                        {/* Filter Count Badge */}
+                        {activeFiltersCount > 0 && (
+                            <span
+                                className="absolute -top-1.5 -right-1.5 flex h-5 w-5 items-center justify-center rounded-full bg-[#2D8FE3] text-[10px] font-bold text-white border-2 border-white shadow-sm animate-in zoom-in duration-300">
+                                {activeFiltersCount}
+                            </span>
+                        )}
                     </button>
                 </div>
 
-                {error && (
-                    <div style={{
-                        background: '#fef2f2',
-                        border: '1px solid #fecaca',
-                        borderRadius: '12px',
-                        padding: '16px 20px',
-                        marginBottom: '24px',
-                        display: 'flex',
-                        alignItems: 'center',
-                        gap: '12px'
-                    }}>
-                        <i className="fas fa-exclamation-triangle" style={{ color: '#ef4444' }}></i>
-                        <span style={{ color: '#b91c1c' }}>{error}</span>
-                    </div>
-                )}
+                <div className="w-full bg-white border-b border-gray-200 flex items-center ">
+                    {/* Tabs Container */}
+                    <div className="flex flex-1 items-center gap-4 overflow-x-auto no-scrollbar scroll-smooth">
+                        {tabs.map((tab) => {
+                            const Icon = tab.icon;
+                            const isActive = filter === tab.id;
 
-                {/* Outstanding Cancellation Fees Section */}
-                {!loadingFees && pendingFees?.has_outstanding_fees && (
-                    <div className="outstanding-fees-card">
-                        <div className="fees-header">
-                            <div className="fees-header-icon">
-                                <i className="fas fa-exclamation-triangle"></i>
-                            </div>
-                            <div className="fees-header-content">
-                                <h3>Outstanding Cancellation Fees</h3>
-                                <p>You have cancellation fees that need to be paid. These fees were incurred from withdrawing from booked contracts within 48 hours of start.</p>
-                            </div>
-                            <div className="fees-header-total">
-                                <span className="total-label">Total Outstanding</span>
-                                <span className="total-value">${pendingFees.total_amount?.toFixed(2)} CAD</span>
-                            </div>
-                        </div>
-                        <div className="fees-body">
-                            {pendingFees.fees.map((fee) => (
-                                <div key={fee.id} className="fee-row">
-                                    <div className="fee-info">
-                                        <div className="fee-contract-name">
-                                            <i className="fas fa-file-contract"></i>
-                                            {fee.contract_title || `Contract #${fee.contract_id}`}
-                                        </div>
-                                        <div className="fee-details-meta">
-                                            <span>
-                                                <i className="fas fa-calendar"></i>
-                                                {new Date(fee.created_at).toLocaleDateString('en-US', {
-                                                    month: 'short',
-                                                    day: 'numeric',
-                                                    year: 'numeric'
-                                                })}
-                                            </span>
-                                            <span className="fee-rate">{fee.percentage}% cancellation fee</span>
-                                        </div>
-                                    </div>
-                                    <div className="fee-actions">
-                                        <span className="fee-amount-display">${fee.amount?.toFixed(2)}</span>
-                                        <button className="pay-btn" onClick={() => handlePayFee(fee)}>
-                                            <i className="fas fa-credit-card"></i>
-                                            Pay Now
-                                        </button>
-                                    </div>
-                                </div>
-                            ))}
-                        </div>
-                    </div>
-                )}
-
-                {/* Statistics */}
-                <div className="stats-grid">
-                    <div
-                        className={`stat-card ${filter === 'all' ? 'active' : ''}`}
-                        onClick={() => setFilter('all')}
-                    >
-                        <div className="stat-icon" style={{ background: 'linear-gradient(135deg, #6366f1 0%, #4f46e5 100%)', color: 'white' }}>
-                            <i className="fas fa-file-invoice"></i>
-                        </div>
-                        <div className="stat-value">{stats.total}</div>
-                        <div className="stat-label">Total Invoices</div>
-                    </div>
-                    <div
-                        className={`stat-card ${filter === 'open' ? 'active' : ''}`}
-                        onClick={() => setFilter('open')}
-                    >
-                        <div className="stat-icon" style={{ background: 'linear-gradient(135deg, #f59e0b 0%, #d97706 100%)', color: 'white' }}>
-                            <i className="fas fa-clock"></i>
-                        </div>
-                        <div className="stat-value">{stats.open}</div>
-                        <div className="stat-label">Open</div>
-                    </div>
-                    <div
-                        className={`stat-card ${filter === 'paid' ? 'active' : ''}`}
-                        onClick={() => setFilter('paid')}
-                    >
-                        <div className="stat-icon" style={{ background: 'linear-gradient(135deg, #10b981 0%, #059669 100%)', color: 'white' }}>
-                            <i className="fas fa-check-circle"></i>
-                        </div>
-                        <div className="stat-value">{stats.paid}</div>
-                        <div className="stat-label">Paid</div>
-                    </div>
-                    <div
-                        className={`stat-card ${filter === 'overdue' ? 'active' : ''}`}
-                        onClick={() => setFilter('overdue')}
-                    >
-                        <div className="stat-icon" style={{ background: 'linear-gradient(135deg, #ef4444 0%, #dc2626 100%)', color: 'white' }}>
-                            <i className="fas fa-exclamation-circle"></i>
-                        </div>
-                        <div className="stat-value">{stats.overdue}</div>
-                        <div className="stat-label">Overdue</div>
-                    </div>
-                </div>
-
-                {/* Invoice Table */}
-                <div className="invoice-table-card">
-                    <div className="invoice-table-header">
-                        <h2>
-                            {filter === 'all' ? 'All Invoices' :
-                             filter === 'open' ? 'Open Invoices' :
-                             filter === 'paid' ? 'Paid Invoices' :
-                             'Overdue Invoices'}
-                            <span style={{ fontWeight: 400, color: '#64748b', marginLeft: '8px' }}>
-                                ({filteredInvoices.length})
-                            </span>
-                        </h2>
-                        <button
-                            className={`filter-toggle-btn ${activeFiltersCount > 0 ? 'active' : ''}`}
-                            onClick={() => setShowFilters(!showFilters)}
-                        >
-                            <i className={`fas ${showFilters ? 'fa-times' : 'fa-filter'}`}></i>
-                            {showFilters ? 'Hide Filters' : 'Filters'}
-                            {activeFiltersCount > 0 && (
-                                <span className="filter-badge">{activeFiltersCount}</span>
-                            )}
-                        </button>
-                    </div>
-
-                    {/* Filter Panel */}
-                    {showFilters && (
-                        <div className="filter-panel">
-                            <div className="filter-row">
-                                <div className="filter-group">
-                                    <label>
-                                        <i className="fas fa-hashtag mr-2"></i>
-                                        Invoice ID / Number
-                                    </label>
-                                    <input
-                                        type="text"
-                                        name="invoice_id"
-                                        placeholder="Search by invoice ID or number..."
-                                        value={searchFilters.invoice_id}
-                                        onChange={handleSearchFilterChange}
-                                    />
-                                </div>
-                                <div className="filter-group">
-                                    <label>
-                                        <i className="fas fa-tag mr-2"></i>
-                                        Invoice Type
-                                    </label>
-                                    <select
-                                        name="invoice_type"
-                                        value={searchFilters.invoice_type}
-                                        onChange={handleSearchFilterChange}
-                                    >
-                                        <option value="">All Types</option>
-                                        <option value="headhunter_monthly">Monthly Subscription</option>
-                                        <option value="headhunter_commission">Commission</option>
-                                        <option value="clinic_commission">Service Fee</option>
-                                        <option value="direct_hire">Direct Hire</option>
-                                    </select>
-                                </div>
-                                <div className="filter-group">
-                                    <label>
-                                        <i className="fas fa-calendar-alt mr-2"></i>
-                                        From Date
-                                    </label>
-                                    <input
-                                        type="date"
-                                        name="start_date"
-                                        value={searchFilters.start_date}
-                                        onChange={handleSearchFilterChange}
-                                    />
-                                </div>
-                                <div className="filter-group">
-                                    <label>
-                                        <i className="fas fa-calendar-check mr-2"></i>
-                                        To Date
-                                    </label>
-                                    <input
-                                        type="date"
-                                        name="end_date"
-                                        value={searchFilters.end_date}
-                                        onChange={handleSearchFilterChange}
-                                    />
-                                </div>
-                            </div>
-                            <div className="filter-actions">
-                                <button
-                                    type="button"
-                                    className="filter-clear-btn"
-                                    onClick={handleClearFilters}
+                            return (
+                                <div
+                                    key={tab.id}
+                                    onClick={() => setFilter(tab.id)}
+                                    className={`
+                                relative flex items-center gap-3 px-2 pb-3 cursor-pointer transition-all duration-300 whitespace-nowrap group
+                                ${isActive ? 'text-[#2D8FE3]' : 'text-gray-500 hover:text-gray-700'}
+                            `}
                                 >
-                                    <i className="fas fa-times mr-2"></i>
-                                    Clear Filters
-                                </button>
-                            </div>
-                        </div>
-                    )}
+                                    {/* Icon */}
+                                    <Icon
+                                        size={20}
+                                        strokeWidth={isActive ? 2 : 1.5}
+                                        className={`${isActive ? 'text-[#2D8FE3]' : 'text-gray-400 group-hover:text-gray-600'}`}
+                                    />
 
-                    {filteredInvoices.length === 0 ? (
-                        <div className="empty-state">
-                            <div className="empty-state-icon">
-                                <i className="fas fa-file-invoice"></i>
-                            </div>
-                            <h3>No invoices found</h3>
-                            <p>
-                                {filter === 'all'
-                                    ? 'Invoices will appear here once contracts are booked'
-                                    : `No ${filter} invoices at the moment`
-                                }
-                            </p>
-                        </div>
-                    ) : (
-                        <table className="invoice-table">
-                            <thead>
-                                <tr>
-                                    <th>Invoice #</th>
-                                    <th>Type</th>
-                                    <th>Contract</th>
-                                    <th>Issue Date</th>
-                                    <th>Due Date</th>
-                                    <th>Amount</th>
-                                    <th>Status</th>
-                                    <th style={{ textAlign: 'right' }}>Actions</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                {filteredInvoices.map((invoice) => {
-                                    const statusInfo = getStatusInfo(invoice);
-                                    const typeInfo = getInvoiceTypeInfo(invoice);
-                                    const contractInfo = getContractInfo(invoice);
-                                    const isOverdue = invoice.due_date && new Date(invoice.due_date) < new Date() && invoice.status?.toLowerCase() === 'open';
-                                    const isHighlighted = highlightedInvoiceId === invoice.id;
+                                    {/* Label */}
+                                    <span
+                                        className={`text-[15px] font-medium tracking-tight ${isActive ? 'font-semibold' : 'font-normal'}`}>
+                                    {tab.label}
+                                </span>
 
-                                    return (
-                                        <tr key={invoice.id} className={isHighlighted ? 'invoice-row-highlighted' : ''}>
-                                            <td>
-                                                <span className="invoice-id">
-                                                    {getInvoiceNumber(invoice)}
-                                                </span>
-                                            </td>
-                                            <td>
-                                                <span
-                                                    className="type-badge"
-                                                    style={{ background: typeInfo.bg, color: typeInfo.color }}
-                                                    title={typeInfo.description}
-                                                >
-                                                    <i className={`fas ${typeInfo.icon}`}></i>
-                                                    {typeInfo.label}
-                                                </span>
-                                            </td>
-                                            <td>
-                                                {contractInfo.contractId ? (
-                                                    <span className="contract-link">
-                                                        <i className="fas fa-file-contract"></i>
-                                                        #{contractInfo.contractId}
-                                                    </span>
-                                                ) : (
-                                                    <span style={{ color: '#94a3b8' }}>-</span>
-                                                )}
-                                            </td>
-                                            <td>
-                                                <span className="date-value">
-                                                    {formatDate(invoice.created_at || invoice.created)}
-                                                </span>
-                                            </td>
-                                            <td>
-                                                <span className={`date-value ${isOverdue ? 'due-date-overdue' : ''}`}>
-                                                    {formatDate(invoice.due_date)}
-                                                    {isOverdue && (
-                                                        <i className="fas fa-exclamation-triangle ml-1" style={{ fontSize: '0.75rem' }}></i>
-                                                    )}
-                                                </span>
-                                            </td>
-                                            <td>
-                                                <span className="amount-value">
-                                                    {formatAmount(invoice.amount_due, invoice.currency)}
-                                                </span>
-                                            </td>
-                                            <td>
-                                                <span
-                                                    className="status-badge"
-                                                    style={{ background: statusInfo.bg, color: statusInfo.color }}
-                                                >
-                                                    <i className={`fas ${statusInfo.icon}`}></i>
-                                                    {statusInfo.label}
-                                                </span>
-                                            </td>
-                                            <td className="actions-cell">
-                                                {invoice.status?.toLowerCase() === 'open' && invoice.hosted_invoice_url && (
-                                                    <button className="btn-pay" onClick={() => handlePayInvoice(invoice)}>
-                                                        Pay
-                                                    </button>
-                                                )}
-                                                {(invoice.invoice_pdf || invoice.invoice_pdf_url) && (
-                                                    <button className="btn-pdf" onClick={() => handleViewPDF(invoice)}>
-                                                        PDF
-                                                    </button>
-                                                )}
-                                                {invoice.hosted_invoice_url && (
-                                                    <button className="btn-view" onClick={() => window.open(invoice.hosted_invoice_url, '_blank')}>
-                                                        View
-                                                    </button>
-                                                )}
-                                            </td>
-                                        </tr>
-                                    );
-                                })}
-                            </tbody>
-                        </table>
-                    )}
+                                    {/* Badge/Count */}
+                                    <span className={`
+                                ml-1 flex items-center justify-center px-2.5 py-0.5 text-xs font-semibold rounded-lg border
+                                ${isActive
+                                        ? 'bg-[#EEF7FF] border-[#DBEEFF] text-[#2D8FE3]'
+                                        : 'bg-white border-gray-200 text-gray-500'}
+                                `}>
+                                    {tab.count}
+                                </span>
+
+                                    {/* Active Underline Indicator */}
+                                    {isActive && (
+                                        <div
+                                            className="absolute bottom-0 left-0 right-0 h-[3px] bg-[#2D8FE3] rounded-t-full"/>
+                                    )}
+                                </div>
+                            );
+                        })}
+                    </div>
                 </div>
             </div>
-        </div>
+
+            {showFilters && (
+                <div
+                    className="bg-white border border-gray-200 rounded-xl p-6 mt-4 shadow-sm animate-in fade-in zoom-in duration-200">
+                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+
+                        {/* Invoice ID / Number */}
+                        <div className="space-y-2">
+                            <Label className="!flex items-center gap-2 text-sm font-semibold text-[#2A394B]">
+                                <Hash size={16} className="text-gray-400"/>
+                                Invoice ID / Number
+                            </Label>
+                            <Input
+                                type="text"
+                                name="invoice_id"
+                                placeholder="Search by ID..."
+                                value={searchFilters.invoice_id}
+                                onChange={handleSearchFilterChange}
+                                className="h-10 focus-visible:ring-[#2D8FE3] border-gray-200"
+                            />
+                        </div>
+
+                        {/* Invoice Type */}
+                        <div className="space-y-2">
+                            <Label className="!flex items-center gap-2 text-sm font-semibold text-[#2A394B]">
+                                <Tag size={16} className="text-gray-400"/>
+                                Invoice Type
+                            </Label>
+                            <Select
+                                name="invoice_type"
+                                value={searchFilters.invoice_type || "all_types"}
+                                // Shadcn Select সরাসরি value দেয়, তাই আমরা manual event object তৈরি করে দিচ্ছি
+                                onValueChange={(value) => {
+                                    const finalValue = value === "all_types" ? "" : value;
+                                    handleSearchFilterChange({
+                                        target: {
+                                            name: "invoice_type",
+                                            value: finalValue
+                                        }
+                                    })
+                                }}
+                            >
+                                <SelectTrigger className="w-full h-10 border-gray-200 focus:ring-[#2D8FE3]">
+                                    <SelectValue placeholder="All Types"/>
+                                </SelectTrigger>
+
+                                <SelectContent>
+                                    <SelectItem value="all_types">All
+                                        Types</SelectItem> {/* value খালি রাখা যায় না তাই 'all_types' বা 'all' দিতে পারেন */}
+                                    <SelectItem value="headhunter_monthly">Monthly Subscription</SelectItem>
+                                    <SelectItem value="headhunter_commission">Commission</SelectItem>
+                                    <SelectItem value="clinic_commission">Service Fee</SelectItem>
+                                    <SelectItem value="direct_hire">Direct Hire</SelectItem>
+                                </SelectContent>
+                            </Select>
+                        </div>
+
+                        {/* From Date */}
+                        <div className="space-y-2">
+                            <Label className="!flex items-center gap-2 text-sm font-semibold text-[#2A394B]">
+                                <CalendarDays size={16} className="text-gray-400"/>
+                                From Date
+                            </Label>
+                            <Input
+                                type="date"
+                                name="start_date"
+                                value={searchFilters.start_date}
+                                onChange={handleSearchFilterChange}
+                                className="h-10 focus-visible:ring-[#2D8FE3] border-gray-200"
+                            />
+                        </div>
+
+                        {/* To Date */}
+                        <div className="space-y-2">
+                            <Label className="!flex items-center gap-2 text-sm font-semibold text-[#2A394B]">
+                                <CalendarCheck size={16} className="text-gray-400"/>
+                                To Date
+                            </Label>
+                            <Input
+                                type="date"
+                                name="end_date"
+                                value={searchFilters.end_date}
+                                onChange={handleSearchFilterChange}
+                                className="h-10 focus-visible:ring-[#2D8FE3] border-gray-200"
+                            />
+                        </div>
+                    </div>
+
+                    {/* Action Buttons */}
+                    <div className="flex justify-end mt-6 pt-4 border-t border-gray-100">
+                        <Button
+                            variant="outline"
+                            size="sm"
+                            onClick={handleClearFilters}
+                            className="text-gray-500 hover:text-red-500 hover:bg-red-50 !rounded-md gap-2 font-medium transition-colors"
+                        >
+                            <X size={16}/>
+                            Clear Filters
+                        </Button>
+                    </div>
+                </div>
+            )}
+
+            {filteredInvoices.length === 0 ? (
+                <div className="empty-state py-20 text-center border rounded-xl bg-white mt-4">
+                    <div className="empty-state-icon mb-4 flex justify-center">
+                        <div className="p-4 bg-gray-50 rounded-full">
+                            <FileText size={48} className="text-gray-300"/>
+                        </div>
+                    </div>
+                    <h3 className="text-lg font-semibold text-gray-900">No invoices found</h3>
+                    <p className="text-gray-500">
+                        {filter === 'all'
+                            ? 'Invoices will appear here once contracts are booked'
+                            : `No ${filter} invoices at the moment`
+                        }
+                    </p>
+                </div>
+            ) : (
+                <div className="mt-4">
+                    <InvoiceTable
+                        data={filteredInvoices}
+                        getStatusInfo={getStatusInfo}
+                        getInvoiceTypeInfo={getInvoiceTypeInfo}
+                        getContractInfo={getContractInfo}
+                        getInvoiceNumber={getInvoiceNumber}
+                        formatDate={formatDate}
+                        formatAmount={formatAmount}
+                        handlePayInvoice={handlePayInvoice}
+                        handleViewPDF={handleViewPDF}
+                    />
+                </div>
+            )}
+
+        </>
     );
 };
 
