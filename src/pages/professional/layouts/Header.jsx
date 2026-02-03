@@ -73,7 +73,7 @@ const Header = () => {
                             {/* হেডার সেকশন */}
                             <div
                                 className="flex items-center justify-between p-4 border-b border-gray-100 bg-gray-50/50">
-                                <p className="text-sm font-bold text-[#102A56] flex items-center gap-2">
+                                <p className="text-sm font-bold text-[#102A56] flex items-center gap-2 !mb-0">
                                     <BellIcon className="size-4"/> Notifications
                                 </p>
                                 {notificationStatistics?.unread_count > 0 && (
@@ -106,10 +106,10 @@ const Header = () => {
                                                 </div>
 
                                                 <div className="flex-1 overflow-hidden">
-                                                    <p className={`text-sm leading-tight truncate ${!notification.is_read ? 'font-semibold text-gray-900' : 'text-gray-600'}`}>
+                                                    <p className={`!mb-0 text-sm leading-tight truncate ${!notification.is_read ? 'font-semibold text-gray-900' : 'text-gray-600'}`}>
                                                         {notification?.title || "-"}
                                                     </p>
-                                                    <p className="text-[11px] text-gray-400 mt-1">
+                                                    <p className="!mb-0 text-[11px] text-gray-400 mt-1">
                                                         {notification?.created_at ? format(notification.created_at) : ""}
                                                     </p>
                                                 </div>
@@ -141,7 +141,7 @@ const Header = () => {
     )
 }
 
-export default Header
+export default Header;
 
 // import React, { useState, useEffect } from "react";
 // import { Link } from "react-router-dom";

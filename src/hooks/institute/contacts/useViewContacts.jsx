@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import { useState, useEffect } from "react";
 import { getContactsService } from "@services/institute/ContactService";
 import { useNavigate } from "react-router-dom";
 import { Chip, IconButton } from "@mui/material";
