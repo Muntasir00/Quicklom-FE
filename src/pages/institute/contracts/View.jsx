@@ -1,9 +1,15 @@
-import React, { useState, useEffect, useMemo } from "react";
-import { Link, useNavigate } from "react-router-dom";
-import { useViewContract } from "@hooks/institute/contracts/useViewContract";
-import Filter from "@components/forms/UserContractFilterForm"
+import React, {useState, useEffect, useMemo} from "react";
+import {Link, useNavigate} from "react-router-dom";
+import {useViewContract} from "@hooks/institute/contracts/useViewContract";
+import UserContractFilterForm from "@components/forms/UserContractFilterForm.jsx"
 import CancelConfirmationModal from "@components/modals/CancelConfirmationModal";
-import { cancelContractService } from "@services/institute/ContractCancellationService";
+import {cancelContractService} from "@services/institute/ContractCancellationService";
+import ContractsTable from "@pages/institute/contracts/Components/ContractsTable.jsx";
+import {getContractColumns} from "@pages/institute/contracts/Components/columns.jsx";
+import ContractCard from "@pages/institute/contracts/Components/ContractCard.jsx";
+import {FilterIcon, Inbox, LayoutGrid, Plus, List, Filter, ChevronDown, AlertCircle} from "lucide-react";
+import MetricsGrid from "@pages/institute/contracts/Components/metrics-grid.jsx";
+import {Button} from "@components/ui/button.jsx";
 
 // Category configuration
 const CATEGORY_CONFIG = {
@@ -53,7 +59,7 @@ const DEFAULT_CATEGORY_CONFIG = {
 };
 
 const View = () => {
-    const{
+    const {
         menu,
         sessionUserRole,
         contracts,
@@ -70,7 +76,7 @@ const View = () => {
     } = useViewContract();
 
     const navigate = useNavigate();
-
+    const [isOpen, setIsOpen] = useState(false);
     // Check if special filter is active
     const activeSpecialFilter = searchParams?.get("filter");
     const isNoApplicationsFilter = activeSpecialFilter === "no_applications";
@@ -236,7 +242,7 @@ const View = () => {
                 if (start && end) {
                     const [startH, startM] = start.split(':').map(Number);
                     const [endH, endM] = end.split(':').map(Number);
-                    let hours = (endH + endM/60) - (startH + startM/60);
+                    let hours = (endH + endM / 60) - (startH + startM / 60);
                     if (hours < 0) hours += 24; // Handle overnight shifts
                     totalHours += hours;
                 }
@@ -264,7 +270,7 @@ const View = () => {
 
         // 1. Fixed Contract Value - use directly
         if (contractValue > 0 && isFixedContractValue) {
-            return { value: contractValue, type: 'fixed', label: 'Contract Value' };
+            return {value: contractValue, type: 'fixed', label: 'Contract Value'};
         }
 
         // 2. Hourly rate - multiply by total hours
@@ -272,29 +278,33 @@ const View = () => {
             const totalHours = getTotalHoursFromTimeSlots(data);
             if (totalHours) {
                 const total = hourlyRate * totalHours;
-                return { value: total, type: 'hourly', label: `${totalHours.toFixed(1)}hrs @ $${hourlyRate.toLocaleString()}/hr` };
+                return {
+                    value: total,
+                    type: 'hourly',
+                    label: `${totalHours.toFixed(1)}hrs @ $${hourlyRate.toLocaleString()}/hr`
+                };
             }
             // Fallback: assume 8 hours per day
             const daysCount = getSelectedDatesCount(data);
             const total = hourlyRate * daysCount * 8;
-            return { value: total, type: 'hourly', label: `${daysCount} days @ $${hourlyRate.toLocaleString()}/hr` };
+            return {value: total, type: 'hourly', label: `${daysCount} days @ $${hourlyRate.toLocaleString()}/hr`};
         }
 
         // 3. Daily rate - multiply by selected days count
         if (dailyRate > 0) {
             const daysCount = getSelectedDatesCount(data);
             const total = dailyRate * daysCount;
-            return { value: total, type: 'daily', label: `${daysCount} days @ $${dailyRate.toLocaleString()}/day` };
+            return {value: total, type: 'daily', label: `${daysCount} days @ $${dailyRate.toLocaleString()}/day`};
         }
 
         // 4. Annual salary - use directly
         if (annualSalary > 0) {
-            return { value: annualSalary, type: 'salary', label: 'Annual Salary' };
+            return {value: annualSalary, type: 'salary', label: 'Annual Salary'};
         }
 
         // 5. Gross salary - use directly
         if (grossSalary > 0) {
-            return { value: grossSalary, type: 'salary', label: 'Annual Salary' };
+            return {value: grossSalary, type: 'salary', label: 'Annual Salary'};
         }
 
         return null;
@@ -337,17 +347,29 @@ const View = () => {
             const rate = parseCurrency(data.service_rate);
             if (rate) return `$${rate.toLocaleString()}/service`;
         }
-        if (data.service_rate) { const rate = parseCurrency(data.service_rate); if (rate) return `$${rate.toLocaleString()}/service`; }
-        if (data.procedure_rate) { const rate = parseCurrency(data.procedure_rate); if (rate) return `$${rate.toLocaleString()}/procedure`; }
+        if (data.service_rate) {
+            const rate = parseCurrency(data.service_rate);
+            if (rate) return `$${rate.toLocaleString()}/service`;
+        }
+        if (data.procedure_rate) {
+            const rate = parseCurrency(data.procedure_rate);
+            if (rate) return `$${rate.toLocaleString()}/procedure`;
+        }
         if (data.production_percentage) return `${data.production_percentage}% of production`;
-        if (data.rate_amount) { const rate = parseCurrency(data.rate_amount); if (rate) return `$${rate.toLocaleString()}`; }
-        if (data.compensation_value) { const value = parseCurrency(data.compensation_value); if (value) return `$${value.toLocaleString()}`; }
+        if (data.rate_amount) {
+            const rate = parseCurrency(data.rate_amount);
+            if (rate) return `$${rate.toLocaleString()}`;
+        }
+        if (data.compensation_value) {
+            const value = parseCurrency(data.compensation_value);
+            if (value) return `$${value.toLocaleString()}`;
+        }
         return 'Not specified';
     };
 
     const formatDate = (dateString) => {
         if (!dateString) return 'N/A';
-        return new Date(dateString).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
+        return new Date(dateString).toLocaleDateString('en-US', {month: 'short', day: 'numeric', year: 'numeric'});
     };
 
     const getPositions = (contract) => {
@@ -366,13 +388,13 @@ const View = () => {
 
     const getStatusBadge = (status) => {
         const statusConfig = {
-            'open': { color: 'success', icon: 'fa-check-circle', text: 'Open' },
-            'pending': { color: 'warning', icon: 'fa-clock', text: 'Pending' },
-            'pending_signature': { color: 'info', icon: 'fa-file-signature', text: 'Pending Signature' },
-            'closed': { color: 'secondary', icon: 'fa-times-circle', text: 'Closed' },
-            'cancelled': { color: 'danger', icon: 'fa-ban', text: 'Cancelled' },
-            'in_discussion': { color: 'info', icon: 'fa-comments', text: 'In Discussion' },
-            'booked': { color: 'primary', icon: 'fa-handshake', text: 'Booked' },
+            'open': {color: 'success', icon: 'fa-check-circle', text: 'Open'},
+            'pending': {color: 'warning', icon: 'fa-clock', text: 'Pending'},
+            'pending_signature': {color: 'info', icon: 'fa-file-signature', text: 'Pending Signature'},
+            'closed': {color: 'secondary', icon: 'fa-times-circle', text: 'Closed'},
+            'cancelled': {color: 'danger', icon: 'fa-ban', text: 'Cancelled'},
+            'in_discussion': {color: 'info', icon: 'fa-comments', text: 'In Discussion'},
+            'booked': {color: 'primary', icon: 'fa-handshake', text: 'Booked'},
         };
         const config = statusConfig[status] || statusConfig['pending'];
         return (
@@ -383,393 +405,216 @@ const View = () => {
         );
     };
 
-    // Contract Card Component
-    const ContractCard = ({ contract }) => {
-        const config = getCategoryConfig(contract?.contract_type?.industry);
-        return (
-            <div
-                className="card contract-card shadow-sm h-100"
-                onClick={() => handleContractClick(contract)}
-                style={{ cursor: 'pointer', transition: 'all 0.3s ease', borderLeft: `4px solid ${config.color}` }}
-            >
-                <div className="card-header bg-white border-0 pb-0 pt-3">
-                    <div className="d-flex justify-content-between align-items-start">
-                        <div className="d-flex align-items-center">
-                            <div
-                                className="icon-wrapper mr-2 d-flex align-items-center justify-content-center rounded-circle"
-                                style={{ width: '35px', height: '35px', backgroundColor: config.bgColor }}
-                            >
-                                <i className={`${config.icon}`} style={{ color: config.color, fontSize: '0.9rem' }}></i>
-                            </div>
-                            <div>
-                                <h6 className="mb-0 font-weight-bold text-truncate" style={{ maxWidth: '160px', fontSize: '0.85rem' }}>
-                                    {contract?.contract_type?.contract_name || 'Unnamed'}
-                                </h6>
-                                <small className="text-muted">ID: #{contract?.id}</small>
-                            </div>
-                        </div>
-                        {contract?.data?.urgent_need && (
-                            <span className="badge badge-danger badge-pill" style={{ fontSize: '0.65rem' }}>Urgent</span>
-                        )}
-                    </div>
-                </div>
-                <div className="card-body py-2">
-                    <div className="mb-2">{getStatusBadge(contract?.status)}</div>
-                    <div className="mb-2">
-                        <small className="text-muted"><i className="fas fa-user-tie mr-1"></i>Position</small>
-                        <div className="font-weight-bold text-truncate" style={{ fontSize: '0.8rem' }}>{getPositions(contract)}</div>
-                    </div>
-                    <div className="mb-2">
-                        <small className="text-muted"><i className="fas fa-map-marker-alt mr-1"></i>Location</small>
-                        <div className="text-truncate" style={{ fontSize: '0.8rem' }}>{getLocation(contract)}</div>
-                    </div>
-                    <div className="mb-2">
-                        <small className="text-muted"><i className="fas fa-calendar-alt mr-1"></i>Duration</small>
-                        <div style={{ fontSize: '0.8rem' }}>{formatDate(contract?.start_date)}{contract?.end_date ? ` - ${formatDate(contract?.end_date)}` : ' - Ongoing'}</div>
-                    </div>
-                    <div>
-                        <small className="text-muted"><i className="fas fa-dollar-sign mr-1"></i>Contract Value</small>
-                        <div className="text-success font-weight-bold">{getCompensation(contract)}</div>
-                    </div>
-                </div>
-                <div className="card-footer bg-light border-0 py-2">
-                    <div className="d-flex justify-content-between align-items-center">
-                        <small className="text-muted">{new Date(contract?.created_at).toLocaleDateString()}</small>
-                        <div className="btn-group btn-group-sm">
-                            <button className="btn btn-outline-primary btn-sm" onClick={(e) => { e.stopPropagation(); handleContractClick(contract); }}>
-                                <i className="fas fa-eye"></i>
-                            </button>
-                            {(contract?.status === 'booked' || contract?.status === 'cancelled') ? (
-                                <button className="btn btn-outline-secondary btn-sm" disabled style={{ opacity: '0.5' }}><i className="fas fa-edit"></i></button>
-                            ) : (
-                                <Link to={`/${sessionUserRole}/${menu}/${contract.id}/edit`} className="btn btn-outline-warning btn-sm" onClick={(e) => e.stopPropagation()}>
-                                    <i className="fas fa-edit"></i>
-                                </Link>
-                            )}
-                            {contract?.status !== 'booked' && contract?.status !== 'cancelled' && (
-                                <button className="btn btn-outline-danger btn-sm" onClick={(e) => handleOpenCancelModal(contract, e)}><i className="fas fa-ban"></i></button>
-                            )}
-                        </div>
-                    </div>
-                </div>
-            </div>
-        );
+    const helpers = {
+        getPositions,
+        getLocation,
+        formatDate,
+        getStatusBadge,
+        getCompensation
     };
+    const columns = getContractColumns(
+        handleContractClick,
+        sessionUserRole,
+        menu,
+        helpers
+    );
+
+    const statsConfig = [
+        {label: "Open", value: contracts.filter(c => c.status === 'open' || c.status === 'in_discussion').length},
+        {
+            label: "Pending",
+            value: contracts.filter(c => c.status === 'pending' || c.status === 'pending_signature').length
+        },
+        {label: "Booked", value: contracts.filter(c => c.status === 'booked').length},
+        {label: "Closed", value: contracts.filter(c => c.status === 'closed' || c.status === 'cancelled').length},
+    ];
 
     return (
-        <div className="content-wrapper" style={{ minHeight: 'calc(100vh - 57px)' }}>
-            {/* Page Header */}
-            <div className="content-header py-3" style={{ backgroundColor: '#f4f6f9', marginTop: '25px' }}>
-                <div className="container-fluid">
-                    <div className="d-flex flex-wrap justify-content-between align-items-center">
-                        <div className="d-flex align-items-center mb-2 mb-md-0">
-                            <div
-                                className="icon-wrapper mr-3 d-flex align-items-center justify-content-center rounded"
-                                style={{
-                                    width: '48px',
-                                    height: '48px',
-                                    background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
-                                    boxShadow: '0 4px 12px rgba(102, 126, 234, 0.3)'
-                                }}
-                            >
-                                <i className="fas fa-file-contract text-white" style={{ fontSize: '1.3rem' }}></i>
-                            </div>
-                            <div>
-                                <h4 className="mb-0 font-weight-bold text-dark">My Contracts</h4>
-                                <span className="text-muted" style={{ fontSize: '0.9rem' }}>
-                                    {totalContracts} total contract{totalContracts !== 1 ? 's' : ''} • Manage your healthcare agreements
-                                </span>
-                            </div>
-                        </div>
-                        <Link
-                            to={`/${sessionUserRole}/${menu}/create`}
-                            className="btn btn-primary px-4 shadow-sm"
-                            style={{
-                                background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
-                                border: 'none',
-                                borderRadius: '8px',
-                                fontWeight: '600'
-                            }}
-                        >
-                            <i className="fa fa-plus mr-2"></i>
-                            Add New Contract
-                        </Link>
+        <div>
+            <MetricsGrid stats={statsConfig}/>
+
+            <div className="flex flex-col md:flex-row items-center justify-between gap-4 mb-6">
+
+                <div className="flex items-center gap-2 w-full md:w-auto ">
+                    {/* Filter Toggle Button */}
+                    <Button
+                        variant="outline"
+                        size="icon"
+                        className={`rounded-lg shrink-0 border-gray-200 ${isOpen ? "!bg-blue-50": ""}`}
+                        onClick={() => setIsOpen(!isOpen)}
+                    >
+                        <FilterIcon className="h-4 w-4 text-gray-500"/>
+                    </Button>
+
+                    {/* Category Tabs (Middle) */}
+                    <div
+                        className="flex items-center gap-1 p-1 bg-white border border-gray-200 rounded-xl overflow-x-auto no-scrollbar">
+                        {categories.map((category) => {
+                            const config = getCategoryConfig(category);
+                            const isActive = activeCategory === category;
+                            const count = groupedContracts[category]?.length || 0;
+
+                            return (
+                                <button
+                                    key={category}
+                                    type="button"
+                                    onClick={() => setActiveCategory(category)}
+                                    className={`
+                                        flex items-center gap-2 px-3 py-1.5 !rounded-lg transition-all duration-200 whitespace-nowrap
+                                        ${isActive
+                                        ? "bg-[#F0F7FF] border border-[#D1E9FF] text-[#2D8FE3]"
+                                        : "bg-transparent border border-transparent text-[#4B5563] hover:bg-gray-50"
+                                    }
+                                    `}
+                                >
+                                    <i className={`${config.icon} text-sm`}
+                                       style={{color: isActive ? '#2D8FE3' : config.color}}></i>
+                                    <span className="text-xs font-semibold">{category}</span>
+                                </button>
+                            );
+                        })}
                     </div>
+                </div>
+
+                {/* Right Side: View Mode & Add Button */}
+                <div className="flex items-center gap-3 w-full md:w-auto justify-end">
+                    {/* View Switcher */}
+                    <div className="flex bg-white border border-gray-200 rounded-lg p-1">
+                        <button
+                            onClick={() => setViewMode('table')}
+                            className={`p-1.5 rounded-md transition-all ${viewMode === 'table' ? 'bg-[#F0F7FF] text-[#2D8FE3]' : 'text-gray-400'}`}
+                        >
+                            <List className="h-4 w-4"/>
+                        </button>
+                        <button
+                            onClick={() => setViewMode('cards')}
+                            className={`p-1.5 rounded-md transition-all ${viewMode === 'cards' ? 'bg-[#F0F7FF] text-[#2D8FE3]' : 'text-gray-400'}`}
+                        >
+                            <LayoutGrid className="h-4 w-4"/>
+                        </button>
+                    </div>
+
+                    {/* Add Contract Button */}
+                    <Button asChild className="!bg-[#2D8FE3] hover:bg-[#1E70B8] text-white !rounded-lg px-4 flex gap-2">
+                        <Link to={`/${sessionUserRole}/${menu}/create`}>
+                            <Plus className="h-4 w-4"/>
+                            <span className="font-semibold text-sm">Add Contract</span>
+                        </Link>
+                    </Button>
                 </div>
             </div>
 
-            <section className="content pt-0">
-                <div className="container-fluid">
-
-                    {/* Active Special Filter Banner */}
-                    {isNoApplicationsFilter && (
-                        <div
-                            className="alert mb-3 d-flex align-items-center justify-content-between"
-                            style={{
-                                background: 'linear-gradient(135deg, #ff9800 0%, #f57c00 100%)',
-                                color: 'white',
-                                border: 'none',
-                                borderRadius: '10px',
-                                boxShadow: '0 4px 12px rgba(255, 152, 0, 0.3)'
-                            }}
-                        >
-                            <div className="d-flex align-items-center">
-                                <i className="fas fa-filter mr-2" style={{ fontSize: '1.2rem' }}></i>
-                                <div>
-                                    <strong>Filter Active:</strong> Showing contracts with no applications (open for 7+ days)
-                                </div>
-                            </div>
-                            <button
-                                className="btn btn-sm btn-light"
-                                onClick={clearSpecialFilter}
-                                style={{ fontWeight: '600' }}
-                            >
-                                <i className="fas fa-times mr-1"></i>
-                                Clear Filter
-                            </button>
-                        </div>
-                    )}
-
-                    {/* Filter Section - Collapsible */}
-                    <div className={`card shadow-sm mb-3 ${isNoApplicationsFilter ? 'border-warning' : ''}`} style={isNoApplicationsFilter ? { borderWidth: '2px' } : {}}>
-                        <div className="card-header bg-white py-2" data-toggle="collapse" data-target="#filterCollapse" style={{ cursor: 'pointer' }}>
-                            <div className="d-flex align-items-center justify-content-between">
-                                <div className="d-flex align-items-center">
-                                    <i className={`fas fa-filter mr-2 ${isNoApplicationsFilter ? 'text-warning' : 'text-primary'}`}></i>
-                                    <span className="font-weight-bold" style={{ fontSize: '0.9rem' }}>Filters</span>
-                                    {isNoApplicationsFilter && (
-                                        <span className="badge badge-warning ml-2" style={{ fontSize: '0.7rem' }}>
-                                            <i className="fas fa-exclamation-circle mr-1"></i>
-                                            Active
-                                        </span>
-                                    )}
-                                </div>
-                                <div className="d-flex align-items-center">
-                                    <div className="btn-group btn-group-sm mr-3" role="group">
-                                        <button type="button" className={`btn btn-sm ${viewMode === 'cards' ? 'btn-primary' : 'btn-outline-primary'}`} onClick={(e) => { e.stopPropagation(); setViewMode('cards'); }}>
-                                            <i className="fas fa-th-large"></i>
-                                        </button>
-                                        <button type="button" className={`btn btn-sm ${viewMode === 'table' ? 'btn-primary' : 'btn-outline-primary'}`} onClick={(e) => { e.stopPropagation(); setViewMode('table'); }}>
-                                            <i className="fas fa-list"></i>
-                                        </button>
-                                    </div>
-                                    <i className="fas fa-chevron-down text-muted"></i>
-                                </div>
-                            </div>
-                        </div>
-                        <div className="collapse" id="filterCollapse">
-                            <div className="card-body py-2">
-                                <Filter setContracts={setContracts} useFilterHook={useFilterHook} />
-                            </div>
-                        </div>
+            {/* 3. Special Filter Alert (If active) */}
+            {isNoApplicationsFilter && (
+                <div
+                    className="mb-4 flex items-center justify-between p-3 bg-orange-50 border border-orange-100 rounded-xl text-orange-800">
+                    <div className="flex items-center gap-2 text-sm font-medium">
+                        <FilterIcon className="h-4 w-4"/>
+                        Showing contracts with no applications (7+ days)
                     </div>
-
-                    {/* Category Tabs */}
-                    {contracts && contracts.length > 0 ? (
-                        <>
-                            <div className="category-tabs d-flex flex-wrap mb-3" style={{ gap: '8px' }}>
-                                {categories.map((category) => {
-                                    const config = getCategoryConfig(category);
-                                    const isActive = activeCategory === category;
-                                    const count = groupedContracts[category]?.length || 0;
-
-                                    return (
-                                        <button
-                                            key={category}
-                                            type="button"
-                                            className={`btn category-tab d-flex align-items-center ${isActive ? 'active' : ''}`}
-                                            onClick={() => setActiveCategory(category)}
-                                            style={{
-                                                backgroundColor: isActive ? config.color : config.bgColor,
-                                                color: isActive ? 'white' : config.color,
-                                                border: `2px solid ${config.color}`,
-                                                borderRadius: '25px',
-                                                padding: '6px 14px',
-                                                fontWeight: '600',
-                                                transition: 'all 0.2s ease',
-                                                fontSize: '0.85rem'
-                                            }}
-                                        >
-                                            <i className={`${config.icon} mr-2`}></i>
-                                            {category}
-                                            <span
-                                                className="badge badge-pill ml-2"
-                                                style={{
-                                                    backgroundColor: isActive ? 'rgba(255,255,255,0.3)' : config.color,
-                                                    color: 'white',
-                                                    fontSize: '0.7rem'
-                                                }}
-                                            >
-                                                {count}
-                                            </span>
-                                        </button>
-                                    );
-                                })}
-                            </div>
-
-                            {/* Contracts Panel */}
-                            <div
-                                className="contracts-panel p-3 rounded"
-                                style={{
-                                    backgroundColor: activeConfig?.bgColor || '#f8f9fa',
-                                    border: `2px solid ${activeConfig?.color || '#dee2e6'}`,
-                                    minHeight: '300px'
-                                }}
-                            >
-                                {viewMode === 'cards' ? (
-                                    <div className="row">
-                                        {activeContracts.map((contract) => (
-                                            <div className="col-xl-3 col-lg-4 col-md-6 mb-3" key={contract.id}>
-                                                <ContractCard contract={contract} />
-                                            </div>
-                                        ))}
-                                    </div>
-                                ) : (
-                                    <div className="table-responsive">
-                                        <table className="table table-hover bg-white rounded">
-                                            <thead className="thead-light">
-                                                <tr>
-                                                    <th>ID</th>
-                                                    <th>Contract Type</th>
-                                                    <th>Position</th>
-                                                    <th>Location</th>
-                                                    <th>Start</th>
-                                                    <th>Status</th>
-                                                    <th>Contract Value</th>
-                                                    <th>Actions</th>
-                                                </tr>
-                                            </thead>
-                                            <tbody>
-                                                {activeContracts.map((contract) => (
-                                                    <tr key={contract.id} onClick={() => handleContractClick(contract)} style={{ cursor: 'pointer' }}>
-                                                        <td>#{contract.id}</td>
-                                                        <td className="text-truncate" style={{ maxWidth: '150px' }}>{contract?.contract_type?.contract_name}</td>
-                                                        <td className="text-truncate" style={{ maxWidth: '120px' }}>{getPositions(contract)}</td>
-                                                        <td className="text-truncate" style={{ maxWidth: '100px' }}>{getLocation(contract)}</td>
-                                                        <td>{formatDate(contract?.start_date)}</td>
-                                                        <td>{getStatusBadge(contract?.status)}</td>
-                                                        <td className="text-success font-weight-bold">{getCompensation(contract)}</td>
-                                                        <td>
-                                                            <div className="btn-group btn-group-sm">
-                                                                <button className="btn btn-outline-primary btn-sm" onClick={(e) => { e.stopPropagation(); handleContractClick(contract); }}><i className="fas fa-eye"></i></button>
-                                                                {(contract?.status !== 'booked' && contract?.status !== 'cancelled') && (
-                                                                    <Link to={`/${sessionUserRole}/${menu}/${contract.id}/edit`} className="btn btn-outline-warning btn-sm" onClick={(e) => e.stopPropagation()}><i className="fas fa-edit"></i></Link>
-                                                                )}
-                                                            </div>
-                                                        </td>
-                                                    </tr>
-                                                ))}
-                                            </tbody>
-                                        </table>
-                                    </div>
-                                )}
-
-                                {activeContracts.length === 0 && (
-                                    <div className="text-center text-muted py-5">
-                                        <i className="fas fa-inbox fa-3x mb-3"></i>
-                                        <h6>No contracts in this category</h6>
-                                        <p className="mb-0">Try selecting a different category or adjusting your filters</p>
-                                    </div>
-                                )}
-                            </div>
-
-                            {/* Quick Stats */}
-                            <div className="row mt-3">
-                                <div className="col-6 col-md-3 mb-2">
-                                    <div className="card shadow-sm border-left-success py-2">
-                                        <div className="card-body py-2 px-3">
-                                            <div className="d-flex align-items-center">
-                                                <i className="fas fa-check-circle text-success mr-2"></i>
-                                                <div>
-                                                    <div className="text-xs text-uppercase text-muted">Open</div>
-                                                    <div className="h6 mb-0 font-weight-bold">{contracts.filter(c => c.status === 'open' || c.status === 'in_discussion').length}</div>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                                <div className="col-6 col-md-3 mb-2">
-                                    <div className="card shadow-sm border-left-warning py-2">
-                                        <div className="card-body py-2 px-3">
-                                            <div className="d-flex align-items-center">
-                                                <i className="fas fa-clock text-warning mr-2"></i>
-                                                <div>
-                                                    <div className="text-xs text-uppercase text-muted">Pending</div>
-                                                    <div className="h6 mb-0 font-weight-bold">{contracts.filter(c => c.status === 'pending' || c.status === 'pending_signature').length}</div>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                                <div className="col-6 col-md-3 mb-2">
-                                    <div className="card shadow-sm border-left-info py-2">
-                                        <div className="card-body py-2 px-3">
-                                            <div className="d-flex align-items-center">
-                                                <i className="fas fa-handshake text-info mr-2"></i>
-                                                <div>
-                                                    <div className="text-xs text-uppercase text-muted">Booked</div>
-                                                    <div className="h6 mb-0 font-weight-bold">{contracts.filter(c => c.status === 'booked').length}</div>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                                <div className="col-6 col-md-3 mb-2">
-                                    <div className="card shadow-sm border-left-secondary py-2">
-                                        <div className="card-body py-2 px-3">
-                                            <div className="d-flex align-items-center">
-                                                <i className="fas fa-times-circle text-secondary mr-2"></i>
-                                                <div>
-                                                    <div className="text-xs text-uppercase text-muted">Closed</div>
-                                                    <div className="h6 mb-0 font-weight-bold">{contracts.filter(c => c.status === 'closed' || c.status === 'cancelled').length}</div>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </>
-                    ) : (
-                        <div className="card shadow-sm">
-                            <div className="card-body p-5 text-center">
-                                <i className="fas fa-inbox fa-4x text-muted mb-3"></i>
-                                <h5 className="text-muted">No Contracts Found</h5>
-                                <p className="text-muted">There are no contracts to display. Click "Add New" to create one.</p>
-                                <Link to={`/${sessionUserRole}/${menu}/create`} className="btn btn-primary mt-2">
-                                    <i className="fa fa-plus mr-2"></i>Create Your First Contract
-                                </Link>
-                            </div>
-                        </div>
-                    )}
-
-                    {/* Contract Modal */}
-                    {ContractModel && show && showContractData && (
-                        <ContractModel show={show} setShow={handleCloseModal} contract={showContractData} />
-                    )}
-
-                    {/* Cancel Confirmation Modal */}
-                    <CancelConfirmationModal
-                        open={showCancelModal}
-                        onClose={() => { setShowCancelModal(false); setContractToCancel(null); }}
-                        onConfirm={handleCancelContract}
-                        title="Cancel Contract"
-                        message={`Are you sure you want to cancel this contract${contractToCancel ? ` (#${contractToCancel.id})` : ''}?`}
-                        type="contract"
-                        id={contractToCancel?.id}
-                    />
+                    <button onClick={clearSpecialFilter} className="text-xs underline font-bold">Clear Filter</button>
                 </div>
+            )}
+
+            <div className="flex items-center gap-2">
+
+                {isNoApplicationsFilter && (
+                    <Badge variant="warning"
+                           className="bg-orange-100 text-orange-700 border-none flex items-center gap-1 text-[10px] px-2 h-5">
+                        <AlertCircle className="h-3 w-3"/> Active
+                    </Badge>
+                )}
+            </div>
+            {/* Collapsible Content */}
+            <div
+                className={`mb-3 overflow-hidden transition-all duration-300 ${isOpen ? 'max-h-[1000px] border-t border-gray-50 opacity-100' : 'max-h-0 opacity-0'}`}>
+                <UserContractFilterForm
+                    setContracts={setContracts}
+                    useFilterHook={useFilterHook}
+                />
+            </div>
+
+            {/* 4. Main Content Area */}
+            <section>
+                {contracts && contracts.length > 0 ? (
+                    <>
+                        {viewMode === 'cards' ? (
+                            <div
+                                className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5">
+                                {activeContracts.map((contract) => (
+                                    <ContractCard
+                                        key={contract.id}
+                                        contract={contract}
+                                        handleContractClick={handleContractClick}
+                                        getPositions={getPositions}
+                                        getLocation={getLocation}
+                                        formatDate={formatDate}
+                                        getCompensation={getCompensation}
+                                        getStatusBadge={getStatusBadge}
+                                        getCategoryConfig={getCategoryConfig}
+                                        handleOpenCancelModal={handleOpenCancelModal}
+                                        sessionUserRole={sessionUserRole}
+                                        menu={menu}
+                                    />
+                                ))}
+
+                                {/* Inner Empty State */}
+                                {activeContracts.length === 0 && (
+                                    <div
+                                        className="col-span-full py-20 bg-white rounded-2xl border-2 border-dashed flex flex-col items-center">
+                                        <Inbox className="h-10 w-10 text-gray-300 mb-2"/>
+                                        <p className="text-gray-500 font-medium text-sm">No contracts in this
+                                            category</p>
+                                    </div>
+                                )}
+                            </div>
+                        ) : (
+                            <div className="bg-white rounded-xl border border-gray-200 overflow-hidden">
+                                <ContractsTable
+                                    data={activeContracts}
+                                    columns={columns}
+                                    onRowClick={handleContractClick}
+                                />
+                            </div>
+                        )}
+                    </>
+                ) : (
+                    /* Outer Global Empty State */
+                    <div
+                        className="bg-white rounded-2xl border border-gray-200 p-16 flex flex-col items-center text-center">
+                        <div
+                            className="w-20 h-20 bg-gray-50 rounded-full flex items-center justify-center mb-6 text-gray-400">
+                            <Inbox size={40} strokeWidth={1}/>
+                        </div>
+                        <h3 className="text-xl font-bold text-[#2A394B] mb-2">No Contracts Found</h3>
+                        <p className="text-gray-500 mb-8 max-w-xs">There are no contracts to display. Create your first
+                            one to get started.</p>
+                        <Button asChild className="bg-[#2D8FE3] rounded-xl px-8 h-12">
+                            <Link to={`/${sessionUserRole}/${menu}/create`}>Create First Contract</Link>
+                        </Button>
+                    </div>
+                )}
             </section>
 
-            <style jsx>{`
-                .border-left-success { border-left: 4px solid #28a745 !important; }
-                .border-left-warning { border-left: 4px solid #ffc107 !important; }
-                .border-left-info { border-left: 4px solid #17a2b8 !important; }
-                .border-left-secondary { border-left: 4px solid #6c757d !important; }
-                .contract-card { border: 2px solid transparent; }
-                .contract-card:hover { transform: translateY(-3px); box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15) !important; border-color: #007bff; }
-                .category-tab:hover { transform: translateY(-2px); box-shadow: 0 4px 8px rgba(0,0,0,0.15); }
-                .category-tab:focus { outline: none; }
-            `}</style>
+
+            {/* Contract Modal */}
+            {ContractModel && show && showContractData && (
+                <ContractModel show={show} setShow={handleCloseModal} contract={showContractData}/>
+            )}
+
+            {/* Cancel Confirmation Modal */}
+            <CancelConfirmationModal
+                open={showCancelModal}
+                onClose={() => {
+                    setShowCancelModal(false);
+                    setContractToCancel(null);
+                }}
+                onConfirm={handleCancelContract}
+                title="Cancel Contract"
+                message={`Are you sure you want to cancel this contract${contractToCancel ? ` (#${contractToCancel.id})` : ''}?`}
+                type="contract"
+                id={contractToCancel?.id}
+            />
         </div>
     );
 }

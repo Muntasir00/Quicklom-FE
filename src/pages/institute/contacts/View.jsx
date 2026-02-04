@@ -16,7 +16,7 @@ const View = () => {
     } = useViewContacts();
 
     return (
-        <div className="content-wrapper" style={{ minHeight: 'calc(100vh - 57px)' }}>
+        <div className="" style={{ minHeight: 'calc(100vh - 57px)' }}>
             {/* Page Header */}
             <div className="content-header py-3" style={{ backgroundColor: '#f4f6f9', marginTop: '15px' }}>
                 <div className="container-fluid">

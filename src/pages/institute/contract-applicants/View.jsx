@@ -573,7 +573,7 @@ const View = () => {
     };
 
     return (
-        <div className="content-wrapper" style={{ minHeight: 'calc(100vh - 57px)', backgroundColor: '#f8fafc' }}>
+        <div >
             {/* Page Header */}
             <div style={{
                 background: 'linear-gradient(135deg, #1e3a8a 0%, #3b82f6 100%)',
