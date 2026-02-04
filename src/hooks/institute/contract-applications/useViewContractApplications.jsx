@@ -54,7 +54,7 @@ export const useViewContractApplications = () => {
             const profileData = await getUserProfileService();
             if (profileData?.category?.name) {
                 setUserCategory(profileData.category.name);
-                console.log("User category:", profileData.category.name);
+                // console.log("User category:", profileData.category.name);
             }
         } catch (error) {
             console.error("Error fetching user profile:", error);
@@ -74,8 +74,8 @@ export const useViewContractApplications = () => {
         const categoryLower = userCategory.toLowerCase();
         const isMatch = categoryLower === "head hunter" || categoryLower === "recruitment agency";
 
-        console.log("User category:", userCategory);
-        console.log("Is headhunter/agency:", isMatch);
+        // console.log("User category:", userCategory);
+        // console.log("Is headhunter/agency:", isMatch);
 
         return isMatch;
     };
