@@ -415,7 +415,7 @@ const View = () => {
 
     return (
         <div
-            className="content-wrapper"
+            className=""
             style={{ minHeight: "calc(100vh - 57px)", backgroundColor: "#f8fafc", marginTop: "25px" }}
         >
             {/* Header */}

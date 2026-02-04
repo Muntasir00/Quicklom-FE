@@ -1,7 +1,15 @@
-import React, { useState, useMemo } from "react";
-import { useViewPublishedContracts } from "@hooks/institute/published-contracts/useViewPublishedContracts";
-import ContractApplicationAdditionalInformationModal from "@components/modals/ContractApplicationAdditionalInformationModal";
+import {useState, useMemo} from "react";
+import {useViewPublishedContracts} from "@hooks/institute/published-contracts/useViewPublishedContracts";
+import ContractApplicationAdditionalInformationModal
+    from "@components/modals/ContractApplicationAdditionalInformationModal";
 import Filter from "@components/forms/UserContractFilterForm";
+import {
+    Clock,
+    HeartHandshake,
+    LayoutGrid, ListFilter, Pill,
+    PlusSquare,
+    Stethoscope, User
+} from "lucide-react";
 
 // Industry configuration with icons and colors
 const INDUSTRIES = [
@@ -84,8 +92,6 @@ const getContractDurationType = (contractName) => {
 
 const View = () => {
     const {
-        menu,
-        action,
         rows,
         showForm,
         setShowForm,
@@ -126,12 +132,12 @@ const View = () => {
         const other = filteredRows.filter(row =>
             getContractDurationType(row.contract_type?.contract_name) === 'other'
         );
-        return { temporary, permanent, other };
+        return {temporary, permanent, other};
     }, [filteredRows]);
 
     // Industry counts
     const industryCounts = useMemo(() => {
-        const counts = { all: rows.length };
+        const counts = {all: rows.length};
         INDUSTRIES.forEach(ind => {
             if (ind.id !== 'all') {
                 counts[ind.id] = rows.filter(row =>
@@ -224,7 +230,7 @@ const View = () => {
                 if (start && end) {
                     const [startH, startM] = start.split(':').map(Number);
                     const [endH, endM] = end.split(':').map(Number);
-                    let hours = (endH + endM/60) - (startH + startM/60);
+                    let hours = (endH + endM / 60) - (startH + startM / 60);
                     if (hours < 0) hours += 24; // Handle overnight shifts
                     totalHours += hours;
                 }
@@ -357,422 +363,302 @@ const View = () => {
 
     const activeIndustryData = INDUSTRIES.find(i => i.id === activeIndustry);
 
-    // Contract Card Component
-    const ContractCard = ({ contract, durationType }) => {
-        const typeConfig = CONTRACT_TYPE_COLORS[durationType] || CONTRACT_TYPE_COLORS.temporary;
-        const hasApplied = contract?.user_application?.has_applied;
-        const totalValue = getTotalContractValue(contract);
-        const positionSought = getPositionSought(contract);
-        const fullLocation = getFullLocation(contract);
 
-        return (
-            <div
-                onClick={() => handleShowModal(contract.id, contract.contract_type?.contract_name)}
-                style={{
-                    background: 'white',
-                    borderRadius: '12px',
-                    border: `2px solid ${typeConfig.border}20`,
-                    borderLeft: `4px solid ${typeConfig.border}`,
-                    padding: '1rem',
-                    marginBottom: '0.75rem',
-                    transition: 'all 0.2s ease',
-                    cursor: 'pointer',
-                    boxShadow: '0 2px 8px rgba(0,0,0,0.04)'
-                }}
-                onMouseEnter={(e) => {
-                    e.currentTarget.style.transform = 'translateY(-2px)';
-                    e.currentTarget.style.boxShadow = '0 8px 20px rgba(0,0,0,0.08)';
-                }}
-                onMouseLeave={(e) => {
-                    e.currentTarget.style.transform = 'translateY(0)';
-                    e.currentTarget.style.boxShadow = '0 2px 8px rgba(0,0,0,0.04)';
-                }}
-            >
-                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '0.75rem' }}>
-                    <div style={{ flex: 1 }}>
-                        <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '0.25rem', flexWrap: 'wrap' }}>
-                            <span style={{
-                                background: typeConfig.badge,
-                                color: 'white',
-                                padding: '0.2rem 0.5rem',
-                                borderRadius: '4px',
-                                fontSize: '10px',
-                                fontWeight: '700',
-                                textTransform: 'uppercase'
-                            }}>
-                                {typeConfig.label}
-                            </span>
-                            <span style={{
-                                background: getStatusColor(contract.status),
-                                color: 'white',
-                                padding: '0.2rem 0.5rem',
-                                borderRadius: '4px',
-                                fontSize: '10px',
-                                fontWeight: '700',
-                                textTransform: 'uppercase'
-                            }}>
-                                {contract.status?.replace('_', ' ')}
-                            </span>
-                            {totalValue && (
-                                <span style={{
-                                    background: 'linear-gradient(135deg, #10b981 0%, #059669 100%)',
-                                    color: 'white',
-                                    padding: '0.2rem 0.6rem',
-                                    borderRadius: '4px',
-                                    fontSize: '10px',
-                                    fontWeight: '700'
-                                }}>
-                                    {formatCurrency(totalValue)}
-                                </span>
-                            )}
-                        </div>
-                        <h6 style={{ margin: 0, fontWeight: '700', color: '#1a1a2e', fontSize: '14px' }}>
-                            {contract.contract_type?.contract_name || 'Contract'}
-                        </h6>
-                    </div>
-                    <span style={{ fontWeight: '800', color: activeIndustryData?.color || '#667eea', fontSize: '12px' }}>
-                        #{contract.id}
-                    </span>
-                </div>
+    const Industries = [
+        {
+            id: "all",
+            name: 'All Industries',
+            icon: LayoutGrid,
+            color: 'text-blue-500',
+            activeBg: 'bg-blue-50',
+            activeBorder: 'border-blue-200'
+        },
+        {id: "general_medicine", name: 'General Medicine', icon: PlusSquare, color: 'text-purple-500'},
+        {id: "dental_care", name: 'Dental Care', icon: Stethoscope, color: 'text-blue-400'},
+        {id: "pharmacy", name: 'Pharmacy', icon: Pill, color: 'text-emerald-500'},
+        {id: "nursing", name: 'Nursing & Home Care', icon: HeartHandshake, color: 'text-orange-400'},
+    ];
 
-                {/* Position Sought */}
-                {positionSought && (
-                    <div style={{
-                        display: 'flex',
-                        alignItems: 'center',
-                        gap: '0.5rem',
-                        marginBottom: '0.5rem',
-                        background: '#f0f9ff',
-                        padding: '0.4rem 0.6rem',
-                        borderRadius: '6px'
-                    }}>
-                        <i className="fas fa-user-md" style={{ color: '#0369a1', fontSize: '11px' }}></i>
-                        <span style={{ fontSize: '12px', color: '#0c4a6e', fontWeight: '600' }}>
-                            {positionSought}
-                        </span>
-                    </div>
-                )}
 
-                {/* Full Location */}
-                {fullLocation && (
-                    <div style={{
-                        display: 'flex',
-                        alignItems: 'flex-start',
-                        gap: '0.5rem',
-                        marginBottom: '0.5rem'
-                    }}>
-                        <i className="fas fa-map-marker-alt" style={{ color: '#dc2626', fontSize: '11px', marginTop: '2px' }}></i>
-                        <span style={{ fontSize: '11px', color: '#4b5563', lineHeight: '1.4' }}>
-                            {fullLocation}
-                        </span>
-                    </div>
-                )}
-
-                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0.5rem', marginBottom: '0.75rem' }}>
-                    <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-                        <i className="fas fa-building" style={{ color: '#6b7280', fontSize: '11px' }}></i>
-                        <span style={{ fontSize: '12px', color: '#374151', fontWeight: '600' }}>
-                            {contract.published_by?.name || 'Unknown'}
-                        </span>
-                    </div>
-                    <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-                        <i className="fas fa-calendar" style={{ color: '#6b7280', fontSize: '11px' }}></i>
-                        <span style={{ fontSize: '11px', color: '#6b7280' }}>
-                            {contract.start_date ? formatDate(contract.start_date) : '-'} → {contract.end_date ? formatDate(contract.end_date) : '-'}
-                        </span>
-                    </div>
-                </div>
-
-                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                    <div>
-                        {hasApplied ? (
-                            <span style={{
-                                background: '#dcfce7',
-                                color: '#166534',
-                                padding: '0.25rem 0.75rem',
-                                borderRadius: '20px',
-                                fontSize: '11px',
-                                fontWeight: '700',
-                                display: 'inline-flex',
-                                alignItems: 'center',
-                                gap: '0.25rem'
-                            }}>
-                                <i className="fas fa-check-circle"></i> Applied
-                            </span>
-                        ) : (
-                            <span style={{
-                                background: '#f3f4f6',
-                                color: '#6b7280',
-                                padding: '0.25rem 0.75rem',
-                                borderRadius: '20px',
-                                fontSize: '11px',
-                                fontWeight: '600'
-                            }}>
-                                Not Applied
-                            </span>
-                        )}
-                    </div>
-                    <div style={{ display: 'flex', gap: '0.5rem' }}>
-                        {!hasApplied && (
-                            <button
-                                onClick={(e) => {
-                                    e.stopPropagation();
-                                    setSelectedContractId(contract.id);
-                                    setShowForm(true);
-                                }}
-                                style={{
-                                    background: activeIndustryData?.gradient || 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
-                                    color: 'white',
-                                    border: 'none',
-                                    padding: '0.4rem 1rem',
-                                    borderRadius: '6px',
-                                    fontSize: '11px',
-                                    fontWeight: '700',
-                                    cursor: 'pointer',
-                                    display: 'flex',
-                                    alignItems: 'center',
-                                    gap: '0.25rem'
-                                }}
-                            >
-                                <i className="fas fa-paper-plane"></i> Apply
-                            </button>
-                        )}
-                    </div>
-                </div>
-            </div>
-        );
+    const TYPE_CONFIG = {
+        temporary: {
+            primary: 'text-blue-500',
+            bg: 'bg-blue-50',
+            border: 'border-blue-500',
+            accent: '#3b82f6',
+            icon: <Clock className="text-blue-500"/>
+        },
+        permanent: {
+            primary: 'text-amber-500',
+            bg: 'bg-amber-50',
+            border: 'border-amber-500',
+            accent: '#f59e0b',
+            icon: <User className="text-amber-500"/>
+        }
     };
 
-    // Contract Section Component
-    const ContractSection = ({ title, contracts, durationType, icon }) => {
-        const typeConfig = CONTRACT_TYPE_COLORS[durationType];
-        if (contracts.length === 0) return null;
+    const ContractSection = ({title, contracts, type}) => {
+        const config = TYPE_CONFIG[type] || TYPE_CONFIG.temporary;
+
+        if (!contracts || contracts.length === 0) return null;
+
+        const count = contracts.length;
 
         return (
-            <div style={{ marginBottom: '1.5rem' }}>
-                <div style={{
-                    display: 'flex',
-                    alignItems: 'center',
-                    gap: '0.75rem',
-                    marginBottom: '1rem',
-                    paddingBottom: '0.5rem',
-                    borderBottom: `2px solid ${typeConfig?.border || '#e5e7eb'}20`
-                }}>
-                    <div style={{
-                        width: '36px',
-                        height: '36px',
-                        borderRadius: '8px',
-                        background: `${typeConfig?.badge || '#667eea'}15`,
-                        display: 'flex',
-                        alignItems: 'center',
-                        justifyContent: 'center'
-                    }}>
-                        <i className={icon} style={{ color: typeConfig?.badge || '#667eea', fontSize: '16px' }}></i>
+            <div className="flex flex-col w-full mb-8">
+                {/* Section Header */}
+                <div
+                    className={`flex items-center justify-between mb-3 pb-2 border-b-2 ${config.border} border-opacity-20`}>
+                    <div className="flex items-center gap-3">
+                        {/* Icon Box */}
+                        <div className={`w-9 h-9 ${config.bg} rounded-lg flex items-center justify-center shadow-sm`}>
+                            {/*<i className={`fas ${config.icon} ${config.primary} text-base`}></i>*/}
+                            {config.icon}
+                        </div>
+
+                        {/* Title and Subtitle */}
+                        <div className="flex flex-col">
+                            <h2 className="!text-base font-bold text-[#2D8FE3] leading-tight !mb-0">
+                                {title}
+                            </h2>
+                        </div>
                     </div>
-                    <div>
-                        <h5 style={{ margin: 0, fontWeight: '700', color: '#1a1a2e', fontSize: '16px' }}>
-                            {title}
-                        </h5>
-                        <span style={{ fontSize: '12px', color: '#6b7280' }}>
-                            {contracts.length} contract{contracts.length !== 1 ? 's' : ''} available
-                        </span>
+
+                    {/* Right Side Circular Badge (matches image) */}
+                    <div
+                        className="w-6 h-6 rounded-lg py-[3px] px-2 border border-[#BDD7ED] flex items-center justify-center">
+                    <span className="text-sm font-medium text-[#374151]">
+                        {count}
+                    </span>
                     </div>
                 </div>
-                <div>
-                    {contracts.map(contract => (
-                        <ContractCard key={contract.id} contract={contract} durationType={durationType} />
+
+                {/* List of Cards */}
+                <div className="flex flex-col gap-4">
+                    {contracts.map((contract) => (
+                        <ContractCard
+                            key={contract.id}
+                            contract={contract}
+                            durationType={type} // Pass 'temporary' or 'permanent'
+                        />
                     ))}
                 </div>
             </div>
         );
     };
 
-    return (
-        <div className="content-wrapper" style={{ minHeight: "calc(100vh - 57px)", background: '#f8fafc' }}>
-            {/* Page Header */}
-            <div className="content-header py-3" style={{ backgroundColor: '#f4f6f9', marginTop: '15px' }}>
-                <div className="container-fluid">
-                    <div className="d-flex flex-wrap justify-content-between align-items-center">
-                        <div className="d-flex align-items-center mb-2 mb-md-0">
-                            <div
-                                className="icon-wrapper mr-3 d-flex align-items-center justify-content-center rounded"
-                                style={{
-                                    width: '48px',
-                                    height: '48px',
-                                    background: activeIndustryData?.gradient || 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
-                                    boxShadow: `0 4px 12px ${activeIndustryData?.color || '#667eea'}40`
-                                }}
-                            >
-                                <i className={activeIndustryData?.icon || 'fas fa-briefcase'} style={{ fontSize: '1.3rem', color: 'white' }}></i>
-                            </div>
-                            <div>
-                                <h4 className="mb-0 font-weight-bold text-dark">Job Offers</h4>
-                                <span className="text-muted" style={{ fontSize: '0.9rem' }}>
-                                    {filteredRows.length} available position{filteredRows.length !== 1 ? 's' : ''} • Browse by industry
-                                </span>
-                            </div>
-                        </div>
-                        <button
-                            onClick={() => setShowFilters(!showFilters)}
-                            className={`btn ${appliedFiltersCount > 0 ? 'btn-warning' : 'btn-outline-secondary'}`}
-                            style={{
-                                borderRadius: '8px',
-                                position: 'relative',
-                                background: appliedFiltersCount > 0 ? 'linear-gradient(135deg, #f59e0b 0%, #d97706 100%)' : undefined,
-                                border: appliedFiltersCount > 0 ? 'none' : undefined,
-                                color: appliedFiltersCount > 0 ? 'white' : undefined,
-                                fontWeight: appliedFiltersCount > 0 ? '600' : undefined,
-                                boxShadow: appliedFiltersCount > 0 ? '0 4px 12px rgba(245, 158, 11, 0.4)' : undefined
-                            }}
-                        >
-                            <i className={`fas fa-filter mr-2`}></i>
-                            {showFilters ? 'Hide Filters' : 'Show Filters'}
-                            {appliedFiltersCount > 0 && (
-                                <span style={{
-                                    position: 'absolute',
-                                    top: '-8px',
-                                    right: '-8px',
-                                    background: '#ef4444',
-                                    color: 'white',
-                                    borderRadius: '50%',
-                                    width: '22px',
-                                    height: '22px',
-                                    display: 'flex',
-                                    alignItems: 'center',
-                                    justifyContent: 'center',
-                                    fontSize: '11px',
-                                    fontWeight: '700',
-                                    border: '2px solid white',
-                                    boxShadow: '0 2px 4px rgba(0,0,0,0.2)'
-                                }}>
-                                    {appliedFiltersCount}
-                                </span>
-                            )}
+
+    const ContractCard = ({contract, durationType}) => {
+        const typeConfig = CONTRACT_TYPE_COLORS[durationType] || CONTRACT_TYPE_COLORS.temporary;
+        const hasApplied = contract?.user_application?.has_applied;
+        const totalValue = getTotalContractValue(contract);
+        const positionSought = getPositionSought(contract);
+        const fullLocation = getFullLocation(contract);
+
+        const typeTagClass = typeConfig.label === "Temporary"
+            ? "bg-[#FBF1E7] text-[#F36B2D]"
+            : "bg-blue-50 text-blue-500 border-blue-100";
+
+        const cardBorderColor = durationType !== 'permanent' ? "!border-[#95C8EC]" : "!border-[#F1D370]"
+
+        return (
+            <div
+                onClick={() => handleShowModal(contract.id, contract.contract_type?.contract_name)}
+                className={`group bg-[#FBFBFB] border ${cardBorderColor} rounded-xl p-3 space-y-3 transition-all duration-200 cursor-pointer relative overflow-hidden`}
+            >
+                {/* Top Row: ID and Status Tags */}
+                <div className="flex justify-between items-start mb-3">
+                    <span className="text-sm text-[#374151] tracking-tight">
+                      #{contract.id}
+                    </span>
+                    <div className="flex items-center gap-2">
+                        {/* Status Badge */}
+                        <span
+                            className="bg-emerald-50 text-emerald-600 text-[10px] font-extrabold px-2 py-1 rounded uppercase tracking-wider border border-emerald-100">
+                            {contract.status?.replace('_', ' ') || 'Open'}
+                          </span>
+                        {/* Type Badge (Temporary/Permanent) */}
+                        <span
+                            className={`text-[10px] font-extrabold px-2 py-1 rounded uppercase tracking-wider border ${typeTagClass}`}>
+                                {typeConfig.label}
+                              </span>
+                        {/* Action Menu icon */}
+                        <button className="text-gray-300 hover:text-gray-500 ml-1">
+                            <i className="fas fa-ellipsis-v text-xs"></i>
                         </button>
                     </div>
                 </div>
-            </div>
 
-            <section className="content pt-0" style={{ padding: '1rem' }}>
-                <div className="container-fluid">
-                    {/* Filter Section */}
-                    {showFilters && (
-                        <div style={{ marginBottom: '1rem' }}>
-                            <Filter
-                                setContracts={setContracts}
-                                useFilterHook={useFilterHook}
-                                onFiltersChange={(count) => setAppliedFiltersCount(count)}
-                            />
+                {/* Main Title & Position */}
+                <div className="mb-2">
+                    <h3 className="!text-base font-medium text-[#2A394B] mb-1 leading-tight group-hover:text-blue-600 transition-colors">
+                        {contract.contract_type?.contract_name || 'General Dentistry – Temporary Contract'}
+                    </h3>
+
+                    {/* Dynamic Position Sought (if exists) */}
+                    {positionSought && (
+                        <div
+                            className="flex items-center gap-2 mb-2 text-blue-700 bg-blue-50/50 w-fit px-2 py-0.5 rounded text-[12px] font-semibold">
+                            <i className="fas fa-user-md text-[10px]"></i>
+                            {positionSought}
                         </div>
                     )}
 
-                    {/* Industry Tabs */}
-                    <div style={{
-                        display: 'flex',
-                        gap: '0.5rem',
-                        marginBottom: '1.5rem',
-                        overflowX: 'auto',
-                        paddingBottom: '0.5rem'
-                    }}>
-                        {INDUSTRIES.map(industry => (
-                            <button
-                                key={industry.id}
-                                onClick={() => {
-                                    setActiveIndustry(industry.id);
-                                    setCurrentPage(1);
-                                }}
-                                style={{
-                                    display: 'flex',
-                                    alignItems: 'center',
-                                    gap: '0.5rem',
-                                    padding: '0.75rem 1.25rem',
-                                    borderRadius: '10px',
-                                    border: activeIndustry === industry.id ? 'none' : '2px solid #e5e7eb',
-                                    background: activeIndustry === industry.id ? industry.gradient : 'white',
-                                    color: activeIndustry === industry.id ? 'white' : '#374151',
-                                    cursor: 'pointer',
-                                    fontWeight: '600',
-                                    fontSize: '13px',
-                                    whiteSpace: 'nowrap',
-                                    transition: 'all 0.2s ease',
-                                    boxShadow: activeIndustry === industry.id ? `0 4px 12px ${industry.color}40` : 'none'
-                                }}
-                            >
-                                <i className={industry.icon} style={{ fontSize: '14px' }}></i>
-                                {industry.name}
-                                <span style={{
-                                    background: activeIndustry === industry.id ? 'rgba(255,255,255,0.25)' : '#f3f4f6',
-                                    padding: '0.15rem 0.5rem',
-                                    borderRadius: '20px',
-                                    fontSize: '11px',
-                                    fontWeight: '700'
-                                }}>
-                                    {industryCounts[industry.id] || 0}
-                                </span>
-                            </button>
-                        ))}
+                    {/* Location Section */}
+                    <div className="flex flex-col  sm:gap-1 text-[13px] text-gray-500">
+                        <span className="!text-sm text-[#6B7280] !block !mb-0">Location</span>
+                        <span
+                            className="line-clamp-1 !mb-0 !text-sm text-[#2A394B]">{fullLocation || "Address not specified"}</span>
                     </div>
+                </div>
 
-                    {/* Content Area */}
-                    {filteredRows.length === 0 ? (
-                        <div style={{
-                            textAlign: 'center',
-                            padding: '3rem',
-                            background: 'white',
-                            borderRadius: '12px',
-                            boxShadow: '0 2px 8px rgba(0,0,0,0.04)'
-                        }}>
-                            <i className={activeIndustryData?.icon || 'fas fa-briefcase'} style={{
-                                fontSize: '48px',
-                                color: '#d1d5db',
-                                marginBottom: '1rem'
-                            }}></i>
-                            <h5 style={{ color: '#6b7280', marginBottom: '0.5rem' }}>No Job Offers Available</h5>
-                            <p style={{ color: '#9ca3af', fontSize: '14px' }}>
-                                There are no {activeIndustry !== 'all' ? activeIndustryData?.name : ''} positions available at the moment.
+                {/* Footer Info & Action Button */}
+                <div
+                    className="flex flex-col sm:flex-row justify-between items-end gap-4 pt-2 border-t border-gray-50 mt-2">
+                    <div className="flex gap-3 sm:gap-10 w-full sm:w-auto">
+                        {/* Contract Value */}
+                        <div>
+                            <p className="text-sm capitalize text-[#6B7280]  !mb-0">
+                                Contract value
+                            </p>
+                            <p className="text-sm font-medium text-[#2D8FE3] !mb-0">
+                                {totalValue ? formatCurrency(totalValue) : '$ 0.00'}
                             </p>
                         </div>
-                    ) : (
-                        <div style={{
-                            display: 'grid',
-                            gridTemplateColumns: 'repeat(auto-fit, minmax(400px, 1fr))',
-                            gap: '1.5rem'
-                        }}>
-                            {/* Temporary Contracts Column */}
-                            <div>
-                                <ContractSection
-                                    title="Temporary Positions"
-                                    contracts={groupedContracts.temporary}
-                                    durationType="temporary"
-                                    icon="fas fa-clock"
-                                />
-                            </div>
 
-                            {/* Permanent Contracts Column */}
-                            <div>
-                                <ContractSection
-                                    title="Permanent Positions"
-                                    contracts={groupedContracts.permanent}
-                                    durationType="permanent"
-                                    icon="fas fa-user-tie"
-                                />
-                            </div>
+                        {/* Duration */}
+                        <div>
+                            <p className="text-sm text-[#6B7280]  !mb-0">
+                                Duration
+                            </p>
+                            <p className="text-[14px] text-[#2A394B] !mb-0">
+                                {contract.start_date ? formatDate(contract.start_date) : 'TBD'}
+                                {contract.end_date ? ` - ${formatDate(contract.end_date)}` : ''}
+                            </p>
                         </div>
-                    )}
+                    </div>
 
-                    {/* Other contracts (if any don't match temporary/permanent) */}
-                    {groupedContracts.other.length > 0 && (
-                        <div style={{ marginTop: '1.5rem' }}>
-                            <ContractSection
-                                title="Other Positions"
-                                contracts={groupedContracts.other}
-                                durationType="temporary"
-                                icon="fas fa-briefcase"
-                            />
-                        </div>
-                    )}
+                    {/* Dynamic Button based on Application Status */}
+                    <div className="w-full sm:w-auto">
+                        {hasApplied ? (
+                            <button
+                                className="flex items-center justify-center gap-2 w-full sm:w-auto px-3 py-2 !rounded-lg border-[2px] border-[#BDD7ED]  bg-[#EAF5FE] text-[#2D8FE3] text-sm transition-colors"
+                                onClick={(e) => e.stopPropagation()}
+                            >
+                                <i className="far fa-file-alt"></i>
+                                Applied
+                            </button>
+                        ) : (
+                            <button
+                                onClick={(e) => {
+                                    e.stopPropagation();
+                                    setSelectedContractId(contract.id);
+                                    setShowForm(true);
+                                }}
+                                // style={{background: activeIndustryData?.gradient || 'linear-gradient(135deg, #3b82f6 0%, #2563eb 100%)'}}
+                                className="flex items-center justify-center gap-2 w-full sm:w-auto px-3 py-2 !rounded-lg bg-[#2D8FE3] text-white text-sm  hover:brightness-110 transition-all active:scale-95"
+                            >
+                                <i className="fas fa-paper-plane text-[11px]"></i>
+                                Apply
+                            </button>
+                        )}
+                    </div>
                 </div>
-            </section>
+            </div>
+        );
+    };
+
+    return (
+        <>
+
+            <div className="flex items-center gap-3 bg-white w-full">
+                {/* Filter Icon Button */}
+                <button
+                    className={`flex-shrink-0 p-3 border border-gray-200 !rounded-lg hover:bg-gray-50 transition-all shadow-sm relative
+                     ${showFilters || appliedFiltersCount > 0
+                        ? 'bg-blue-50 border-blue-200 text-blue-700 shadow-sm'
+                        : 'bg-white border-slate-200 text-slate-600 hover:bg-slate-50 hover:border-slate-300'
+                    }
+                    `}
+                    onClick={() => setShowFilters(!showFilters)}
+                >
+                    <ListFilter className="w-4 h-4 text-gray-500"/>
+                </button>
+
+                {/* Scrollable Tabs Container */}
+                <div
+                    className="flex items-center gap-1 p-2 border border-gray-100 rounded-xl overflow-x-auto no-scrollbar scroll-smooth">
+                    {Industries.map((industry) => {
+                        const Icon = industry.icon;
+                        const isActive = activeIndustry === industry.id;
+
+                        return (
+                            <button
+                                key={industry.id}
+                                onClick={() => setActiveIndustry(industry.id)}
+                                className={`flex items-center gap-2 px-3 py-2 !rounded-lg whitespace-nowrap transition-all duration-200
+                                    ${isActive
+                                    ? 'bg-blue-50 border border-blue-200 text-blue-600 shadow-sm'
+                                    : 'border border-transparent text-slate-600 hover:bg-gray-50'
+                                }
+                                  `}
+                            >
+                                <Icon
+                                    className={`h-3.5 w-3.5 md:h-4 md:w-4 ${isActive ? 'text-blue-500' : industry.color}`}/>
+                                <span className="text-sm font-semibold tracking-wide">
+                                    {industry.name}
+                                  </span>
+                            </button>
+                        );
+                    })}
+                </div>
+
+            </div>
+
+            {/* Filter Section */}
+            {showFilters && (
+                <div className="my-4">
+                    <Filter
+                        setContracts={setContracts}
+                        useFilterHook={useFilterHook}
+                        onFiltersChange={(count) => setAppliedFiltersCount(count)}
+                    />
+                </div>
+            )}
+
+            <div className="mt-4">
+                {filteredRows.length === 0 ? (
+                    <div
+                        className="flex flex-col items-center justify-center p-12 bg-white rounded-xl shadow-sm border border-gray-100">
+                        <div className="w-20 h-20 bg-gray-50 rounded-full flex items-center justify-center mb-4">
+                            <i className={`${activeIndustryData?.icon || 'fas fa-briefcase'} text-5xl text-gray-300`}></i>
+                        </div>
+                        <h5 className="text-xl font-semibold text-gray-600 mb-2">No Job Offers Available</h5>
+                        <p className="text-gray-400 text-sm">
+                            There are no {activeIndustry !== 'all' ? activeIndustryData?.name : ''} positions
+                            available at the moment.
+                        </p>
+                    </div>
+                ) : (
+                    <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 items-start">
+                        {/* Temporary Contracts Column */}
+                        <ContractSection
+                            title="Temporary Positions"
+                            contracts={groupedContracts.temporary}
+                            type="temporary"
+                            count={groupedContracts.temporary?.length || 0}
+                        />
+
+                        {/* Permanent Contracts Column */}
+                        <ContractSection
+                            title="Permanent Positions"
+                            contracts={groupedContracts.permanent}
+                            type="permanent"
+                            count={groupedContracts.permanent?.length || 0}
+                        />
+                    </div>
+                )}
+            </div>
 
             {/* Modals */}
             <ContractApplicationAdditionalInformationModal
@@ -788,7 +674,7 @@ const View = () => {
                     contract={showContractData}
                 />
             )}
-        </div>
+        </>
     );
 };
 
