@@ -1,15 +1,36 @@
-import React, { useState, useMemo, useEffect } from "react";
-import { useViewContractApplicants } from "@hooks/institute/contract-applicants/useViewContractApplicants";
-import { useNavigate, useSearchParams } from "react-router-dom";
+import {useState, useMemo, useEffect} from "react";
+import {useViewContractApplicants} from "@hooks/institute/contract-applicants/useViewContractApplicants";
+import {useNavigate, useSearchParams} from "react-router-dom";
 import UserProfileModal from "@components/modals/UserProfileModal";
 import ViewCandidatesModal from "@components/modals/ViewCandidatesModal";
-import { Tooltip, CircularProgress, Skeleton, Dialog, DialogTitle, DialogContent, DialogActions, Button, Chip, Tabs, Tab, Box, Collapse, TextField, MenuItem, InputAdornment } from "@mui/material";
+import {
+    CircularProgress,
+    Skeleton,
+    Dialog,
+    DialogTitle,
+    DialogContent,
+    DialogActions,
+} from "@mui/material";
 import WarningAmberIcon from '@mui/icons-material/WarningAmber';
-import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
-import ExpandLessIcon from '@mui/icons-material/ExpandLess';
-import SearchIcon from '@mui/icons-material/Search';
-import FilterListIcon from '@mui/icons-material/FilterList';
-import ClearIcon from '@mui/icons-material/Clear';
+import ApplicantListItem from "@pages/institute/contract-applicants/ApplicantListItem.jsx";
+import {Search, ListFilter, FileText, X, FolderOpen} from "lucide-react";
+import {Input} from "@components/ui/input";
+import {
+    Select,
+    SelectContent,
+    SelectItem,
+    SelectTrigger,
+    SelectValue,
+} from "@components/ui/select";
+import {Badge} from "@components/ui/badge";
+import {Button} from "@components/ui/button";
+import {
+    Tooltip,
+    TooltipContent,
+    TooltipProvider,
+    TooltipTrigger,
+} from "@components/ui/tooltip";
+import MetricsGrid from "@pages/institute/contract-applications/metrics-grid.jsx";
 
 // Category configuration matching contracts page
 const CATEGORY_CONFIG = {
@@ -95,7 +116,7 @@ const View = () => {
     const [searchParams, setSearchParams] = useSearchParams();
 
     const [activeCategory, setActiveCategory] = useState(null);
-    const [expandedSections, setExpandedSections] = useState({ temporary: true, permanent: true });
+    const [expandedSections, setExpandedSections] = useState({temporary: true, permanent: true});
     const [searchTerm, setSearchTerm] = useState("");
     const [statusFilter, setStatusFilter] = useState("all");
     const [contractIdFilter, setContractIdFilter] = useState("");
@@ -104,7 +125,7 @@ const View = () => {
     // Clear all URL filters
     const clearUrlFilters = () => {
         // Remove URL params by navigating to the same page without params
-        navigate('/institute/contract-applicants', { replace: true });
+        navigate('/institute/contract-applicants', {replace: true});
     };
 
     // Clear all filters (both URL and local)
@@ -120,17 +141,17 @@ const View = () => {
     // Get category from contract data
     const getContractCategory = (row) => {
         return row?.contract?.contract_type?.industry ||
-               row?.contract?.industry ||
-               row?.industry ||
-               "Other";
+            row?.contract?.industry ||
+            row?.industry ||
+            "Other";
     };
 
     // Get contract duration type
     const getContractDurationType = (row) => {
         const durationType = row?.contract?.contract_type?.contract_duration_type ||
-                            row?.contract?.duration_type ||
-                            row?.duration_type ||
-                            "";
+            row?.contract?.duration_type ||
+            row?.duration_type ||
+            "";
         if (durationType.toLowerCase().includes('permanent')) return 'Permanent';
         if (durationType.toLowerCase().includes('temporary')) return 'Temporary';
         return 'Other';
@@ -170,8 +191,8 @@ const View = () => {
             const durationType = getContractDurationType(row);
             const contractId = row.contract_id;
             const contractName = row.contract?.contract_type?.contract_name ||
-                                row.contract_name ||
-                                `Contract #${contractId}`;
+                row.contract_name ||
+                `Contract #${contractId}`;
 
             if (!grouped[category]) {
                 grouped[category] = {
@@ -246,7 +267,7 @@ const View = () => {
 
     // Category stats
     const getCategoryStats = (category) => {
-        const categoryData = groupedData[category] || { Temporary: {}, Permanent: {}, Other: {} };
+        const categoryData = groupedData[category] || {Temporary: {}, Permanent: {}, Other: {}};
         let total = 0;
         let pending = 0;
 
@@ -257,627 +278,242 @@ const View = () => {
             });
         });
 
-        return { total, pending };
-    };
-
-    const getStatusColor = (status) => {
-        const colors = {
-            pending: '#f59e0b',
-            accepted: '#10b981',
-            rejected: '#ef4444',
-        };
-        return colors[status] || '#6b7280';
+        return {total, pending};
     };
 
     // Get action buttons for an applicant
     const getActionButtons = (applicant) => {
         const actions = originalColumns.find(col => col.field === 'actions');
         if (actions && actions.getActions) {
-            return actions.getActions({ row: applicant });
+            return actions.getActions({row: applicant});
         }
         return [];
     };
 
-    const renderActionButton = (action, applicant, idx) => {
-        const label = action.props.label;
-        const isDisabled = action.props.disabled;
-        const applicationId = applicant.id;
-        let bgColor, hoverBg, iconClass, tooltipText;
-
-        if (label === 'View Candidates') {
-            bgColor = '#3b82f6';
-            hoverBg = '#2563eb';
-            iconClass = 'fas fa-users';
-            tooltipText = 'View Candidates';
-        } else if (label === 'View Contract') {
-            bgColor = '#10b981';
-            hoverBg = '#059669';
-            iconClass = 'fas fa-file-contract';
-            tooltipText = 'View Contract';
-        } else if (label === 'View Profile') {
-            bgColor = '#8b5cf6';
-            hoverBg = '#7c3aed';
-            iconClass = 'fas fa-user';
-            tooltipText = 'View Profile';
-        } else if (label === 'Accept') {
-            bgColor = '#10b981';
-            hoverBg = '#059669';
-            iconClass = 'fas fa-check';
-            tooltipText = isActionLoading(applicationId, 'accept') ? 'Accepting...' : 'Accept';
-        } else if (label === 'Reject') {
-            bgColor = '#ef4444';
-            hoverBg = '#dc2626';
-            iconClass = 'fas fa-times';
-            tooltipText = isActionLoading(applicationId, 'reject') ? 'Rejecting...' : 'Reject';
-        } else {
-            return null;
-        }
-
-        return (
-            <Tooltip key={idx} title={tooltipText} arrow>
-                <span>
-                    <button
-                        onClick={(e) => {
-                            e.stopPropagation();
-                            action.props.onClick(e);
-                        }}
-                        disabled={isDisabled}
-                        style={{
-                            display: 'inline-flex',
-                            alignItems: 'center',
-                            justifyContent: 'center',
-                            width: '32px',
-                            height: '32px',
-                            padding: 0,
-                            backgroundColor: isDisabled ? '#d1d5db' : bgColor,
-                            color: '#ffffff',
-                            border: 'none',
-                            borderRadius: '8px',
-                            fontSize: '0.85rem',
-                            cursor: isDisabled ? 'not-allowed' : 'pointer',
-                            transition: 'all 0.2s',
-                            opacity: isDisabled ? 0.6 : 1
-                        }}
-                        onMouseEnter={(e) => {
-                            if (!isDisabled) {
-                                e.currentTarget.style.backgroundColor = hoverBg;
-                                e.currentTarget.style.transform = 'translateY(-1px)';
-                            }
-                        }}
-                        onMouseLeave={(e) => {
-                            if (!isDisabled) {
-                                e.currentTarget.style.backgroundColor = bgColor;
-                                e.currentTarget.style.transform = 'translateY(0)';
-                            }
-                        }}
-                    >
-                        {isDisabled && (label === 'Accept' || label === 'Reject') ? (
-                            <CircularProgress size={14} style={{ color: '#ffffff' }} />
-                        ) : (
-                            <i className={iconClass}></i>
-                        )}
-                    </button>
-                </span>
-            </Tooltip>
-        );
-    };
-
-    const toggleSection = (section) => {
-        setExpandedSections(prev => ({
-            ...prev,
-            [section]: !prev[section]
-        }));
-    };
-
     const categories = Object.keys(groupedData);
-    const activeConfig = getCategoryConfig(activeCategory);
-    const activeCategoryData = groupedData[activeCategory] || { Temporary: {}, Permanent: {}, Other: {} };
+    const activeCategoryData = groupedData[activeCategory] || {Temporary: {}, Permanent: {}, Other: {}};
 
-    const renderContractSection = (contracts, durationType) => {
+    const renderContractSection = (contracts,) => {
         const contractList = Object.values(contracts);
         if (contractList.length === 0) return null;
 
-        const isExpanded = expandedSections[durationType.toLowerCase()];
-        const totalApplicants = contractList.reduce((sum, c) => sum + c.applicants.length, 0);
-        const pendingApplicants = contractList.reduce((sum, c) =>
-            sum + c.applicants.filter(a => a.status === 'pending').length, 0);
-
         return (
-            <div style={{ marginBottom: '1.5rem' }}>
-                {/* Section Header */}
-                <div
-                    onClick={() => toggleSection(durationType.toLowerCase())}
-                    style={{
-                        display: 'flex',
-                        alignItems: 'center',
-                        justifyContent: 'space-between',
-                        padding: '0.75rem 1rem',
-                        backgroundColor: durationType === 'Temporary' ? '#fef3c7' : '#dbeafe',
-                        borderRadius: '10px',
-                        cursor: 'pointer',
-                        marginBottom: isExpanded ? '1rem' : 0,
-                        border: `2px solid ${durationType === 'Temporary' ? '#fbbf24' : '#3b82f6'}`,
-                        transition: 'all 0.2s'
-                    }}
-                >
-                    <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
-                        <i className={durationType === 'Temporary' ? 'fas fa-clock' : 'fas fa-briefcase'}
-                           style={{ color: durationType === 'Temporary' ? '#d97706' : '#2563eb', fontSize: '1.1rem' }}></i>
-                        <span style={{ fontWeight: 700, color: durationType === 'Temporary' ? '#92400e' : '#1e40af', fontSize: '1rem' }}>
-                            {durationType} Contracts
-                        </span>
-                        <Chip
-                            label={`${contractList.length} contract${contractList.length !== 1 ? 's' : ''}`}
-                            size="small"
-                            sx={{
-                                backgroundColor: durationType === 'Temporary' ? '#fbbf24' : '#3b82f6',
-                                color: 'white',
-                                fontWeight: 600,
-                                fontSize: '0.75rem'
-                            }}
-                        />
-                        <Chip
-                            label={`${totalApplicants} applicant${totalApplicants !== 1 ? 's' : ''}`}
-                            size="small"
-                            sx={{
-                                backgroundColor: '#6b7280',
-                                color: 'white',
-                                fontWeight: 600,
-                                fontSize: '0.75rem'
-                            }}
-                        />
-                        {pendingApplicants > 0 && (
-                            <Chip
-                                label={`${pendingApplicants} pending`}
-                                size="small"
-                                sx={{
-                                    backgroundColor: '#f59e0b',
-                                    color: 'white',
-                                    fontWeight: 600,
-                                    fontSize: '0.75rem'
-                                }}
+            <div>
+                {contractList.map(({applicants}) => {
+                    return (
+                        applicants.map((applicant) => (
+                            <ApplicantListItem
+                                key={applicant.id}
+                                applicant={applicant}
+                                getActionButtons={getActionButtons} // হুক থেকে আসা ফাংশন
+                                isActionLoading={isActionLoading}   // হুক থেকে আসা স্টেট
                             />
-                        )}
-                    </div>
-                    {isExpanded ? <ExpandLessIcon /> : <ExpandMoreIcon />}
-                </div>
-
-                {/* Contract Cards */}
-                <Collapse in={isExpanded}>
-                    <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
-                        {contractList.map(({ contractId, contractName, contractData, applicants }) => (
-                            <div key={contractId} style={{
-                                backgroundColor: '#ffffff',
-                                borderRadius: '12px',
-                                border: '1px solid #e5e7eb',
-                                overflow: 'hidden',
-                                boxShadow: '0 1px 3px rgba(0,0,0,0.05)'
-                            }}>
-                                {/* Contract Header */}
-                                <div style={{
-                                    background: activeConfig.gradient,
-                                    padding: '0.875rem 1rem',
-                                    display: 'flex',
-                                    justifyContent: 'space-between',
-                                    alignItems: 'center'
-                                }}>
-                                    <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
-                                        <i className="fas fa-file-contract" style={{ color: 'white', fontSize: '1rem' }}></i>
-                                        <div>
-                                            <h6 style={{ margin: 0, color: 'white', fontWeight: 700, fontSize: '0.95rem' }}>
-                                                {contractName}
-                                            </h6>
-                                            <span style={{ color: 'rgba(255,255,255,0.8)', fontSize: '0.75rem' }}>
-                                                ID: #{contractId}
-                                            </span>
-                                        </div>
-                                    </div>
-                                    <Chip
-                                        label={`${applicants.length} applicant${applicants.length !== 1 ? 's' : ''}`}
-                                        size="small"
-                                        sx={{
-                                            backgroundColor: 'rgba(255,255,255,0.2)',
-                                            color: 'white',
-                                            fontWeight: 600,
-                                            fontSize: '0.75rem'
-                                        }}
-                                    />
-                                </div>
-
-                                {/* Applicants List */}
-                                <div style={{ padding: '0.75rem' }}>
-                                    {applicants.map((applicant) => {
-                                        const actions = getActionButtons(applicant);
-                                        const hasProposedCandidates = applicant.proposed_candidates && applicant.proposed_candidates.length > 0;
-
-                                        return (
-                                            <div key={applicant.id} style={{
-                                                display: 'flex',
-                                                alignItems: 'center',
-                                                justifyContent: 'space-between',
-                                                padding: '0.75rem',
-                                                marginBottom: '0.5rem',
-                                                backgroundColor: '#f8fafc',
-                                                borderRadius: '8px',
-                                                border: '1px solid #e5e7eb',
-                                                gap: '1rem'
-                                            }}>
-                                                {/* Applicant Info */}
-                                                <div style={{ flex: 1, minWidth: 0 }}>
-                                                    <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', flexWrap: 'wrap', marginBottom: '0.25rem' }}>
-                                                        <span style={{ fontWeight: 700, color: '#1e293b', fontSize: '0.9rem' }}>
-                                                            {applicant.user?.name || applicant.applicant_name || 'Unknown'}
-                                                        </span>
-                                                        {applicant.user?.applicant_type && (
-                                                            <Chip
-                                                                label={applicant.user.applicant_type}
-                                                                size="small"
-                                                                sx={{
-                                                                    backgroundColor: applicant.user.applicant_type === 'Headhunter' ? '#9333ea' :
-                                                                                   applicant.user.applicant_type === 'Recruitment Agency' ? '#3b82f6' : '#10b981',
-                                                                    color: 'white',
-                                                                    fontWeight: 600,
-                                                                    fontSize: '0.65rem',
-                                                                    height: '20px'
-                                                                }}
-                                                            />
-                                                        )}
-                                                        <Chip
-                                                            label={applicant.status}
-                                                            size="small"
-                                                            sx={{
-                                                                backgroundColor: getStatusColor(applicant.status),
-                                                                color: 'white',
-                                                                fontWeight: 700,
-                                                                textTransform: 'uppercase',
-                                                                fontSize: '0.65rem',
-                                                                height: '20px'
-                                                            }}
-                                                        />
-                                                        {hasProposedCandidates && (
-                                                            <Chip
-                                                                icon={<i className="fas fa-users" style={{ color: 'white', fontSize: '0.6rem' }}></i>}
-                                                                label={`${applicant.proposed_candidates.length} candidates`}
-                                                                size="small"
-                                                                sx={{
-                                                                    backgroundColor: '#6366f1',
-                                                                    color: 'white',
-                                                                    fontWeight: 600,
-                                                                    fontSize: '0.65rem',
-                                                                    height: '20px'
-                                                                }}
-                                                            />
-                                                        )}
-                                                    </div>
-                                                    <div style={{ fontSize: '0.8rem', color: '#64748b' }}>
-                                                        {applicant.applicant_email || applicant.email || applicant.user?.email || 'No email'}
-                                                        <span style={{ margin: '0 0.5rem' }}>|</span>
-                                                        Applied: {applicant.applied_at ? new Date(applicant.applied_at).toLocaleDateString() : 'N/A'}
-                                                    </div>
-                                                </div>
-
-                                                {/* Actions */}
-                                                <div style={{ display: 'flex', gap: '0.375rem', flexShrink: 0 }}>
-                                                    {actions.map((action, idx) => renderActionButton(action, applicant, idx))}
-                                                </div>
-                                            </div>
-                                        );
-                                    })}
-                                </div>
-                            </div>
-                        ))}
-                    </div>
-                </Collapse>
+                        ))
+                    )
+                })}
             </div>
         );
     };
-
+    const statsConfig = [
+        {label: "Total", value: stats.total},
+        {label: "Pending", value: stats.pending},
+        {label: "Accepted", value: stats.accepted},
+        {label: "Rejected", value: stats.rejected},
+    ];
     return (
-        <div >
-            {/* Page Header */}
-            <div style={{
-                background: 'linear-gradient(135deg, #1e3a8a 0%, #3b82f6 100%)',
-                padding: '1.5rem 2rem',
-                marginTop: '25px'
-            }}>
-                <div className="container-fluid">
-                    <div className="d-flex flex-wrap justify-content-between align-items-center">
-                        <div className="d-flex align-items-center">
-                            <div style={{
-                                width: '56px',
-                                height: '56px',
-                                backgroundColor: 'rgba(255,255,255,0.15)',
-                                borderRadius: '12px',
-                                display: 'flex',
-                                alignItems: 'center',
-                                justifyContent: 'center',
-                                marginRight: '1rem'
-                            }}>
-                                <i className="fas fa-users" style={{ color: 'white', fontSize: '1.5rem' }}></i>
-                            </div>
-                            <div>
-                                <h4 style={{ margin: 0, color: 'white', fontWeight: 700 }}>Contract Applicants</h4>
-                                <span style={{ color: 'rgba(255,255,255,0.8)', fontSize: '0.9rem' }}>
-                                    {stats.total} applicant{stats.total !== 1 ? 's' : ''} across {categories.length} {categories.length === 1 ? 'industry' : 'industries'}
-                                </span>
-                            </div>
-                        </div>
-                        {/* Quick Stats */}
-                        <div className="d-flex gap-3 mt-2 mt-md-0">
-                            <div style={{ backgroundColor: 'rgba(255,255,255,0.15)', padding: '0.5rem 1rem', borderRadius: '8px', textAlign: 'center' }}>
-                                <div style={{ color: '#fbbf24', fontWeight: 700, fontSize: '1.25rem' }}>{stats.pending}</div>
-                                <div style={{ color: 'rgba(255,255,255,0.8)', fontSize: '0.75rem' }}>Pending</div>
-                            </div>
-                            <div style={{ backgroundColor: 'rgba(255,255,255,0.15)', padding: '0.5rem 1rem', borderRadius: '8px', textAlign: 'center' }}>
-                                <div style={{ color: '#34d399', fontWeight: 700, fontSize: '1.25rem' }}>{stats.accepted}</div>
-                                <div style={{ color: 'rgba(255,255,255,0.8)', fontSize: '0.75rem' }}>Accepted</div>
-                            </div>
-                            <div style={{ backgroundColor: 'rgba(255,255,255,0.15)', padding: '0.5rem 1rem', borderRadius: '8px', textAlign: 'center' }}>
-                                <div style={{ color: '#f87171', fontWeight: 700, fontSize: '1.25rem' }}>{stats.rejected}</div>
-                                <div style={{ color: 'rgba(255,255,255,0.8)', fontSize: '0.75rem' }}>Rejected</div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
+        <div>
+            <MetricsGrid stats={statsConfig}/>
 
             {/* Main Content */}
-            <div className="container-fluid" style={{ padding: '1.5rem' }}>
+            <div>
                 {/* URL Filter Banner - Shows when navigated with filters */}
                 {hasUrlFilter && (
-                    <div style={{
-                        backgroundColor: '#fef3c7',
-                        border: '1px solid #fbbf24',
-                        borderRadius: '12px',
-                        padding: '0.75rem 1rem',
-                        marginBottom: '1rem',
-                        display: 'flex',
-                        alignItems: 'center',
-                        justifyContent: 'space-between',
-                        gap: '1rem'
-                    }}>
-                        <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-                            <FilterListIcon sx={{ color: '#d97706', fontSize: '1.25rem' }} />
-                            <span style={{ color: '#92400e', fontWeight: 600, fontSize: '0.9rem' }}>
-                                Filtered view:
+                    <div
+                        className="bg-amber-50 border border-amber-400 rounded-xl px-4 py-3 mb-4 flex flex-wrap items-center justify-between gap-4">
+                        <div className="flex items-center gap-2">
+                            <ListFilter className="text-amber-600 h-5 w-5"/>
+                            <span className="text-amber-900 font-semibold text-[0.9rem]">
+                Filtered view:
                                 {applicationIdParam && ` Application #${applicationIdParam}`}
                                 {contractIdParam && ` Contract #${contractIdParam}`}
-                            </span>
-                            <Chip
-                                label={`${rows.length} result${rows.length !== 1 ? 's' : ''}`}
-                                size="small"
-                                sx={{
-                                    backgroundColor: '#fbbf24',
-                                    color: '#78350f',
-                                    fontWeight: 600,
-                                    fontSize: '0.75rem'
-                                }}
-                            />
+            </span>
+                            <Badge
+                                variant="secondary"
+                                className="bg-amber-400 text-amber-950 hover:bg-amber-400 font-bold text-[0.75rem] px-2 py-0"
+                            >
+                                {rows.length} result{rows.length !== 1 ? 's' : ''}
+                            </Badge>
                         </div>
+
                         <Button
-                            variant="outlined"
-                            size="small"
-                            startIcon={<ClearIcon />}
+                            variant="outline"
+                            size="sm"
                             onClick={clearUrlFilters}
-                            sx={{
-                                color: '#92400e',
-                                borderColor: '#d97706',
-                                textTransform: 'none',
-                                fontWeight: 600,
-                                '&:hover': {
-                                    backgroundColor: '#fde68a',
-                                    borderColor: '#b45309'
-                                }
-                            }}
+                            className="text-amber-900 border-amber-600 font-semibold h-8 hover:bg-amber-100 hover:text-amber-950 transition-colors"
                         >
+                            <X className="mr-1.5 h-4 w-4"/>
                             Clear Filter
                         </Button>
                     </div>
                 )}
 
                 {/* Search and Filter Bar */}
-                <div style={{
-                    backgroundColor: 'white',
-                    borderRadius: '12px',
-                    padding: '1rem',
-                    marginBottom: '1.5rem',
-                    boxShadow: '0 1px 3px rgba(0,0,0,0.05)',
-                    display: 'flex',
-                    gap: '1rem',
-                    flexWrap: 'wrap',
-                    alignItems: 'center'
-                }}>
-                    <TextField
-                        placeholder="Search by name, email, or contract..."
-                        value={searchTerm}
-                        onChange={(e) => setSearchTerm(e.target.value)}
-                        size="small"
-                        sx={{ minWidth: '300px', flex: 1 }}
-                        InputProps={{
-                            startAdornment: (
-                                <InputAdornment position="start">
-                                    <SearchIcon sx={{ color: '#9ca3af' }} />
-                                </InputAdornment>
-                            ),
-                        }}
-                    />
-                    <TextField
-                        select
-                        value={statusFilter}
-                        onChange={(e) => setStatusFilter(e.target.value)}
-                        size="small"
-                        sx={{ minWidth: '150px' }}
-                        InputProps={{
-                            startAdornment: (
-                                <InputAdornment position="start">
-                                    <FilterListIcon sx={{ color: '#9ca3af' }} />
-                                </InputAdornment>
-                            ),
-                        }}
-                    >
-                        <MenuItem value="all">All Status</MenuItem>
-                        <MenuItem value="pending">Pending</MenuItem>
-                        <MenuItem value="accepted">Accepted</MenuItem>
-                        <MenuItem value="rejected">Rejected</MenuItem>
-                    </TextField>
-                    <TextField
-                        select
-                        value={contractIdFilter}
-                        onChange={(e) => setContractIdFilter(e.target.value)}
-                        size="small"
-                        sx={{ minWidth: '220px' }}
-                        InputProps={{
-                            startAdornment: (
-                                <InputAdornment position="start">
-                                    <i className="fas fa-file-contract" style={{ color: '#9ca3af', fontSize: '0.9rem' }}></i>
-                                </InputAdornment>
-                            ),
-                        }}
-                    >
-                        <MenuItem value="">All Contracts</MenuItem>
-                        {uniqueContracts.map((contract) => (
-                            <MenuItem key={contract.id} value={String(contract.id)}>
-                                #{contract.id} - {contract.name.length > 25 ? contract.name.substring(0, 25) + '...' : contract.name}
-                            </MenuItem>
-                        ))}
-                    </TextField>
-                    {/* Clear All Filters Button - Shows when any filter is active */}
+
+                <div
+                    className="bg-white rounded-xl p-4 mb-6 flex flex-wrap gap-4 items-center border border-gray-100">
+
+                    {/* Search Input */}
+                    <div className="relative flex-1 min-w-[300px]">
+                        <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400"/>
+                        <Input
+                            placeholder="Search by name, email, or contract..."
+                            value={searchTerm}
+                            onChange={(e) => setSearchTerm(e.target.value)}
+                            className="!pl-10 h-10 border-gray-200 focus-visible:ring-slate-400"
+                        />
+                    </div>
+
+                    {/* Status Filter Select */}
+                    <div className="flex items-center gap-2 min-w-[150px]">
+                        <Select value={statusFilter} onValueChange={setStatusFilter}>
+                            <SelectTrigger className="h-10 border-gray-200 focus:ring-slate-400">
+                                <div className="flex items-center gap-2">
+                                    <ListFilter className="h-4 w-4 text-gray-400"/>
+                                    <SelectValue placeholder="All Status"/>
+                                </div>
+                            </SelectTrigger>
+                            <SelectContent>
+                                <SelectItem value="all">All Status</SelectItem>
+                                <SelectItem value="pending">Pending</SelectItem>
+                                <SelectItem value="accepted">Accepted</SelectItem>
+                                <SelectItem value="rejected">Rejected</SelectItem>
+                            </SelectContent>
+                        </Select>
+                    </div>
+
+                    {/* Contract Filter Select */}
+                    <div className="flex items-center gap-2 min-w-[220px]">
+                        <Select value={contractIdFilter} onValueChange={setContractIdFilter}>
+                            <SelectTrigger className="h-10 border-gray-200 focus:ring-slate-400">
+                                <div className="flex items-center gap-2 text-left">
+                                    <FileText className="h-4 w-4 text-gray-400 shrink-0"/>
+                                    <SelectValue placeholder="All Contracts"/>
+                                </div>
+                            </SelectTrigger>
+                            <SelectContent>
+                                <SelectItem value="all-contracts">All Contracts</SelectItem>
+                                {uniqueContracts.map((contract) => {
+                                    return (
+                                        <SelectItem key={contract.id} value={String(contract.id)}>
+                                            #{contract.id} - {contract.name.length > 25 ? contract.name.substring(0, 25) + '...' : contract.name}
+                                        </SelectItem>
+                                    )
+                                })}
+                            </SelectContent>
+                        </Select>
+                    </div>
+
+                    {/* Clear All Filters Button */}
                     {(searchTerm || statusFilter !== 'all' || contractIdFilter) && (
-                        <Tooltip title="Clear all filters">
-                            <Button
-                                variant="outlined"
-                                size="small"
-                                startIcon={<ClearIcon />}
-                                onClick={clearAllFilters}
-                                sx={{
-                                    color: '#6b7280',
-                                    borderColor: '#d1d5db',
-                                    textTransform: 'none',
-                                    fontWeight: 600,
-                                    '&:hover': {
-                                        backgroundColor: '#f3f4f6',
-                                        borderColor: '#9ca3af'
-                                    }
-                                }}
-                            >
-                                Clear
-                            </Button>
-                        </Tooltip>
+                        <TooltipProvider>
+                            <Tooltip>
+                                <TooltipTrigger asChild>
+                                    <Button
+                                        variant="outline"
+                                        size="sm"
+                                        onClick={clearAllFilters}
+                                        className="h-10 px-4 text-gray-500 border-gray-200 font-semibold hover:bg-gray-50 hover:text-gray-700 transition-colors"
+                                    >
+                                        <X className="mr-2 h-4 w-4"/>
+                                        Clear
+                                    </Button>
+                                </TooltipTrigger>
+                                <TooltipContent>
+                                    <p>Clear all filters</p>
+                                </TooltipContent>
+                            </Tooltip>
+                        </TooltipProvider>
                     )}
                 </div>
 
                 {isLoading ? (
-                    <div style={{ marginTop: '2rem' }}>
-                        <Skeleton variant="rectangular" width="100%" height={60} sx={{ mb: 2, borderRadius: '12px' }} />
-                        <Skeleton variant="rectangular" width="100%" height={400} sx={{ borderRadius: '12px' }} />
+                    <div style={{marginTop: '2rem'}}>
+                        <Skeleton variant="rectangular" width="100%" height={60} sx={{mb: 2, borderRadius: '12px'}}/>
+                        <Skeleton variant="rectangular" width="100%" height={400} sx={{borderRadius: '12px'}}/>
                     </div>
                 ) : categories.length === 0 ? (
-                    <div style={{
-                        backgroundColor: 'white',
-                        borderRadius: '12px',
-                        padding: '4rem 2rem',
-                        textAlign: 'center',
-                        boxShadow: '0 1px 3px rgba(0,0,0,0.05)'
-                    }}>
-                        <i className="fas fa-inbox" style={{ fontSize: '4rem', color: '#d1d5db', marginBottom: '1rem' }}></i>
-                        <h5 style={{ color: '#6b7280', fontWeight: 600 }}>No applicants found</h5>
-                        <p style={{ color: '#9ca3af' }}>
+                    <div className="bg-white rounded-xl py-16 px-8 text-center shadow-sm">
+                        <i className="fas fa-inbox text-[4rem] text-gray-300 mb-4"></i>
+                        <h5 className="text-gray-500 font-semibold">No applicants found</h5>
+                        <p className="text-gray-400">
                             {searchTerm || statusFilter !== 'all' || contractIdFilter
                                 ? 'Try adjusting your search or filter criteria'
                                 : 'Applicants will appear here once professionals apply to your contracts'}
                         </p>
                     </div>
                 ) : (
-                    <div style={{
-                        backgroundColor: 'white',
-                        borderRadius: '12px',
-                        boxShadow: '0 1px 3px rgba(0,0,0,0.05)',
-                        overflow: 'hidden'
-                    }}>
+                    <>
                         {/* Industry Tabs */}
-                        <Box sx={{ borderBottom: 1, borderColor: 'divider', backgroundColor: '#f8fafc' }}>
-                            <Tabs
-                                value={categories.indexOf(activeCategory) >= 0 ? categories.indexOf(activeCategory) : 0}
-                                onChange={(e, newValue) => setActiveCategory(categories[newValue])}
-                                variant="scrollable"
-                                scrollButtons="auto"
-                                sx={{
-                                    '& .MuiTab-root': {
-                                        textTransform: 'none',
-                                        fontWeight: 600,
-                                        fontSize: '0.9rem',
-                                        minHeight: '60px',
-                                        padding: '0.75rem 1.5rem',
-                                    },
-                                    '& .Mui-selected': {
-                                        color: `${activeConfig?.color} !important`,
-                                    },
-                                    '& .MuiTabs-indicator': {
-                                        backgroundColor: activeConfig?.color,
-                                        height: '3px',
-                                    },
-                                }}
-                            >
-                                {categories.map((category) => {
-                                    const config = getCategoryConfig(category);
-                                    const catStats = getCategoryStats(category);
-                                    return (
-                                        <Tab
-                                            key={category}
-                                            label={
-                                                <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-                                                    <i className={config.icon} style={{ color: config.color }}></i>
-                                                    <span>{category}</span>
-                                                    <Chip
-                                                        label={catStats.total}
-                                                        size="small"
-                                                        sx={{
-                                                            backgroundColor: config.color,
-                                                            color: 'white',
-                                                            fontWeight: 700,
-                                                            fontSize: '0.7rem',
-                                                            height: '22px',
-                                                            minWidth: '28px'
-                                                        }}
-                                                    />
-                                                    {catStats.pending > 0 && (
-                                                        <Chip
-                                                            label={catStats.pending}
-                                                            size="small"
-                                                            sx={{
-                                                                backgroundColor: '#f59e0b',
-                                                                color: 'white',
-                                                                fontWeight: 700,
-                                                                fontSize: '0.7rem',
-                                                                height: '22px',
-                                                                minWidth: '22px'
-                                                            }}
-                                                        />
-                                                    )}
-                                                </div>
-                                            }
-                                        />
-                                    );
-                                })}
-                            </Tabs>
-                        </Box>
+                        <div
+                            className="flex items-center gap-2 p-1 bg-white border border-gray-200 rounded-xl mb-6 overflow-x-auto no-scrollbar">
+                            {categories.map((category) => {
+                                const config = getCategoryConfig(category);
+                                const catStats = getCategoryStats(category);
+                                const isActive = activeCategory === category;
+
+                                return (
+                                    <button
+                                        key={category}
+                                        type="button"
+                                        onClick={() => setActiveCategory(category)}
+                                        className={`
+                                            flex items-center gap-2 pl-2 pr-4 py-2 !rounded-lg transition-all duration-200 whitespace-nowrap text-sm font-semibold
+                                            ${isActive
+                                            ? "bg-[#F0F7FF] border border-[#D1E9FF] text-[#2D8FE3]"
+                                            : "bg-transparent border border-transparent text-[#4B5563] hover:bg-gray-50"
+                                        }
+                                        `}
+                                    >
+                                        {/* Icon */}
+                                        <i
+                                            className={`${config.icon} text-base`}
+                                            style={{color: isActive ? '#2D8FE3' : config.color}}
+                                        ></i>
+
+                                        {/* Category Name & Count */}
+                                        <span className="tracking-tight">
+                                            {category}
+                                            {category !== "All Industries" && catStats.total > 0 && (
+                                                <span className="ml-1 opacity-70 font-medium">({catStats.total})</span>
+                                            )}
+                                        </span>
+
+                                        {/* Optional: Pending Badge (যদি আগের মতো ছোট কমলা ডট বা সংখ্যা দেখাতে চান) */}
+                                        {isActive && catStats.pending > 0 && (
+                                            <span
+                                                className="ml-1 w-2 h-2 bg-orange-500 rounded-full animate-pulse"></span>
+                                        )}
+                                    </button>
+                                );
+                            })}
+                        </div>
 
                         {/* Tab Content */}
-                        <div style={{ padding: '1.5rem' }}>
+                        <>
                             {renderContractSection(activeCategoryData.Temporary, 'Temporary')}
                             {renderContractSection(activeCategoryData.Permanent, 'Permanent')}
                             {renderContractSection(activeCategoryData.Other, 'Other')}
 
                             {Object.keys(activeCategoryData.Temporary).length === 0 &&
-                             Object.keys(activeCategoryData.Permanent).length === 0 &&
-                             Object.keys(activeCategoryData.Other).length === 0 && (
-                                <div style={{ textAlign: 'center', padding: '3rem', color: '#94a3b8' }}>
-                                    <i className="fas fa-folder-open" style={{ fontSize: '2.5rem', marginBottom: '1rem' }}></i>
-                                    <p style={{ fontSize: '1rem', fontWeight: 500 }}>No applicants in this category</p>
-                                </div>
-                            )}
-                        </div>
-                    </div>
+                                Object.keys(activeCategoryData.Permanent).length === 0 &&
+                                Object.keys(activeCategoryData.Other).length === 0 && (
+                                    <div className="flex flex-col items-center justify-center p-12 text-slate-400">
+                                        <FolderOpen size={40} className="mb-4 opacity-80" strokeWidth={1.5}/>
+                                        <p className="!text-base font-medium !mb-0">No applicants in this category</p>
+                                    </div>
+                                )}
+                        </>
+                    </>
                 )}
             </div>
 
@@ -913,13 +549,20 @@ const View = () => {
                 onClose={handleCancelAccept}
                 maxWidth="sm"
                 fullWidth
-                PaperProps={{ sx: { borderRadius: '12px', padding: '0.5rem' } }}
+                PaperProps={{sx: {borderRadius: '12px', padding: '0.5rem'}}}
             >
-                <DialogTitle sx={{ display: 'flex', alignItems: 'center', gap: '0.75rem', color: '#d97706', fontSize: '1.25rem', fontWeight: 700 }}>
-                    <WarningAmberIcon sx={{ fontSize: '2rem', color: '#f59e0b' }} />
+                <DialogTitle sx={{
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: '0.75rem',
+                    color: '#d97706',
+                    fontSize: '1.25rem',
+                    fontWeight: 700
+                }}>
+                    <WarningAmberIcon sx={{fontSize: '2rem', color: '#f59e0b'}}/>
                     Confirm Acceptance
                 </DialogTitle>
-                <DialogContent sx={{ paddingTop: '1rem' }}>
+                <DialogContent sx={{paddingTop: '1rem'}}>
                     <div style={{
                         backgroundColor: '#fef3c7',
                         border: '2px solid #fbbf24',
@@ -927,27 +570,34 @@ const View = () => {
                         padding: '1rem',
                         marginBottom: '1rem'
                     }}>
-                        <p style={{ margin: 0, color: '#92400e', fontSize: '0.95rem', lineHeight: '1.5' }}>
-                            <strong>Warning:</strong> Accepting this candidate will automatically reject all other pending applicants for this contract.
+                        <p style={{margin: 0, color: '#92400e', fontSize: '0.95rem', lineHeight: '1.5'}}>
+                            <strong>Warning:</strong> Accepting this candidate will automatically reject all other
+                            pending applicants for this contract.
                         </p>
                     </div>
-                    <p style={{ margin: 0, color: '#4b5563', fontSize: '0.95rem', lineHeight: '1.6' }}>
+                    <p style={{margin: 0, color: '#4b5563', fontSize: '0.95rem', lineHeight: '1.6'}}>
                         Are you sure you want to proceed?
                     </p>
                 </DialogContent>
-                <DialogActions sx={{ padding: '1rem', gap: '0.5rem' }}>
-                    <Button onClick={handleCancelAccept} variant="outlined" sx={{ color: '#6b7280', borderColor: '#d1d5db', textTransform: 'none', fontWeight: 600 }}>
+                <DialogActions sx={{padding: '1rem', gap: '0.5rem'}}>
+                    <Button onClick={handleCancelAccept} variant="outlined"
+                            sx={{color: '#6b7280', borderColor: '#d1d5db', textTransform: 'none', fontWeight: 600}}>
                         Cancel
                     </Button>
                     <Button
                         onClick={handleConfirmAccept}
                         disabled={isProcessingAccept}
                         variant="contained"
-                        sx={{ backgroundColor: '#10b981', textTransform: 'none', fontWeight: 600, '&:hover': { backgroundColor: '#059669' } }}
+                        sx={{
+                            backgroundColor: '#10b981',
+                            textTransform: 'none',
+                            fontWeight: 600,
+                            '&:hover': {backgroundColor: '#059669'}
+                        }}
                     >
                         {isProcessingAccept ? (
                             <>
-                                <CircularProgress size={16} style={{ color: '#ffffff', marginRight: '8px' }} />
+                                <CircularProgress size={16} style={{color: '#ffffff', marginRight: '8px'}}/>
                                 Processing...
                             </>
                         ) : (

@@ -788,7 +788,7 @@ const InstituteUpcomingContracts = () => {
     const activeFiltersCount = [filterUrgency, filterStatus, filterProfessional].filter(f => f !== 'all').length + (searchText ? 1 : 0);
 
     return (
-        <div className="content-wrapper" style={{ minHeight: 'calc(100vh - 57px)', background: '#f8fafc' }}>
+        <div className="" style={{ minHeight: 'calc(100vh - 57px)', background: '#f8fafc' }}>
             <PageHeader stats={stats} />
 
             <section className="content pt-0">
