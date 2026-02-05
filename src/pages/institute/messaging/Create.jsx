@@ -765,8 +765,8 @@ const Create = () => {
                                         <span>{showContracts ? "Hide Shared Contracts" : "Show Shared Contracts"}</span>
                                         <span
                                             className="inline-flex h-5 min-w-5 items-center justify-center rounded-md bg-blue-600 px-1.5 text-[11px] font-bold text-white">
-              {activeContracts.length}
-            </span>
+                                          {activeContracts.length}
+                                        </span>
                                     </button>
                                 )}
                             </div>

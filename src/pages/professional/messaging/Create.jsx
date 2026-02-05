@@ -1,11 +1,12 @@
-import React, { useState } from "react";
-import { useParams } from "react-router-dom";
+import React, {useState} from "react";
+import {useParams} from "react-router-dom";
 import Chat from '@components/messaging/Chat';
-import { useCreateMessaging } from "@hooks/professional/messaging/useCreateMessaging";
+import {useCreateMessaging} from "@hooks/professional/messaging/useCreateMessaging";
 import MessagingForm from "@components/forms/MessagingForm";
 import ContactsSidebar from "@components/messaging/ContactsSidebar";
 import ContractDetailsModal from "@components/messaging/ContractDetailsModal";
 import "./MessagingStyles.css";
+import {Avatar, AvatarFallback, AvatarImage} from "@components/ui/avatar.jsx";
 
 const Create = () => {
     const {
@@ -28,7 +29,7 @@ const Create = () => {
         setUploadedFile,
     } = useCreateMessaging();
 
-    const { id: receiver_id } = useParams();
+    const {id: receiver_id} = useParams();
     const [searchQuery, setSearchQuery] = useState("");
     const [selectedContract, setSelectedContract] = useState(null);
     const [showAllContracts, setShowAllContracts] = useState(false);
@@ -69,194 +70,222 @@ const Create = () => {
     };
 
     return (
-        <div className=" messaging-page-wrapper">
-            <div className="messaging-container-fullpage">
-                <div className="messaging-layout">
-                    {/* Left Sidebar - Contacts */}
-                    <ContactsSidebar
-                        contacts={contacts}
-                        searchQuery={searchQuery}
-                        setSearchQuery={setSearchQuery}
-                        SESSION_USER_ROLE={SESSION_USER_ROLE}
-                        SESSION_USER_ID={SESSION_USER_ID}
-                        setValue={setValue}
-                        currentReceiverId={receiver_id}
-                        messages={allMessages}
-                    />
+        <div className="flex h-[calc(100vh-105px)] w-full bg-[#FBFBFB] overflow-hidden font-sans text-slate-900">
+            {/* Left Sidebar - Contacts */}
+            <ContactsSidebar
+                contacts={contacts}
+                searchQuery={searchQuery}
+                setSearchQuery={setSearchQuery}
+                SESSION_USER_ROLE={SESSION_USER_ROLE}
+                SESSION_USER_ID={SESSION_USER_ID}
+                setValue={setValue}
+                currentReceiverId={receiver_id}
+                messages={allMessages}
+            />
 
-                    {/* Right Panel - Chat Area */}
-                    <div className="chat-panel">
-                        {receiver_id ? (
-                            <>
-                                {/* Chat Header with Contract Info */}
-                                <div className="chat-header">
-                                    <div className="d-flex flex-column flex-grow-1">
-                                        <div className="d-flex align-items-center w-100">
-                                            <img
-                                                src="/assets/dist/img/user.png"
-                                                alt="Avatar"
-                                                className="chat-header-avatar"
-                                            />
-                                            <div className="chat-header-info flex-grow-1">
-                                                <h5 className="mb-0">{currentUser?.name || "Contact"}</h5>
-                                                {getContactType(currentUser) && (
-                                                    <div style={{
-                                                        display: 'inline-flex',
-                                                        alignItems: 'center',
-                                                        gap: '4px',
-                                                        background: 'rgba(255, 255, 255, 0.2)',
-                                                        padding: '2px 8px',
-                                                        borderRadius: '12px',
-                                                        marginTop: '4px'
-                                                    }}>
-                                                        <i className={`fas ${getContactTypeIcon(currentUser)}`} style={{ fontSize: '10px', color: 'white' }}></i>
-                                                        <small style={{ color: 'white', fontSize: '11px' }}>{getContactType(currentUser)}</small>
-                                                    </div>
-                                                )}
-                                            </div>
-                                            <div className="chat-header-actions ml-auto">
-                                                <span className="badge badge-info mr-2">
-                                                    {watch('subject') || "General"}
-                                                </span>
-                                                <button
-                                                    type="button"
-                                                    onClick={() => setShowContactInfo(true)}
-                                                    style={{
-                                                        background: 'rgba(255, 255, 255, 0.2)',
-                                                        border: '1px solid rgba(255, 255, 255, 0.3)',
-                                                        borderRadius: '8px',
-                                                        color: 'white',
-                                                        padding: '6px 12px',
-                                                        cursor: 'pointer',
-                                                        fontSize: '13px',
-                                                        fontWeight: '500',
-                                                        display: 'inline-flex',
-                                                        alignItems: 'center',
-                                                        gap: '6px',
-                                                        transition: 'all 0.2s ease'
-                                                    }}
-                                                    onMouseEnter={(e) => { e.currentTarget.style.background = 'rgba(255, 255, 255, 0.3)'; }}
-                                                    onMouseLeave={(e) => { e.currentTarget.style.background = 'rgba(255, 255, 255, 0.2)'; }}
-                                                    title="View contact details"
-                                                >
-                                                    <i className="fas fa-info-circle"></i>
-                                                    Info
-                                                </button>
-                                            </div>
-                                        </div>
+            {/* Right Panel - Chat Area */}
+            <div className="w-full flex h-full flex-col bg-slate-50 w-full">
+                {/*<div className="flex h-full flex-col overflow-hidden w-full rounded-xl border border-slate-200 bg-slate-50">*/}
+                {receiver_id ? (
+                    <>
+                        {/* ✅ Chat Header (Tailwind) */}
+                        <div
+                            className=" p-4 border-b border-[#E4E7EC] bg-[#F9FAFB] flex items-center justify-between shrink-0 z-10">
 
-                                        {/* Contract Pills */}
-                                        {activeContracts && activeContracts.length > 0 && (
-                                            <div style={{ display: 'flex', flexWrap: 'wrap', gap: '8px', marginTop: '12px' }}>
-                                                {(showAllContracts ? activeContracts : activeContracts.slice(0, 3)).map((contract, index) => {
-                                                    const isBooked = contract.contract_status?.toLowerCase() === 'booked';
-                                                    const isPendingSignature = contract.contract_status?.toLowerCase() === 'pending_signature';
-                                                    const baseColor = isBooked ? 'rgba(59, 130, 246, 0.3)' : isPendingSignature ? 'rgba(245, 158, 11, 0.3)' : 'rgba(255, 255, 255, 0.25)';
-                                                    const hoverColor = isBooked ? 'rgba(59, 130, 246, 0.5)' : isPendingSignature ? 'rgba(245, 158, 11, 0.5)' : 'rgba(255, 255, 255, 0.4)';
-                                                    const borderColor = isBooked ? 'rgba(59, 130, 246, 0.6)' : isPendingSignature ? 'rgba(245, 158, 11, 0.6)' : 'rgba(255, 255, 255, 0.4)';
+                            {/*<div className="border-b border-slate-200 bg-white px-5 py-4">*/}
+                            <div className="flex flex-col w-full">
+                                <div className="flex items-center gap-3">
+                                    {/* Avatar */}
+                                    <div className="relative">
+                                        <Avatar className="rounded-md border-[1.6px] border-[#BDD7ED]">
+                                            <AvatarImage src="https://avatar.iran.liara.run/public/49"/>
+                                            <AvatarFallback>
+                                                {currentUser?.name
+                                                    ? currentUser.name.split(" ").map(n => n[0]).join("").substring(0, 2).toUpperCase()
+                                                    : "???"}
+                                            </AvatarFallback>
+                                        </Avatar>
+                                        <span
+                                            className="absolute bottom-0 right-0 w-3 h-3 bg-green-500 border-2 border-white rounded-full"></span>
+                                    </div>
+                                    {/*<div className="relative shrink-0">*/}
+                                    {/*    <img*/}
+                                    {/*        src="/assets/dist/img/user.png"*/}
+                                    {/*        alt="Avatar"*/}
+                                    {/*        className="h-11 w-11 rounded-full object-cover ring-1 ring-slate-200"*/}
+                                    {/*    />*/}
+                                    {/*    /!* Optional online dot (remove if you don't need) *!/*/}
+                                    {/*    <span className="absolute -bottom-0.5 -right-0.5 h-3 w-3 rounded-full bg-emerald-500 ring-2 ring-white" />*/}
+                                    {/*</div>*/}
 
-                                                    return (
-                                                        <button
-                                                            key={contract.contract_id || index}
-                                                            type="button"
-                                                            onClick={(e) => { e.preventDefault(); e.stopPropagation(); setSelectedContract(contract); }}
-                                                            title={`Click to view contract details${isBooked ? ' (Booked)' : isPendingSignature ? ' (Pending Signature)' : ''}`}
-                                                            style={{
-                                                                display: 'inline-flex', alignItems: 'center', gap: '6px',
-                                                                background: baseColor, color: 'white', border: `1px solid ${borderColor}`,
-                                                                borderRadius: '12px', padding: '6px 14px', fontSize: '12px', fontWeight: '500',
-                                                                cursor: 'pointer', transition: 'all 0.2s ease', outline: 'none', whiteSpace: 'nowrap'
-                                                            }}
-                                                            onMouseEnter={(e) => { e.currentTarget.style.background = hoverColor; e.currentTarget.style.transform = 'translateY(-2px)'; e.currentTarget.style.boxShadow = '0 4px 8px rgba(0, 0, 0, 0.2)'; }}
-                                                            onMouseLeave={(e) => { e.currentTarget.style.background = baseColor; e.currentTarget.style.transform = 'translateY(0)'; e.currentTarget.style.boxShadow = 'none'; }}
-                                                        >
-                                                            <i className="fas fa-file-contract" style={{ fontSize: '10px' }}></i>
-                                                            <span>#{contract.contract_id} - {contract.contract_name ? (contract.contract_name.length > 25 ? contract.contract_name.substring(0, 25) + "..." : contract.contract_name) : "Contract"}</span>
-                                                        </button>
-                                                    );
-                                                })}
-                                                {activeContracts.length > 3 && !showAllContracts && (
-                                                    <button
-                                                        type="button"
-                                                        onClick={(e) => { e.preventDefault(); e.stopPropagation(); setShowAllContracts(true); }}
-                                                        style={{
-                                                            display: 'inline-flex', alignItems: 'center', gap: '6px',
-                                                            background: 'rgba(255, 255, 255, 0.2)', color: 'white',
-                                                            border: '1px solid rgba(255, 255, 255, 0.3)', borderRadius: '12px',
-                                                            padding: '6px 14px', fontSize: '12px', fontWeight: '500',
-                                                            cursor: 'pointer', transition: 'all 0.2s ease', outline: 'none'
-                                                        }}
-                                                        onMouseEnter={(e) => { e.currentTarget.style.background = 'rgba(255, 255, 255, 0.35)'; e.currentTarget.style.transform = 'translateY(-2px)'; }}
-                                                        onMouseLeave={(e) => { e.currentTarget.style.background = 'rgba(255, 255, 255, 0.2)'; e.currentTarget.style.transform = 'translateY(0)'; }}
-                                                    >
-                                                        <i className="fas fa-ellipsis-h" style={{ fontSize: '10px' }}></i>
-                                                        <span>+{activeContracts.length - 3} more</span>
-                                                    </button>
-                                                )}
-                                                {showAllContracts && activeContracts.length > 3 && (
-                                                    <button
-                                                        type="button"
-                                                        onClick={(e) => { e.preventDefault(); e.stopPropagation(); setShowAllContracts(false); }}
-                                                        style={{
-                                                            display: 'inline-flex', alignItems: 'center', gap: '6px',
-                                                            background: 'rgba(255, 255, 255, 0.2)', color: 'white',
-                                                            border: '1px solid rgba(255, 255, 255, 0.3)', borderRadius: '12px',
-                                                            padding: '6px 14px', fontSize: '12px', fontWeight: '500',
-                                                            cursor: 'pointer', transition: 'all 0.2s ease', outline: 'none'
-                                                        }}
-                                                        onMouseEnter={(e) => { e.currentTarget.style.background = 'rgba(255, 255, 255, 0.35)'; e.currentTarget.style.transform = 'translateY(-2px)'; }}
-                                                        onMouseLeave={(e) => { e.currentTarget.style.background = 'rgba(255, 255, 255, 0.2)'; e.currentTarget.style.transform = 'translateY(0)'; }}
-                                                    >
-                                                        <i className="fas fa-minus" style={{ fontSize: '10px' }}></i>
-                                                        <span>Show less</span>
-                                                    </button>
-                                                )}
+                                    {/* Name + Type */}
+                                    <div className="min-w-0 flex-1">
+                                        <h5 className="truncate text-sm font-semibold text-slate-900 !mb-0">
+                                            {currentUser?.name || "Contact"}
+                                        </h5>
+
+                                        {getContactType(currentUser) && (
+                                            <div
+                                                className="mt-1 inline-flex items-center gap-1.5 rounded-full bg-slate-100 px-2 py-0.5 text-[11px] font-medium text-slate-600 ring-1 ring-slate-200">
+                                                <i className={`fas ${getContactTypeIcon(currentUser)} text-[11px]`}/>
+                                                <span className="truncate">{getContactType(currentUser)}</span>
                                             </div>
                                         )}
                                     </div>
-                                </div>
 
-                                {/* Chat Messages */}
-                                <div className="chat-messages-wrapper">
-                                    <Chat messages={messages} sessionUserId={SESSION_USER_ID} />
-                                </div>
+                                    {/* Actions */}
+                                    <div className="ml-auto flex items-center gap-2">
+                                        {/* Subject badge */}
+                                        <span
+                                            className="inline-flex items-center rounded-full bg-blue-50 px-3 py-1 text-xs font-semibold text-blue-700 ring-1 ring-blue-100">
+                <i className="fas fa-tag mr-1 text-[11px]"/>
+                                            {watch("subject") || "General"}
+              </span>
 
-                                {/* Chat Footer - Input */}
-                                <div className="chat-footer">
-                                    <MessagingForm
-                                        formId={FORM_ID}
-                                        handleSubmit={handleSubmit}
-                                        onSubmit={onSubmit}
-                                        register={register}
-                                        errors={errors}
-                                        uploadedFile={uploadedFile}
-                                        setUploadedFile={setUploadedFile}
-                                    />
-                                </div>
-                            </>
-                        ) : (
-                            <div className="no-chat-selected">
-                                <div className="text-center text-muted">
-                                    <i className="fas fa-comments fa-5x mb-3 opacity-50"></i>
-                                    <h4>QuickLocum Messaging</h4>
-                                    <p>Select a contact to start messaging</p>
-                                    <div className="mt-3">
-                                        <small className="text-muted">
-                                            <i className="fas fa-file-contract mr-2"></i>
-                                            Conversations are linked to contracts
-                                        </small>
+                                        {/* Info button */}
+                                        <button
+                                            type="button"
+                                            onClick={() => setShowContactInfo(true)}
+                                            className="inline-flex items-center gap-2 rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm font-medium text-slate-700 shadow-sm transition hover:bg-slate-50 active:scale-[0.99]"
+                                            title="View contact details"
+                                        >
+                                            <i className="fas fa-info-circle"/>
+                                            Info
+                                        </button>
                                     </div>
                                 </div>
+
+                                {/* ✅ Contract Pills (Tailwind only; logic same) */}
+                                {activeContracts && activeContracts.length > 0 && (
+                                    <div className="mt-4 flex flex-wrap gap-2">
+                                        {(showAllContracts ? activeContracts : activeContracts.slice(0, 3)).map(
+                                            (contract, index) => {
+                                                const isBooked = contract.contract_status?.toLowerCase() === "booked";
+                                                const isPendingSignature =
+                                                    contract.contract_status?.toLowerCase() === "pending_signature";
+
+                                                const pillClass = isBooked
+                                                    ? "border-blue-200 bg-blue-50 text-blue-700 hover:bg-blue-100"
+                                                    : isPendingSignature
+                                                        ? "border-amber-200 bg-amber-50 text-amber-700 hover:bg-amber-100"
+                                                        : "border-slate-200 bg-slate-50 text-slate-700 hover:bg-slate-100";
+
+                                                const titleText = `Click to view contract details${
+                                                    isBooked ? " (Booked)" : isPendingSignature ? " (Pending Signature)" : ""
+                                                }`;
+
+                                                const contractName =
+                                                    contract.contract_name
+                                                        ? contract.contract_name.length > 25
+                                                            ? contract.contract_name.substring(0, 25) + "..."
+                                                            : contract.contract_name
+                                                        : "Contract";
+
+                                                return (
+                                                    <button
+                                                        key={contract.contract_id || index}
+                                                        type="button"
+                                                        onClick={(e) => {
+                                                            e.preventDefault();
+                                                            e.stopPropagation();
+                                                            setSelectedContract(contract);
+                                                        }}
+                                                        title={titleText}
+                                                        className={[
+                                                            "inline-flex items-center gap-2 rounded-full border px-3 py-1.5",
+                                                            "text-xs font-semibold transition",
+                                                            "shadow-sm hover:shadow active:scale-[0.99]",
+                                                            "focus:outline-none focus:ring-2 focus:ring-blue-100",
+                                                            pillClass,
+                                                        ].join(" ")}
+                                                    >
+                                                        <i className="fas fa-file-contract text-[11px]"/>
+                                                        <span className="max-w-[320px] truncate">
+                        #{contract.contract_id} - {contractName}
+                      </span>
+                                                    </button>
+                                                );
+                                            }
+                                        )}
+
+                                        {activeContracts.length > 3 && !showAllContracts && (
+                                            <button
+                                                type="button"
+                                                onClick={(e) => {
+                                                    e.preventDefault();
+                                                    e.stopPropagation();
+                                                    setShowAllContracts(true);
+                                                }}
+                                                className="inline-flex items-center gap-2 rounded-full border border-slate-200 bg-white px-3 py-1.5 text-xs font-semibold text-slate-700 shadow-sm transition hover:bg-slate-50 hover:shadow active:scale-[0.99]"
+                                            >
+                                                <i className="fas fa-ellipsis-h text-[11px]"/>
+                                                <span>+{activeContracts.length - 3} more</span>
+                                            </button>
+                                        )}
+
+                                        {showAllContracts && activeContracts.length > 3 && (
+                                            <button
+                                                type="button"
+                                                onClick={(e) => {
+                                                    e.preventDefault();
+                                                    e.stopPropagation();
+                                                    setShowAllContracts(false);
+                                                }}
+                                                className="inline-flex items-center gap-2 rounded-full border border-slate-200 bg-white px-3 py-1.5 text-xs font-semibold text-slate-700 shadow-sm transition hover:bg-slate-50 hover:shadow active:scale-[0.99]"
+                                            >
+                                                <i className="fas fa-minus text-[11px]"/>
+                                                <span>Show less</span>
+                                            </button>
+                                        )}
+                                    </div>
+                                )}
                             </div>
-                        )}
+                        </div>
+
+                        {/* ✅ Chat Messages Wrapper (only wrapper changed; Chat component untouched) */}
+                        <div className="flex-1 overflow-y-auto bg-slate-50">
+                            {/* inner padding like screenshot */}
+                            <div className="px-6 py-6">
+                                <Chat messages={messages} sessionUserId={SESSION_USER_ID}/>
+                            </div>
+                        </div>
+
+                        {/* ✅ Footer / Input wrapper (MessagingForm untouched) */}
+                        <div className="border-t border-slate-200 bg-white px-5 py-3">
+                            <MessagingForm
+                                formId={FORM_ID}
+                                handleSubmit={handleSubmit}
+                                onSubmit={onSubmit}
+                                register={register}
+                                errors={errors}
+                                uploadedFile={uploadedFile}
+                                setUploadedFile={setUploadedFile}
+                            />
+                        </div>
+                    </>
+                ) : (
+                    <div className="flex h-full items-center justify-center bg-slate-50 px-6">
+                        <div className="max-w-md text-center">
+                            <div
+                                className="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-2xl bg-white ring-1 ring-slate-200">
+                                <i className="fas fa-comments text-2xl text-slate-400"/>
+                            </div>
+                            <h4 className="text-base font-semibold text-slate-800">QuickLocum Messaging</h4>
+                            <p className="mt-1 text-sm text-slate-500">Select a contact to start messaging</p>
+                            <div className="mt-4 text-sm text-slate-500">
+                                <i className="fas fa-file-contract mr-2 text-slate-400"/>
+                                Conversations are linked to contracts
+                            </div>
+                        </div>
                     </div>
-                </div>
+                )}
             </div>
+
 
             {/* Contact Info Modal */}
             {showContactInfo && currentUser && (
                 <div className="contract-modal-overlay" onClick={() => setShowContactInfo(false)}>
-                    <div className="contract-modal" onClick={(e) => e.stopPropagation()} style={{ maxWidth: '500px' }}>
+                    <div className="contract-modal" onClick={(e) => e.stopPropagation()} style={{maxWidth: '500px'}}>
                         <div className="contract-modal-header">
                             <div className="contract-header-left">
                                 <div className="contract-modal-icon">
@@ -274,24 +303,41 @@ const Create = () => {
                         <div className="contract-modal-body">
                             <div className="contract-detail-row">
                                 <div className="contract-detail-label"><i className="fas fa-tag mr-2"></i>Type</div>
-                                <div className="contract-detail-value">{currentUser.institute_category?.name || currentUser.professional_category?.name || currentUser.role?.name || "User"}</div>
+                                <div
+                                    className="contract-detail-value">{currentUser.institute_category?.name || currentUser.professional_category?.name || currentUser.role?.name || "User"}</div>
                             </div>
                             <div className="contract-detail-row">
-                                <div className="contract-detail-label"><i className="fas fa-envelope mr-2"></i>Email</div>
-                                <div className="contract-detail-value"><a href={`mailto:${currentUser.email}`} style={{ color: '#6366f1' }}>{currentUser.email}</a></div>
+                                <div className="contract-detail-label"><i className="fas fa-envelope mr-2"></i>Email
+                                </div>
+                                <div className="contract-detail-value"><a href={`mailto:${currentUser.email}`}
+                                                                          style={{color: '#6366f1'}}>{currentUser.email}</a>
+                                </div>
                             </div>
                             <div className="contract-detail-row">
-                                <div className="contract-detail-label"><i className="fas fa-circle mr-2"></i>Status</div>
-                                <div className="contract-detail-value"><span className={`badge ${currentUser.status ? 'badge-success' : 'badge-secondary'}`}>{currentUser.status ? 'Active' : 'Inactive'}</span></div>
+                                <div className="contract-detail-label"><i className="fas fa-circle mr-2"></i>Status
+                                </div>
+                                <div className="contract-detail-value"><span
+                                    className={`badge ${currentUser.status ? 'badge-success' : 'badge-secondary'}`}>{currentUser.status ? 'Active' : 'Inactive'}</span>
+                                </div>
                             </div>
                             <div className="contract-detail-row">
-                                <div className="contract-detail-label"><i className="fas fa-calendar mr-2"></i>Member Since</div>
-                                <div className="contract-detail-value">{new Date(currentUser.created_at).toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' })}</div>
+                                <div className="contract-detail-label"><i className="fas fa-calendar mr-2"></i>Member
+                                    Since
+                                </div>
+                                <div
+                                    className="contract-detail-value">{new Date(currentUser.created_at).toLocaleDateString('en-US', {
+                                    month: 'long',
+                                    day: 'numeric',
+                                    year: 'numeric'
+                                })}</div>
                             </div>
                             {activeContracts && activeContracts.length > 0 && (
                                 <div className="contract-detail-row">
-                                    <div className="contract-detail-label"><i className="fas fa-file-contract mr-2"></i>Active Contracts</div>
-                                    <div className="contract-detail-value"><span className="badge badge-primary">{activeContracts.length}</span></div>
+                                    <div className="contract-detail-label"><i className="fas fa-file-contract mr-2"></i>Active
+                                        Contracts
+                                    </div>
+                                    <div className="contract-detail-value"><span
+                                        className="badge badge-primary">{activeContracts.length}</span></div>
                                 </div>
                             )}
                         </div>
@@ -306,7 +352,7 @@ const Create = () => {
 
             {/* Contract Details Modal */}
             {selectedContract && (
-                <ContractDetailsModal contract={selectedContract} onClose={() => setSelectedContract(null)} />
+                <ContractDetailsModal contract={selectedContract} onClose={() => setSelectedContract(null)}/>
             )}
         </div>
     );

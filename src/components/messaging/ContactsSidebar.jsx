@@ -158,12 +158,12 @@ const ContactsSidebar = ({
                 ].join(" ")}
             >
                 {children}
-                {badge > 0 && (
-                    <span
-                        className="ml-2 inline-flex min-w-4 items-center justify-center rounded-full bg-blue-600 px-1.5 text-[10px] font-semibold text-white">
-            {badge}
-          </span>
-                )}
+          {/*      {badge > 0 && (*/}
+          {/*          <span*/}
+          {/*              className="ml-2 inline-flex min-w-4 items-center justify-center rounded-full bg-blue-600 px-1.5 text-[10px] font-semibold text-white">*/}
+          {/*  {badge}*/}
+          {/*</span>*/}
+          {/*      )}*/}
             </button>
         );
     };
