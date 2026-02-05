@@ -1,9 +1,12 @@
-import React, { useState, useEffect, useCallback } from "react";
+import React, {useState, useEffect, useCallback} from "react";
 import MainForm from './forms/MainForm';
 import Swal from 'sweetalert2';
-import { Link, useLocation, useNavigate, useParams } from "react-router-dom";
-import { getInstituteCategoryService, getInstituteSpecialityService } from "../../../services/institute/InstituteSpecialityService";
-import { updateInstituteProfileService, editInstituteProfileService } from "../../../services/institute/ProfileService";
+import {Link, useLocation, useNavigate, useParams} from "react-router-dom";
+import {
+    getInstituteCategoryService,
+    getInstituteSpecialityService
+} from "../../../services/institute/InstituteSpecialityService";
+import {updateInstituteProfileService, editInstituteProfileService} from "../../../services/institute/ProfileService";
 
 // profile forms
 import PrivateClinicsAndPracticesForm from "./forms/PrivateClinicsAndPracticesForm";
@@ -15,13 +18,13 @@ import StructureLocumLicenseForm from "./forms/StructureLocumLicenseForm";
 import HeadHunterForm from "./forms/HeadHunterForm";
 
 // utils
-import { SessionUtil, SESSION_KEYS } from "@utils/SessionUtils";
+import {SessionUtil, SESSION_KEYS} from "@utils/SessionUtils";
 
 
 const Edit = () => {
     const menu = "Profile";
     const userRole = sessionStorage.getItem("role");
-    const { id } = useParams();
+    const {id} = useParams();
     const navigate = useNavigate();
 
     const [categories, setCategories] = useState([]);
@@ -31,7 +34,7 @@ const Edit = () => {
     const [userCategory, setUserCategory] = useState("");
     const [selectedSpecialties, setSelectedSpecialties] = useState([]);
     const [isEditMode, setIsEditMode] = useState(false);
-    const [tooltipPosition, setTooltipPosition] = useState({ x: 0, y: 0 });
+    const [tooltipPosition, setTooltipPosition] = useState({x: 0, y: 0});
     const [showTooltip, setShowTooltip] = useState(false);
     const [isCategorySaved, setIsCategorySaved] = useState(false);
 
@@ -85,7 +88,7 @@ const Edit = () => {
 
     const handleFormSubmit = async (data, filedata = []) => {
         try {
-            const payload = { ...mainFormData, ...data };
+            const payload = {...mainFormData, ...data};
             let fileKeys = [];
             fileKeys = fileKeys.concat(filedata);
 
@@ -121,7 +124,7 @@ const Edit = () => {
             console.log("profile data submitted successfully");
 
             const category = categories.find(row => row.id === Number(mainFormData.institute_category_id));
-            const categoryName =  category ? category?.name : null;
+            const categoryName = category ? category?.name : null;
             SessionUtil.set(SESSION_KEYS.INSTITUTE_CATEGORY_ID, Number(mainFormData.institute_category_id));
             SessionUtil.set(SESSION_KEYS.INSTITUTE_CATEGORY_NAME, categoryName);
 
@@ -164,7 +167,7 @@ const Edit = () => {
 
     const handleViewModeClick = (e) => {
         if (!isEditMode) {
-            setTooltipPosition({ x: e.clientX, y: e.clientY });
+            setTooltipPosition({x: e.clientX, y: e.clientY});
             setShowTooltip(true);
 
             setTimeout(() => {
@@ -193,7 +196,7 @@ const Edit = () => {
     }, [profile, selectedCategory, mainFormData, selectedSpecialties]);
 
     return (
-        <div className="content-wrapper profile-page-wrapper">
+        <div className="">
             {/* Modern Healthcare Header */}
             <div className="profile-header">
                 <div className="header-background"></div>
@@ -235,7 +238,7 @@ const Edit = () => {
 
             {/* Tooltip */}
             {showTooltip && (
-                <div className="edit-tooltip" style={{ left: tooltipPosition.x + 15, top: tooltipPosition.y + 15 }}>
+                <div className="edit-tooltip" style={{left: tooltipPosition.x + 15, top: tooltipPosition.y + 15}}>
                     <i className="fas fa-lock"></i>
                     Click "Edit Profile" to enable editing
                 </div>
@@ -311,7 +314,8 @@ const Edit = () => {
                                     </div>
 
                                     {selectedCategory?.name === "Recruitment Agency" && (
-                                        <RecruitmentAgencyForm profile={profile} userCategory={userCategory} handleFormSubmit={handleFormSubmit} />
+                                        <RecruitmentAgencyForm profile={profile} userCategory={userCategory}
+                                                               handleFormSubmit={handleFormSubmit}/>
                                     )}
 
                                     {selectedCategory?.name === "Pharmacy" && (
@@ -328,23 +332,23 @@ const Edit = () => {
                                     )}
 
                                     {selectedCategory?.name === "Private Clinics and Practices" &&
-                                    mainFormData?.institute_specialty_ids?.length === 1 &&
-                                    specialties.some(item => item.name === "dental" && item.id === mainFormData.institute_specialty_ids[0]) && (
-                                        <DentalForm profileData={profile} handleFormSubmit={handleFormSubmit} />
-                                    )}
+                                        mainFormData?.institute_specialty_ids?.length === 1 &&
+                                        specialties.some(item => item.name === "dental" && item.id === mainFormData.institute_specialty_ids[0]) && (
+                                            <DentalForm profileData={profile} handleFormSubmit={handleFormSubmit}/>
+                                        )}
 
                                     {selectedCategory?.name === "Private Clinics and Practices" &&
-                                    !(
-                                        mainFormData?.institute_specialty_ids?.length === 1 &&
-                                        specialties.some(item => item.name === "dental" && item.id === mainFormData.institute_specialty_ids[0])
-                                    ) && (
-                                        <PrivateClinicsAndPracticesForm
-                                            profile={profile}
-                                            userCategory={userCategory}
-                                            handleFormSubmit={handleFormSubmit}
-                                            selectedSpecialties={selectedSpecialties}
-                                        />
-                                    )}
+                                        !(
+                                            mainFormData?.institute_specialty_ids?.length === 1 &&
+                                            specialties.some(item => item.name === "dental" && item.id === mainFormData.institute_specialty_ids[0])
+                                        ) && (
+                                            <PrivateClinicsAndPracticesForm
+                                                profile={profile}
+                                                userCategory={userCategory}
+                                                handleFormSubmit={handleFormSubmit}
+                                                selectedSpecialties={selectedSpecialties}
+                                            />
+                                        )}
                                 </>
                             )}
                         </div>
@@ -478,8 +482,12 @@ const Edit = () => {
                 }
 
                 @keyframes pulse-indicator {
-                    0%, 100% { transform: scale(1); }
-                    50% { transform: scale(1.1); }
+                    0%, 100% {
+                        transform: scale(1);
+                    }
+                    50% {
+                        transform: scale(1.1);
+                    }
                 }
 
                 .header-info {
@@ -565,8 +573,14 @@ const Edit = () => {
                 }
 
                 @keyframes tooltipFadeIn {
-                    from { opacity: 0; transform: translateY(-5px); }
-                    to { opacity: 1; transform: translateY(0); }
+                    from {
+                        opacity: 0;
+                        transform: translateY(-5px);
+                    }
+                    to {
+                        opacity: 1;
+                        transform: translateY(0);
+                    }
                 }
 
                 /* Profile Content */

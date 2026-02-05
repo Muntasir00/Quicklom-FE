@@ -71,6 +71,7 @@ export const useContractForm = ({ setSelectedContract, contractTypes, setCurrent
     return {
         register,
         handleSubmit,
+        watch,
         errors,
         onSubmit,
         contractId,

@@ -2,6 +2,7 @@ import React, { useState, useEffect, useCallback } from "react";
 import { Link, useNavigate } from "react-router-dom"
 import Form from './Form';
 import { useCreateContract } from "@hooks/institute/contracts/useCreateContract";
+import {Check} from "lucide-react";
 
 const Create = () => {
     const navigate = useNavigate();
@@ -31,7 +32,7 @@ const Create = () => {
     };       
 
     return (
-        <div className="content-wrapper" style={{ minHeight: 'calc(100vh - 57px)' }}>
+        <div className="" style={{ minHeight: 'calc(100vh - 57px)' }}>
             {/* Page Header */}
             <div className="content-header py-3" style={{ backgroundColor: '#f4f6f9', marginTop: '15px' }}>
                 <div className="container-fluid">
@@ -69,36 +70,105 @@ const Create = () => {
 
             <section className="content pt-0">
                 <div className="container-fluid">
-                    <div className="row justify-content-center">
-                        <div className="col-lg-10 col-md-12">
+                    <div className="">
+                        <div className="">
                             {/* Progress Steps */}
-                            <div className="card shadow-sm mb-4">
-                                <div className="card-body p-4">
-                                    <div className="d-flex justify-content-between align-items-center mb-2">
-                                        <div className="d-flex align-items-center flex-fill">
-                                            <div className={`rounded-circle d-flex align-items-center justify-content-center ${currentStep >= 1 ? 'bg-primary text-white' : 'bg-light text-muted'}`}
-                                                 style={{ width: '40px', height: '40px', fontWeight: 'bold' }}>
-                                                {currentStep > 1 ? <i className="fas fa-check"></i> : '1'}
-                                            </div>
-                                            <div className="ml-3">
-                                                <h6 className="mb-0">Select Contract Type</h6>
-                                                <small className="text-muted">Choose your contract category</small>
-                                            </div>
+                            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
+
+                                {/* Step 1: Select Contract Type */}
+                                <button
+                                    type="button" // ফর্ম সাবমিট হওয়া রোধ করতে
+                                    onClick={() => setCurrentStep(1)}
+                                    className={`relative py-3 px-6 !rounded-xl border-2 transition-all duration-300 text-left
+            ${currentStep === 1
+                                        ? "border-blue-500 bg-white shadow-md ring-1 ring-blue-500/20"
+                                        : currentStep > 1
+                                            ? "border-emerald-500 bg-white shadow-sm"
+                                            : "border-gray-200 bg-gray-50 opacity-80"}
+            hover:shadow-md active:scale-[0.98]
+        `}
+                                >
+                                    <div className="flex items-center gap-4">
+                                        {/* Step Icon/Number */}
+                                        <div
+                                            className={`flex-shrink-0 w-10 h-10 !rounded-lg flex items-center justify-center text-sm font-bold transition-colors
+                    ${currentStep === 1
+                                                ? "bg-blue-100 text-blue-600"
+                                                : currentStep > 1
+                                                    ? "bg-emerald-100 text-emerald-600"
+                                                    : "bg-gray-100 text-gray-400"}
+                `}
+                                        >
+                                            {currentStep > 1 ? <Check className="h-5 w-5 stroke-[3px]" /> : "1"}
                                         </div>
-                                        <div className={`flex-fill mx-3 ${currentStep >= 2 ? 'border-primary' : 'border-light'}`}
-                                             style={{ height: '2px', borderTop: '2px dashed' }}></div>
-                                        <div className="d-flex align-items-center flex-fill">
-                                            <div className={`rounded-circle d-flex align-items-center justify-content-center ${currentStep >= 2 ? 'bg-primary text-white' : 'bg-light text-muted'}`}
-                                                 style={{ width: '40px', height: '40px', fontWeight: 'bold' }}>
-                                                2
-                                            </div>
-                                            <div className="ml-3">
-                                                <h6 className="mb-0">Contract Details</h6>
-                                                <small className="text-muted">Fill in contract information</small>
-                                            </div>
+
+                                        {/* Step Text */}
+                                        <div className="flex-1">
+                                            <h3 className={`font-bold !text-base !mb-0 ${currentStep === 1 ? "text-blue-700" : "text-gray-900"}`}>
+                                                Select Contract Type
+                                            </h3>
+                                            <p className="!text-xs text-gray-500 mt-0.5 font-medium !mb-0">Choose your contract category</p>
                                         </div>
+
+                                        {/* Active Indicator Pulse */}
+                                        {currentStep === 1 && (
+                                            <div className="absolute right-4 top-1/2 -translate-y-1/2">
+                    <span className="relative flex h-3 w-3">
+                        <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-blue-400 opacity-75"></span>
+                        <span className="relative inline-flex rounded-full h-3 w-3 bg-blue-500"></span>
+                    </span>
+                                            </div>
+                                        )}
                                     </div>
-                                </div>
+                                </button>
+
+                                {/* Step 2: Contract Details */}
+                                <button
+                                    type="button"
+                                    onClick={() => currentStep >= 2 && setCurrentStep(2)}
+                                    disabled={currentStep < 2} // যদি স্টেপ ১ সম্পন্ন না হয় তবে ক্লিক করা যাবে না
+                                    className={`relative py-3 px-6 !rounded-xl border-2 transition-all duration-300 text-left
+            ${currentStep === 2
+                                        ? "border-blue-500 bg-white shadow-md ring-1 ring-blue-500/20"
+                                        : currentStep > 2
+                                            ? "border-emerald-500 bg-white shadow-sm"
+                                            : "border-gray-100 bg-gray-50 opacity-70"}
+            ${currentStep >= 2 ? "hover:shadow-md cursor-pointer active:scale-[0.98]" : "cursor-not-allowed"}
+        `}
+                                >
+                                    <div className="flex items-center gap-4">
+                                        {/* Step Icon/Number */}
+                                        <div
+                                            className={`flex-shrink-0 w-10 h-10 !rounded-lg flex items-center justify-center text-sm font-bold transition-colors
+                    ${currentStep === 2
+                                                ? "bg-blue-100 text-blue-600"
+                                                : currentStep > 2
+                                                    ? "bg-emerald-100 text-emerald-600"
+                                                    : "bg-gray-200 text-gray-400"}
+                `}
+                                        >
+                                            {currentStep > 2 ? <Check className="h-5 w-5 stroke-[3px]" /> : "2"}
+                                        </div>
+
+                                        {/* Step Text */}
+                                        <div className="flex-1">
+                                            <h3 className={`!mb-0 font-bold  !text-base ${currentStep === 2 ? "text-blue-700" : "text-gray-900"}`}>
+                                                Contract Details
+                                            </h3>
+                                            <p className="!mb-0 !text-xs text-gray-500 mt-0.5 font-medium">Fill in contract information</p>
+                                        </div>
+
+                                        {/* Active Indicator Pulse */}
+                                        {currentStep === 2 && (
+                                            <div className="absolute right-4 top-1/2 -translate-y-1/2">
+                    <span className="relative flex h-3 w-3">
+                        <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-blue-400 opacity-75"></span>
+                        <span className="relative inline-flex rounded-full h-3 w-3 bg-blue-500"></span>
+                    </span>
+                                            </div>
+                                        )}
+                                    </div>
+                                </button>
                             </div>
 
                             {/* Main Form Card */}
@@ -107,8 +177,8 @@ const Create = () => {
                                     <h5 className="mb-0 font-weight-bold">
                                         {currentStep === 1 ? (
                                             <>
-                                                <i className="fas fa-file-contract text-primary mr-2"></i>
-                                                Select Contract Type
+                                                {/*<i className="fas fa-file-contract text-primary mr-2"></i>*/}
+                                                {/*Select Contract Type*/}
                                             </>
                                         ) : (
                                             <>
@@ -123,10 +193,10 @@ const Create = () => {
                                     <div className="tab-content">
                                         {/* Step 1: Contract Type Selection */}
                                         <div className={currentStep === 1 ? "tab-pane fade show active" : "tab-pane fade d-none"}>
-                                            <div className="alert alert-info mb-4" role="alert">
-                                                <i className="fas fa-info-circle mr-2"></i>
-                                                Please select the type of contract you want to create. This will determine the specific fields you need to fill out.
-                                            </div>
+                                            {/*<div className="alert alert-info mb-4" role="alert">*/}
+                                            {/*    <i className="fas fa-info-circle mr-2"></i>*/}
+                                            {/*    Please select the type of contract you want to create. This will determine the specific fields you need to fill out.*/}
+                                            {/*</div>*/}
                                             <Form setSelectedContract={setSelectedContract} setCurrentStep={setCurrentStep} contractTypes={contractTypes} />
                                         </div>
 

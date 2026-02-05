@@ -1,10 +1,11 @@
-import React, { useState } from "react";
-import { useParams } from "react-router-dom";
+import React, {useState} from "react";
+import {useParams} from "react-router-dom";
 import Chat from '@components/messaging/Chat';
-import { useCreateMessaging } from "@hooks/institute/messaging/useCreateMessaging";
+import {useCreateMessaging} from "@hooks/institute/messaging/useCreateMessaging";
 import MessagingForm from "@components/forms/MessagingForm";
 import ContactsSidebar from "@components/messaging/ContactsSidebar";
 import ContractDetailsModal from "@components/messaging/ContractDetailsModal";
+import {Avatar, AvatarFallback, AvatarImage} from "@components/ui/avatar.jsx";
 
 const Create = () => {
     const {
@@ -27,7 +28,7 @@ const Create = () => {
         setUploadedFile,
     } = useCreateMessaging();
 
-    const { id: receiver_id } = useParams();
+    const {id: receiver_id} = useParams();
     const [searchQuery, setSearchQuery] = useState("");
     const [selectedContract, setSelectedContract] = useState(null);
     const [showAllContracts, setShowAllContracts] = useState(false);
@@ -67,11 +68,31 @@ const Create = () => {
     // Helper to get industry color
     const getIndustryColor = (industry) => {
         const colorMap = {
-            'Dental Care': { base: 'rgba(139, 92, 246, 0.3)', hover: 'rgba(139, 92, 246, 0.5)', border: 'rgba(139, 92, 246, 0.6)' },
-            'Pharmacy': { base: 'rgba(34, 197, 94, 0.3)', hover: 'rgba(34, 197, 94, 0.5)', border: 'rgba(34, 197, 94, 0.6)' },
-            'General Practice': { base: 'rgba(239, 68, 68, 0.3)', hover: 'rgba(239, 68, 68, 0.5)', border: 'rgba(239, 68, 68, 0.6)' },
-            'Nursing': { base: 'rgba(236, 72, 153, 0.3)', hover: 'rgba(236, 72, 153, 0.5)', border: 'rgba(236, 72, 153, 0.6)' },
-            'Healthcare': { base: 'rgba(148, 163, 184, 0.3)', hover: 'rgba(148, 163, 184, 0.5)', border: 'rgba(148, 163, 184, 0.6)' }
+            'Dental Care': {
+                base: 'rgba(139, 92, 246, 0.3)',
+                hover: 'rgba(139, 92, 246, 0.5)',
+                border: 'rgba(139, 92, 246, 0.6)'
+            },
+            'Pharmacy': {
+                base: 'rgba(34, 197, 94, 0.3)',
+                hover: 'rgba(34, 197, 94, 0.5)',
+                border: 'rgba(34, 197, 94, 0.6)'
+            },
+            'General Practice': {
+                base: 'rgba(239, 68, 68, 0.3)',
+                hover: 'rgba(239, 68, 68, 0.5)',
+                border: 'rgba(239, 68, 68, 0.6)'
+            },
+            'Nursing': {
+                base: 'rgba(236, 72, 153, 0.3)',
+                hover: 'rgba(236, 72, 153, 0.5)',
+                border: 'rgba(236, 72, 153, 0.6)'
+            },
+            'Healthcare': {
+                base: 'rgba(148, 163, 184, 0.3)',
+                hover: 'rgba(148, 163, 184, 0.5)',
+                border: 'rgba(148, 163, 184, 0.6)'
+            }
         };
         return colorMap[industry] || colorMap['Healthcare'];
     };
@@ -679,7 +700,8 @@ const Create = () => {
                 }
             `}</style>
 
-            <div className="messaging-fullpage">
+            <div className="flex h-[calc(100vh-105px)] w-full bg-[#FBFBFB] overflow-hidden font-sans text-slate-900">
+                {/*<div className="messaging-fullpage">*/}
                 {/* Left Sidebar - Contacts */}
                 <ContactsSidebar
                     contacts={contacts}
@@ -693,115 +715,116 @@ const Create = () => {
                 />
 
                 {/* Right Panel - Chat Area */}
-                <div className="messaging-chat-panel">
+
+                <div className="flex h-full flex-col bg-slate-50 w-full">
                     {receiver_id ? (
                         <>
-                            {/* Chat Header */}
-                            <div className="messaging-chat-header">
-                                <div className="messaging-chat-header-top">
-                                    <img
-                                        src="/assets/dist/img/user.png"
-                                        alt="Avatar"
-                                        className="messaging-chat-avatar"
-                                    />
-                                    <div className="messaging-chat-info">
-                                        <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
-                                            <h4 style={{ margin: 0 }}>{currentUser?.name || "Contact"}</h4>
-                                            {/* Contracts Toggle Button - Next to name */}
-                                            {activeContracts && activeContracts.length > 0 && (
-                                                <button
-                                                    type="button"
-                                                    onClick={() => setShowContracts(!showContracts)}
-                                                    style={{
-                                                        background: showContracts ? 'rgba(255,255,255,0.3)' : 'rgba(255,255,255,0.15)',
-                                                        border: '1px solid rgba(255,255,255,0.3)',
-                                                        borderRadius: '20px',
-                                                        padding: '5px 12px',
-                                                        color: 'white',
-                                                        fontSize: '0.7rem',
-                                                        fontWeight: 600,
-                                                        cursor: 'pointer',
-                                                        display: 'flex',
-                                                        alignItems: 'center',
-                                                        gap: '5px',
-                                                        transition: 'all 0.2s ease',
-                                                    }}
-                                                    title="View contracts shared with this contact"
-                                                >
-                                                    <i className="fas fa-file-contract" style={{ fontSize: '10px' }}></i>
-                                                    <span>{showContracts ? 'Hide' : 'Show'} Shared Contracts ({activeContracts.length})</span>
-                                                    <i className={`fas fa-chevron-${showContracts ? 'up' : 'down'}`} style={{ fontSize: '8px' }}></i>
-                                                </button>
-                                            )}
-                                        </div>
-                                        {getContactType(currentUser) && (
-                                            <div className="messaging-chat-type">
-                                                <i className={`fas ${getContactTypeIcon(currentUser)}`} style={{ fontSize: '10px' }}></i>
-                                                <span>{getContactType(currentUser)}</span>
-                                            </div>
-                                        )}
+                            {/* Header */}
+                            <div
+                                className="h-16 p-4 border-b border-[#E4E7EC] bg-[#F9FAFB] flex items-center justify-between shrink-0 z-10">
+                                <div className="flex items-center gap-3">
+
+                                    <div className="relative">
+                                        <Avatar className="rounded-md border-[1.6px] border-[#BDD7ED]">
+                                            <AvatarImage src="https://avatar.iran.liara.run/public/49"/>
+                                            <AvatarFallback>
+                                                {currentUser?.name
+                                                    ? currentUser.name.split(" ").map(n => n[0]).join("").substring(0, 2).toUpperCase()
+                                                    : "???"}
+                                            </AvatarFallback>
+                                        </Avatar>
+                                        <span
+                                            className="absolute bottom-0 right-0 w-3 h-3 bg-green-500 border-2 border-white rounded-full"></span>
                                     </div>
-                                    <div className="messaging-chat-subject">
-                                        <i className="fas fa-tag" style={{ fontSize: 11 }}></i>
-                                        {watch('subject') || "General"}
+
+                                    <div className="leading-tight">
+                                        <div className="flex items-center gap-2">
+                                            <h4 className="text-sm font-semibold text-slate-900 !mb-0">
+                                                {currentUser?.name || "Contact"}
+                                            </h4>
+                                        </div>
+                                        <p className="text-xs text-slate-500 !mb-0">
+                                            {currentUser?.username || currentUser?.email || "—"}
+                                        </p>
                                     </div>
                                 </div>
 
-                                {/* Contract Pills - Hidden by default, shown when toggled */}
-                                {activeContracts && activeContracts.length > 0 && showContracts && (
-                                    <div className="messaging-contract-pills">
-                                        {(showAllContracts ? activeContracts : activeContracts.slice(0, 3)).map((contract, index) => {
-                                            const industry = getContractIndustry(contract.contract_type_id);
-                                            const industryColors = getIndustryColor(industry);
-                                            const isPublisher = contract.is_publisher ?? false;
-                                            const roleText = isPublisher ? 'Publisher' : 'Applicant';
-                                            const isBooked = contract.contract_status?.toLowerCase() === 'booked';
-                                            const isPendingSignature = contract.contract_status?.toLowerCase() === 'pending_signature';
-                                            const statusBaseColor = isBooked ? 'rgba(59, 130, 246, 0.3)' : isPendingSignature ? 'rgba(245, 158, 11, 0.3)' : 'rgba(255, 255, 255, 0.25)';
-                                            const statusBorderColor = isBooked ? 'rgba(59, 130, 246, 0.6)' : isPendingSignature ? 'rgba(245, 158, 11, 0.6)' : 'rgba(255, 255, 255, 0.4)';
-                                            const baseColor = isHeadhunterOrAgency ? industryColors.base : statusBaseColor;
-                                            const borderColor = isHeadhunterOrAgency ? industryColors.border : statusBorderColor;
-
-                                            return (
-                                                <button
-                                                    key={contract.contract_id || index}
-                                                    type="button"
-                                                    className="messaging-contract-pill"
-                                                    onClick={(e) => { e.preventDefault(); e.stopPropagation(); setSelectedContract(contract); }}
-                                                    style={{ background: baseColor, borderColor: borderColor }}
-                                                >
-                                                    <i className="fas fa-file-contract"></i>
-                                                    <span>
-                                                        {isHeadhunterOrAgency ? `${industry} - ${roleText}` : `#${contract.contract_id} - ${contract.contract_name?.substring(0, 20) || "Contract"}`}
-                                                    </span>
-                                                </button>
-                                            );
-                                        })}
-                                        {activeContracts.length > 3 && !showAllContracts && (
-                                            <button type="button" className="messaging-contract-pill" onClick={() => setShowAllContracts(true)}
-                                                style={{ background: 'rgba(255,255,255,0.2)', borderColor: 'rgba(255,255,255,0.3)' }}>
-                                                <i className="fas fa-ellipsis-h"></i>
-                                                <span>+{activeContracts.length - 3} more</span>
-                                            </button>
-                                        )}
-                                        {showAllContracts && activeContracts.length > 3 && (
-                                            <button type="button" className="messaging-contract-pill" onClick={() => setShowAllContracts(false)}
-                                                style={{ background: 'rgba(255,255,255,0.2)', borderColor: 'rgba(255,255,255,0.3)' }}>
-                                                <i className="fas fa-chevron-up"></i>
-                                                <span>Show less</span>
-                                            </button>
-                                        )}
-                                    </div>
+                                {/* Right action */}
+                                {activeContracts && activeContracts.length > 0 && (
+                                    <button
+                                        type="button"
+                                        onClick={() => setShowContracts(!showContracts)}
+                                        className={[
+                                            "inline-flex items-center gap-2 rounded-lg border px-3 py-2 text-xs font-semibold transition",
+                                            showContracts
+                                                ? "border-blue-300 bg-blue-50 text-blue-700"
+                                                : "border-slate-200 bg-white text-slate-700 hover:bg-slate-50",
+                                        ].join(" ")}
+                                        title="View contracts shared with this contact"
+                                    >
+                                        <span>{showContracts ? "Hide Shared Contracts" : "Show Shared Contracts"}</span>
+                                        <span
+                                            className="inline-flex h-5 min-w-5 items-center justify-center rounded-md bg-blue-600 px-1.5 text-[11px] font-bold text-white">
+              {activeContracts.length}
+            </span>
+                                    </button>
                                 )}
                             </div>
 
-                            {/* Chat Messages */}
-                            <div className="messaging-messages-area">
-                                <Chat messages={messages} sessionUserId={SESSION_USER_ID} />
+                            {/* Contracts pills (same logic, only styling) */}
+                            {activeContracts && activeContracts.length > 0 && showContracts && (
+                                <div className="border-b border-slate-200 bg-white px-5 py-3">
+                                    <div className="flex flex-wrap gap-2">
+                                        {(showAllContracts ? activeContracts : activeContracts.slice(0, 3)).map((contract, index) => (
+                                            <button
+                                                key={contract.contract_id || index}
+                                                type="button"
+                                                onClick={(e) => {
+                                                    e.preventDefault();
+                                                    e.stopPropagation();
+                                                    setSelectedContract(contract);
+                                                }}
+                                                className="inline-flex items-center gap-2 rounded-full border border-slate-200 bg-slate-50 px-3 py-1 text-xs font-semibold text-slate-700 hover:bg-slate-100"
+                                            >
+                                                <i className="fas fa-file-contract text-slate-500"/>
+                                                <span className="max-w-[220px] truncate">
+                  #{contract.contract_id} — {contract.contract_name?.substring(0, 20) || "Contract"}
+                </span>
+                                            </button>
+                                        ))}
+
+                                        {activeContracts.length > 3 && !showAllContracts && (
+                                            <button
+                                                type="button"
+                                                onClick={() => setShowAllContracts(true)}
+                                                className="rounded-full border border-slate-200 bg-white px-3 py-1 text-xs font-semibold text-slate-700 hover:bg-slate-50"
+                                            >
+                                                +{activeContracts.length - 3} more
+                                            </button>
+                                        )}
+
+                                        {showAllContracts && activeContracts.length > 3 && (
+                                            <button
+                                                type="button"
+                                                onClick={() => setShowAllContracts(false)}
+                                                className="rounded-full border border-slate-200 bg-white px-3 py-1 text-xs font-semibold text-slate-700 hover:bg-slate-50"
+                                            >
+                                                Show less
+                                            </button>
+                                        )}
+                                    </div>
+                                </div>
+                            )}
+
+                            {/* Messages */}
+                            <div className="flex-1 overflow-y-auto bg-slate-50">
+                                <div className="mx-auto w-full max-w-5xl px-6 py-6">
+                                    <Chat messages={messages} sessionUserId={SESSION_USER_ID}/>
+                                </div>
                             </div>
 
-                            {/* Chat Input */}
-                            <div className="messaging-input-area">
+                            {/* Input */}
+                            <div className="border-t border-slate-200 bg-white px-5 py-3">
                                 <MessagingForm
                                     formId={FORM_ID}
                                     handleSubmit={handleSubmit}
@@ -814,15 +837,151 @@ const Create = () => {
                             </div>
                         </>
                     ) : (
-                        <div className="messaging-empty-state">
-                            <div className="messaging-empty-icon">
-                                <i className="fas fa-comments"></i>
+                        <div className="flex h-full items-center justify-center">
+                            <div className="text-center">
+                                <div
+                                    className="mx-auto mb-3 flex h-14 w-14 items-center justify-center rounded-2xl bg-white ring-1 ring-slate-200">
+                                    <i className="fas fa-comments text-slate-400 text-xl"/>
+                                </div>
+                                <h3 className="text-base font-semibold text-slate-800">Select a conversation</h3>
+                                <p className="mt-1 text-sm text-slate-500">Choose a contact from the list to start
+                                    messaging</p>
                             </div>
-                            <h3>Select a conversation</h3>
-                            <p>Choose a contact from the list to start messaging</p>
                         </div>
                     )}
                 </div>
+
+
+                {/*<div className="messaging-chat-panel">*/}
+                {/*    {receiver_id ? (*/}
+                {/*        <>*/}
+                {/*            /!* Chat Header *!/*/}
+                {/*            <div className="messaging-chat-header">*/}
+                {/*                <div className="messaging-chat-header-top">*/}
+                {/*                    <img*/}
+                {/*                        src="/assets/dist/img/user.png"*/}
+                {/*                        alt="Avatar"*/}
+                {/*                        className="messaging-chat-avatar"*/}
+                {/*                    />*/}
+                {/*                    <div className="messaging-chat-info">*/}
+                {/*                        <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>*/}
+                {/*                            <h4 style={{ margin: 0 }}>{currentUser?.name || "Contact"}</h4>*/}
+                {/*                            /!* Contracts Toggle Button - Next to name *!/*/}
+                {/*                            {activeContracts && activeContracts.length > 0 && (*/}
+                {/*                                <button*/}
+                {/*                                    type="button"*/}
+                {/*                                    onClick={() => setShowContracts(!showContracts)}*/}
+                {/*                                    style={{*/}
+                {/*                                        background: showContracts ? 'rgba(255,255,255,0.3)' : 'rgba(255,255,255,0.15)',*/}
+                {/*                                        border: '1px solid rgba(255,255,255,0.3)',*/}
+                {/*                                        borderRadius: '20px',*/}
+                {/*                                        padding: '5px 12px',*/}
+                {/*                                        color: 'white',*/}
+                {/*                                        fontSize: '0.7rem',*/}
+                {/*                                        fontWeight: 600,*/}
+                {/*                                        cursor: 'pointer',*/}
+                {/*                                        display: 'flex',*/}
+                {/*                                        alignItems: 'center',*/}
+                {/*                                        gap: '5px',*/}
+                {/*                                        transition: 'all 0.2s ease',*/}
+                {/*                                    }}*/}
+                {/*                                    title="View contracts shared with this contact"*/}
+                {/*                                >*/}
+                {/*                                    <i className="fas fa-file-contract" style={{ fontSize: '10px' }}></i>*/}
+                {/*                                    <span>{showContracts ? 'Hide' : 'Show'} Shared Contracts ({activeContracts.length})</span>*/}
+                {/*                                    <i className={`fas fa-chevron-${showContracts ? 'up' : 'down'}`} style={{ fontSize: '8px' }}></i>*/}
+                {/*                                </button>*/}
+                {/*                            )}*/}
+                {/*                        </div>*/}
+                {/*                        {getContactType(currentUser) && (*/}
+                {/*                            <div className="messaging-chat-type">*/}
+                {/*                                <i className={`fas ${getContactTypeIcon(currentUser)}`} style={{ fontSize: '10px' }}></i>*/}
+                {/*                                <span>{getContactType(currentUser)}</span>*/}
+                {/*                            </div>*/}
+                {/*                        )}*/}
+                {/*                    </div>*/}
+                {/*                    <div className="messaging-chat-subject">*/}
+                {/*                        <i className="fas fa-tag" style={{ fontSize: 11 }}></i>*/}
+                {/*                        {watch('subject') || "General"}*/}
+                {/*                    </div>*/}
+                {/*                </div>*/}
+
+                {/*                /!* Contract Pills - Hidden by default, shown when toggled *!/*/}
+                {/*                {activeContracts && activeContracts.length > 0 && showContracts && (*/}
+                {/*                    <div className="messaging-contract-pills">*/}
+                {/*                        {(showAllContracts ? activeContracts : activeContracts.slice(0, 3)).map((contract, index) => {*/}
+                {/*                            const industry = getContractIndustry(contract.contract_type_id);*/}
+                {/*                            const industryColors = getIndustryColor(industry);*/}
+                {/*                            const isPublisher = contract.is_publisher ?? false;*/}
+                {/*                            const roleText = isPublisher ? 'Publisher' : 'Applicant';*/}
+                {/*                            const isBooked = contract.contract_status?.toLowerCase() === 'booked';*/}
+                {/*                            const isPendingSignature = contract.contract_status?.toLowerCase() === 'pending_signature';*/}
+                {/*                            const statusBaseColor = isBooked ? 'rgba(59, 130, 246, 0.3)' : isPendingSignature ? 'rgba(245, 158, 11, 0.3)' : 'rgba(255, 255, 255, 0.25)';*/}
+                {/*                            const statusBorderColor = isBooked ? 'rgba(59, 130, 246, 0.6)' : isPendingSignature ? 'rgba(245, 158, 11, 0.6)' : 'rgba(255, 255, 255, 0.4)';*/}
+                {/*                            const baseColor = isHeadhunterOrAgency ? industryColors.base : statusBaseColor;*/}
+                {/*                            const borderColor = isHeadhunterOrAgency ? industryColors.border : statusBorderColor;*/}
+
+                {/*                            return (*/}
+                {/*                                <button*/}
+                {/*                                    key={contract.contract_id || index}*/}
+                {/*                                    type="button"*/}
+                {/*                                    className="messaging-contract-pill"*/}
+                {/*                                    onClick={(e) => { e.preventDefault(); e.stopPropagation(); setSelectedContract(contract); }}*/}
+                {/*                                    style={{ background: baseColor, borderColor: borderColor }}*/}
+                {/*                                >*/}
+                {/*                                    <i className="fas fa-file-contract"></i>*/}
+                {/*                                    <span>*/}
+                {/*                                        {isHeadhunterOrAgency ? `${industry} - ${roleText}` : `#${contract.contract_id} - ${contract.contract_name?.substring(0, 20) || "Contract"}`}*/}
+                {/*                                    </span>*/}
+                {/*                                </button>*/}
+                {/*                            );*/}
+                {/*                        })}*/}
+                {/*                        {activeContracts.length > 3 && !showAllContracts && (*/}
+                {/*                            <button type="button" className="messaging-contract-pill" onClick={() => setShowAllContracts(true)}*/}
+                {/*                                style={{ background: 'rgba(255,255,255,0.2)', borderColor: 'rgba(255,255,255,0.3)' }}>*/}
+                {/*                                <i className="fas fa-ellipsis-h"></i>*/}
+                {/*                                <span>+{activeContracts.length - 3} more</span>*/}
+                {/*                            </button>*/}
+                {/*                        )}*/}
+                {/*                        {showAllContracts && activeContracts.length > 3 && (*/}
+                {/*                            <button type="button" className="messaging-contract-pill" onClick={() => setShowAllContracts(false)}*/}
+                {/*                                style={{ background: 'rgba(255,255,255,0.2)', borderColor: 'rgba(255,255,255,0.3)' }}>*/}
+                {/*                                <i className="fas fa-chevron-up"></i>*/}
+                {/*                                <span>Show less</span>*/}
+                {/*                            </button>*/}
+                {/*                        )}*/}
+                {/*                    </div>*/}
+                {/*                )}*/}
+                {/*            </div>*/}
+
+                {/*            /!* Chat Messages *!/*/}
+                {/*            <div className="messaging-messages-area">*/}
+                {/*                <Chat messages={messages} sessionUserId={SESSION_USER_ID} />*/}
+                {/*            </div>*/}
+
+                {/*            /!* Chat Input *!/*/}
+                {/*            <div className="messaging-input-area">*/}
+                {/*                <MessagingForm*/}
+                {/*                    formId={FORM_ID}*/}
+                {/*                    handleSubmit={handleSubmit}*/}
+                {/*                    onSubmit={onSubmit}*/}
+                {/*                    register={register}*/}
+                {/*                    errors={errors}*/}
+                {/*                    uploadedFile={uploadedFile}*/}
+                {/*                    setUploadedFile={setUploadedFile}*/}
+                {/*                />*/}
+                {/*            </div>*/}
+                {/*        </>*/}
+                {/*    ) : (*/}
+                {/*        <div className="messaging-empty-state">*/}
+                {/*            <div className="messaging-empty-icon">*/}
+                {/*                <i className="fas fa-comments"></i>*/}
+                {/*            </div>*/}
+                {/*            <h3>Select a conversation</h3>*/}
+                {/*            <p>Choose a contact from the list to start messaging</p>*/}
+                {/*        </div>*/}
+                {/*    )}*/}
+                {/*</div>*/}
             </div>
 
             {/* Contract Details Modal */}

@@ -31,6 +31,7 @@ import {
     TooltipTrigger,
 } from "@components/ui/tooltip";
 import MetricsGrid from "@pages/institute/contract-applications/metrics-grid.jsx";
+import ApplicantsSkeleton from "@pages/institute/contract-applicants/ApplicantsSkeleton.jsx";
 
 // Category configuration matching contracts page
 const CATEGORY_CONFIG = {
@@ -320,6 +321,9 @@ const View = () => {
         {label: "Accepted", value: stats.accepted},
         {label: "Rejected", value: stats.rejected},
     ];
+
+    if (isLoading) return <ApplicantsSkeleton/>
+
     return (
         <div>
             <MetricsGrid stats={statsConfig}/>
@@ -436,12 +440,7 @@ const View = () => {
                     )}
                 </div>
 
-                {isLoading ? (
-                    <div style={{marginTop: '2rem'}}>
-                        <Skeleton variant="rectangular" width="100%" height={60} sx={{mb: 2, borderRadius: '12px'}}/>
-                        <Skeleton variant="rectangular" width="100%" height={400} sx={{borderRadius: '12px'}}/>
-                    </div>
-                ) : categories.length === 0 ? (
+                {categories.length === 0 ? (
                     <div className="bg-white rounded-xl py-16 px-8 text-center shadow-sm">
                         <i className="fas fa-inbox text-[4rem] text-gray-300 mb-4"></i>
                         <h5 className="text-gray-500 font-semibold">No applicants found</h5>
