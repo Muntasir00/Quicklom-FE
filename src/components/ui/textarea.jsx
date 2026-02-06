@@ -1,20 +1,21 @@
 import * as React from "react"
-
 import { cn } from "../../lib/utils.js"
 
-function Textarea({
-  className,
-  ...props
-}) {
-  return (
-    <textarea
-      data-slot="textarea"
-      className={cn(
-        "border-input placeholder:text-muted-foreground focus-visible:border-ring focus-visible:ring-ring/50 aria-invalid:ring-destructive/20 dark:aria-invalid:ring-destructive/40 aria-invalid:border-destructive dark:bg-input/30 flex field-sizing-content min-h-16 w-full rounded-md border bg-transparent px-3 py-2 text-base shadow-xs transition-[color,box-shadow] outline-none focus-visible:ring-[3px] disabled:cursor-not-allowed disabled:opacity-50 md:text-sm",
-        className
-      )}
-      {...props} />
-  );
-}
+// React.forwardRef ব্যবহার করে ref পাস করা হয়েছে
+const Textarea = React.forwardRef(({ className, ...props }, ref) => {
+    return (
+        <textarea
+            ref={ref} // এখানে ref টি বসাতে হবে
+            data-slot="textarea"
+            className={cn(
+                "border-input placeholder:text-muted-foreground focus-visible:border-ring focus-visible:ring-ring/50 aria-invalid:ring-destructive/20 dark:aria-invalid:ring-destructive/40 aria-invalid:border-destructive dark:bg-input/30 flex field-sizing-content min-h-16 w-full rounded-md border bg-transparent px-3 py-2 text-base shadow-xs transition-[color,box-shadow] outline-none focus-visible:ring-[3px] disabled:cursor-not-allowed disabled:opacity-50 md:text-sm",
+                className
+            )}
+            {...props}
+        />
+    );
+})
+
+Textarea.displayName = "Textarea" // ডিবাগিং এর সুবিধার জন্য
 
 export { Textarea }
