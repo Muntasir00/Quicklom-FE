@@ -2,8 +2,7 @@ import {MapPin, Calendar, Clock, User2} from 'lucide-react';
 
 const WorkCard = ({job}) => {
     return (
-        <div
-            className=" border border-[#D1D5DB] rounded-xl p-3 shadow-sm hover:shadow-md transition-shadow relative overflow-hidden">
+        <div className=" border border-[#D1D5DB] rounded-xl p-3 shadow-sm hover:shadow-md transition-shadow relative overflow-hidden">
             {/* Header Section */}
             <div className="flex justify-between items-start mb-3">
                 <div className="space-y-1">

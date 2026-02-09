@@ -1,7 +1,7 @@
-import React, { useState, useEffect, useCallback } from "react";
-import { Link, useNavigate } from "react-router-dom"
+import React, {useState, useEffect, useCallback} from "react";
+import {Link, useNavigate} from "react-router-dom"
 import Form from './Form';
-import { useCreateContract } from "@hooks/institute/contracts/useCreateContract";
+import {useCreateContract} from "@hooks/institute/contracts/useCreateContract";
 import {Check} from "lucide-react";
 
 const Create = () => {
@@ -29,37 +29,18 @@ const Create = () => {
         } else {
             setCurrentStep((prev) => prev - 1);
         }
-    };       
+    };
 
     return (
-        <div className="" style={{ minHeight: 'calc(100vh - 57px)' }}>
+        <div className="">
             {/* Page Header */}
-            <div className="content-header py-3" style={{ backgroundColor: '#f4f6f9', marginTop: '15px' }}>
+            <div className="content-header py-3">
                 <div className="container-fluid">
                     <div className="d-flex flex-wrap justify-content-between align-items-center">
-                        <div className="d-flex align-items-center mb-2 mb-md-0">
-                            <div
-                                className="icon-wrapper mr-3 d-flex align-items-center justify-content-center rounded"
-                                style={{
-                                    width: '48px',
-                                    height: '48px',
-                                    background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
-                                    boxShadow: '0 4px 12px rgba(102, 126, 234, 0.3)'
-                                }}
-                            >
-                                <i className="fas fa-plus-circle text-white" style={{ fontSize: '1.3rem' }}></i>
-                            </div>
-                            <div>
-                                <h4 className="mb-0 font-weight-bold text-dark">Create Contract</h4>
-                                <span className="text-muted" style={{ fontSize: '0.9rem' }}>
-                                    Step {currentStep} of {totalSteps} • {currentStep === 1 ? 'Select type' : 'Fill details'}
-                                </span>
-                            </div>
-                        </div>
                         <button
                             onClick={handleBack}
                             className="btn btn-outline-secondary px-4"
-                            style={{ borderRadius: '8px', fontWeight: '600' }}
+                            style={{borderRadius: '8px', fontWeight: '600'}}
                         >
                             <i className="fas fa-arrow-left mr-2"></i>
                             {currentStep <= 1 ? 'Back to Contracts' : 'Previous Step'}
@@ -73,7 +54,7 @@ const Create = () => {
                     <div className="">
                         <div className="">
                             {/* Progress Steps */}
-                            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
+                            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6 mt-6">
 
                                 {/* Step 1: Select Contract Type */}
                                 <button
@@ -99,7 +80,7 @@ const Create = () => {
                                                     : "bg-gray-100 text-gray-400"}
                 `}
                                         >
-                                            {currentStep > 1 ? <Check className="h-5 w-5 stroke-[3px]" /> : "1"}
+                                            {currentStep > 1 ? <Check className="h-5 w-5 stroke-[3px]"/> : "1"}
                                         </div>
 
                                         {/* Step Text */}
@@ -107,14 +88,16 @@ const Create = () => {
                                             <h3 className={`font-bold !text-base !mb-0 ${currentStep === 1 ? "text-blue-700" : "text-gray-900"}`}>
                                                 Select Contract Type
                                             </h3>
-                                            <p className="!text-xs text-gray-500 mt-0.5 font-medium !mb-0">Choose your contract category</p>
+                                            <p className="!text-xs text-gray-500 mt-0.5 font-medium !mb-0">Choose your
+                                                contract category</p>
                                         </div>
 
                                         {/* Active Indicator Pulse */}
                                         {currentStep === 1 && (
                                             <div className="absolute right-4 top-1/2 -translate-y-1/2">
                     <span className="relative flex h-3 w-3">
-                        <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-blue-400 opacity-75"></span>
+                        <span
+                            className="animate-ping absolute inline-flex h-full w-full rounded-full bg-blue-400 opacity-75"></span>
                         <span className="relative inline-flex rounded-full h-3 w-3 bg-blue-500"></span>
                     </span>
                                             </div>
@@ -147,7 +130,7 @@ const Create = () => {
                                                     : "bg-gray-200 text-gray-400"}
                 `}
                                         >
-                                            {currentStep > 2 ? <Check className="h-5 w-5 stroke-[3px]" /> : "2"}
+                                            {currentStep > 2 ? <Check className="h-5 w-5 stroke-[3px]"/> : "2"}
                                         </div>
 
                                         {/* Step Text */}
@@ -155,14 +138,16 @@ const Create = () => {
                                             <h3 className={`!mb-0 font-bold  !text-base ${currentStep === 2 ? "text-blue-700" : "text-gray-900"}`}>
                                                 Contract Details
                                             </h3>
-                                            <p className="!mb-0 !text-xs text-gray-500 mt-0.5 font-medium">Fill in contract information</p>
+                                            <p className="!mb-0 !text-xs text-gray-500 mt-0.5 font-medium">Fill in
+                                                contract information</p>
                                         </div>
 
                                         {/* Active Indicator Pulse */}
                                         {currentStep === 2 && (
                                             <div className="absolute right-4 top-1/2 -translate-y-1/2">
                     <span className="relative flex h-3 w-3">
-                        <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-blue-400 opacity-75"></span>
+                        <span
+                            className="animate-ping absolute inline-flex h-full w-full rounded-full bg-blue-400 opacity-75"></span>
                         <span className="relative inline-flex rounded-full h-3 w-3 bg-blue-500"></span>
                     </span>
                                             </div>
@@ -172,7 +157,7 @@ const Create = () => {
                             </div>
 
                             {/* Main Form Card */}
-                            <div className="card shadow-sm">
+                            <div className=" ">
                                 <div className="card-header bg-white border-0 pt-4 pb-0">
                                     <h5 className="mb-0 font-weight-bold">
                                         {currentStep === 1 ? (
@@ -182,28 +167,31 @@ const Create = () => {
                                             </>
                                         ) : (
                                             <>
-                                                <i className="fas fa-edit text-primary mr-2"></i>
-                                                Contract Details
+                                                {/*<i className="fas fa-edit text-primary mr-2"></i>*/}
+                                                {/*Contract Details*/}
                                             </>
                                         )}
                                     </h5>
                                 </div>
 
-                                <div className="card-body p-4">
+                                <div className="">
                                     <div className="tab-content">
                                         {/* Step 1: Contract Type Selection */}
-                                        <div className={currentStep === 1 ? "tab-pane fade show active" : "tab-pane fade d-none"}>
+                                        <div
+                                            className={currentStep === 1 ? "tab-pane fade show active" : "tab-pane fade d-none"}>
                                             {/*<div className="alert alert-info mb-4" role="alert">*/}
                                             {/*    <i className="fas fa-info-circle mr-2"></i>*/}
                                             {/*    Please select the type of contract you want to create. This will determine the specific fields you need to fill out.*/}
                                             {/*</div>*/}
-                                            <Form setSelectedContract={setSelectedContract} setCurrentStep={setCurrentStep} contractTypes={contractTypes} />
+                                            <Form setSelectedContract={setSelectedContract}
+                                                  setCurrentStep={setCurrentStep} contractTypes={contractTypes}/>
                                         </div>
 
                                         {/* Step 2: Contract Form */}
-                                        <div className={currentStep === 2 ? "tab-pane fade show active" : "tab-pane fade d-none"}>
+                                        <div
+                                            className={currentStep === 2 ? "tab-pane fade show active" : "tab-pane fade d-none"}>
                                             {ContractForm ? (
-                                                <ContractForm ContractFormHook={ContractFormHook} />
+                                                <ContractForm ContractFormHook={ContractFormHook}/>
                                             ) : (
                                                 <div className="alert alert-warning" role="alert">
                                                     <i className="fas fa-exclamation-triangle mr-2"></i>
@@ -261,7 +249,8 @@ const Create = () => {
                                         <div>
                                             <h6 className="mb-1">Need Help?</h6>
                                             <small className="text-muted">
-                                                If you have any questions about creating a contract, please contact our support team.
+                                                If you have any questions about creating a contract, please contact our
+                                                support team.
                                             </small>
                                         </div>
                                     </div>

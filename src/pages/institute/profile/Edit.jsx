@@ -156,8 +156,6 @@ const Edit = () => {
         });
     };
 
-    console.log(profileData)
-
     return (
         <div>
             <InstituteProfile
