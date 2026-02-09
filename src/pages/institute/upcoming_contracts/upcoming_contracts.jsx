@@ -39,6 +39,7 @@ import {StatsCard} from "@pages/institute/upcoming_contracts/StatsCard.jsx";
 import {Button as SButton} from "@components/ui/button.jsx"
 import WorkCard from "@pages/institute/upcoming_contracts/WorkCard.jsx";
 import ContractFilters from "@pages/institute/upcoming_contracts/ContractFilters.jsx";
+import UpcomingContractsSkeleton from "@pages/institute/upcoming_contracts/UpcomingContractsSkeleton.jsx";
 
 const InstituteUpcomingContracts = () => {
     const [loading, setLoading] = useState(true);
@@ -80,13 +81,6 @@ const InstituteUpcomingContracts = () => {
         } finally {
             setLoading(false);
         }
-    };
-
-    const toggleSection = (section) => {
-        setExpandedSections(prev => ({
-            ...prev,
-            [section]: !prev[section]
-        }));
     };
 
     const handleOpenCancelModal = (contract) => {
@@ -234,13 +228,7 @@ const InstituteUpcomingContracts = () => {
 
     if (loading) {
         return (
-            <div className="" style={{minHeight: 'calc(100vh - 57px)', background: '#f8fafc'}}>
-                <Box display="flex" flexDirection="column" justifyContent="center" alignItems="center" minHeight="300px"
-                     gap={2}>
-                    <CircularProgress size={48} sx={{color: '#6366f1'}}/>
-                    <Typography variant="body2" color="text.secondary">Loading your upcoming contracts...</Typography>
-                </Box>
-            </div>
+            <UpcomingContractsSkeleton />
         );
     }
 
