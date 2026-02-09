@@ -433,7 +433,7 @@ const View = () => {
         <div>
             <MetricsGrid stats={statsConfig}/>
 
-            <div className="flex flex-col md:flex-row items-center justify-between gap-4 mb-6">
+            <div className="flex flex-col md:flex-row items-center flex-wrap justify-between gap-4 mb-6">
 
                 <div className="flex items-center gap-2 w-full md:w-auto ">
                     {/* Filter Toggle Button */}
