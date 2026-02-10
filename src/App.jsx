@@ -15,6 +15,7 @@ import ProfessionalLayout from "./layouts/ProfessionalLayout";
 // Auth Pages
 import AdminLogin from "./pages/admin/auth/Login";
 import UserLogin from "./pages/user/auth/Login";
+import UserRegister from "./pages/user/auth/Register";
 
 function App() {
     const location = useLocation();
@@ -37,6 +38,7 @@ function App() {
 
     if (!isAuthenticated && location.pathname === "/admin/login") return <AdminLogin />;
     if (!isAuthenticated && location.pathname === "/login") return <UserLogin />;
+    if (!isAuthenticated && location.pathname === "/register") return <UserRegister />;
     return <Navigate to="/login" replace />;
 }
 

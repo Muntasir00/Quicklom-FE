@@ -69,12 +69,12 @@ function Register() {
                     <Card className="overflow-hidden p-0 shadow-2xl border-none rounded-2xl">
                         <CardContent className="grid p-0 md:grid-cols-2">
                             {/* Left Side: Form */}
-                            <div className="!p-4 md:!p-10 space-y-6 bg-white">
+                            <div className="!p-4 md:!p-10 space-y-4 bg-white">
                                 <div className="space-y-2">
                                     <h1 className="!text-2xl font-bold text-[#1D4ED8] flex items-center gap-0.5">
                                         Quicklocum<span className="text-[#14B8A6]">.</span>
                                     </h1>
-                                    <h2 className="!text-3xl font-extrabold text-[#1E293B] pt-4">
+                                    <h2 className="!text-3xl font-extrabold text-[#1E293B] ">
                                         Create Your Account
                                     </h2>
                                     <p className="text-slate-500 text-sm font-medium">
@@ -85,7 +85,7 @@ function Register() {
                                 <form onSubmit={handleSubmit} className="space-y-4">
                                     {/* Full Name */}
                                     <Field className="gap-1.5">
-                                        <FieldLabel className="text-slate-700 font-semibold" htmlFor="fullName">Full
+                                        <FieldLabel className="text-slate-700 font-semibold  !mb-0" htmlFor="fullName">Full
                                             Name</FieldLabel>
                                         <div className="relative">
                                             <User
@@ -97,7 +97,7 @@ function Register() {
                                                 disabled={isLoading}
                                                 onChange={handleInput}
                                                 placeholder="Enter your full name"
-                                                className={`pl-10 h-11 bg-[#F1F7FE] border-none focus-visible:ring-blue-400 ${errors.fullName ? "ring-2 ring-red-500" : ""}`}
+                                                className={`!pl-10 h-11 bg-[#F1F7FE] border-none focus-visible:ring-blue-400 ${errors.fullName ? "ring-2 ring-red-500" : ""}`}
                                             />
                                         </div>
                                         {errors.fullName &&
@@ -106,7 +106,7 @@ function Register() {
 
                                     {/* Email */}
                                     <Field className="gap-1.5">
-                                        <FieldLabel className="text-slate-700 font-semibold" htmlFor="email">Email
+                                        <FieldLabel className="text-slate-700 font-semibold  !mb-0" htmlFor="email">Email
                                             Address</FieldLabel>
                                         <div className="relative">
                                             <Mail
@@ -118,7 +118,7 @@ function Register() {
                                                 disabled={isLoading}
                                                 onChange={handleInput}
                                                 placeholder="Enter your email"
-                                                className={`pl-10 h-11 bg-[#F1F7FE] border-none focus-visible:ring-blue-400 ${errors.email ? "ring-2 ring-red-500" : ""}`}
+                                                className={`!pl-10 h-11 bg-[#F1F7FE] border-none focus-visible:ring-blue-400 ${errors.email ? "ring-2 ring-red-500" : ""}`}
                                             />
                                         </div>
                                         {errors.email &&
@@ -127,7 +127,7 @@ function Register() {
 
                                     {/* Password */}
                                     <Field className="gap-1.5">
-                                        <FieldLabel className="text-slate-700 font-semibold"
+                                        <FieldLabel className="text-slate-700 font-semibold  !mb-0"
                                                     htmlFor="password">Password</FieldLabel>
                                         <div className="relative">
                                             <Lock
@@ -139,7 +139,7 @@ function Register() {
                                                 disabled={isLoading}
                                                 onChange={handleInput}
                                                 placeholder="Enter your password"
-                                                className={`pl-10 pr-10 h-11 bg-[#F1F7FE] border-none focus-visible:ring-blue-400 ${errors.password ? "ring-2 ring-red-500" : ""}`}
+                                                className={`!pl-10 pr-10 h-11 bg-[#F1F7FE] border-none focus-visible:ring-blue-400 ${errors.password ? "ring-2 ring-red-500" : ""}`}
                                             />
                                             <button
                                                 type="button"
@@ -156,7 +156,7 @@ function Register() {
 
                                     {/* Confirm Password */}
                                     <Field className="gap-1.5">
-                                        <FieldLabel className="text-slate-700 font-semibold" htmlFor="confirmPassword">Confirm
+                                        <FieldLabel className="text-slate-700 font-semibold !mb-0" htmlFor="confirmPassword">Confirm
                                             Password</FieldLabel>
                                         <div className="relative">
                                             <Lock
@@ -168,7 +168,7 @@ function Register() {
                                                 disabled={isLoading}
                                                 onChange={handleInput}
                                                 placeholder="Re-enter your password"
-                                                className={`pl-10 pr-10 h-11 bg-[#F1F7FE] border-none focus-visible:ring-blue-400 ${errors.confirmPassword ? "ring-2 ring-red-500" : ""}`}
+                                                className={`!pl-10 pr-10 h-11 bg-[#F1F7FE] border-none focus-visible:ring-blue-400 ${errors.confirmPassword ? "ring-2 ring-red-500" : ""}`}
                                             />
                                             <button
                                                 type="button"
@@ -186,7 +186,7 @@ function Register() {
                                     <Button
                                         type="submit"
                                         disabled={isLoading}
-                                        className="w-full h-11 bg-[#2563EB] hover:bg-blue-700 text-white font-bold text-sm rounded-lg mt-2 transition-all shadow-md"
+                                        className="w-full h-11 bg-[#2563EB] hover:bg-blue-700 text-white font-bold text-sm !rounded-lg mt-2 transition-all shadow-md"
                                     >
                                         {isLoading ? (
                                             <><Loader2 className="mr-2 h-4 w-4 animate-spin"/> Processing...</>
@@ -198,7 +198,7 @@ function Register() {
                                     <Button
                                         type="button"
                                         variant="outline"
-                                        className="w-full h-11 bg-[#F1F7FE] border-none hover:bg-blue-50 flex items-center justify-center gap-2 text-slate-700 font-bold rounded-lg shadow-sm"
+                                        className="w-full h-11 bg-[#F1F7FE] mt-3 border-none hover:bg-blue-50 flex items-center justify-center gap-2 text-slate-700 font-bold !rounded-lg shadow-sm"
                                     >
                                         <img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/0/google.svg"
                                              alt="G" className="w-4 h-4"/>
