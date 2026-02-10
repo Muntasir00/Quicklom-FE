@@ -1,24 +1,28 @@
-import { API_BASE_URL } from "@config/apiConfig";
-import React, { useState, useEffect, useCallback } from "react";
+import {API_BASE_URL} from "@config/apiConfig";
+import React, {useState, useEffect, useCallback} from "react";
 
-import { useForm } from "react-hook-form";
-import { zodResolver } from "@hookform/resolvers/zod";
-import { permanentStaffingDentalFormSchema } from "@schemas/institute/PermanentStaffingDentalFormSchema";
-import { createContractService, getContractByIdService, updateContractService } from "@services/institute/ContractService";
-import { useNavigate, useParams } from "react-router-dom";
+import {useForm} from "react-hook-form";
+import {zodResolver} from "@hookform/resolvers/zod";
+import {permanentStaffingDentalFormSchema} from "@schemas/institute/PermanentStaffingDentalFormSchema";
+import {
+    createContractService,
+    getContractByIdService,
+    updateContractService
+} from "@services/institute/ContractService";
+import {useNavigate, useParams} from "react-router-dom";
 
-import { getProfessionalCategoriesService } from "@services/user/ProfessionalCategoryService";
-import { getPositionSoughtsService } from "@services/user/PositionSoughtService";
+import {getProfessionalCategoriesService} from "@services/user/ProfessionalCategoryService";
+import {getPositionSoughtsService} from "@services/user/PositionSoughtService";
 
 export const usePermanentStaffingDentalForm = () => {
     const isFile = (val) => val instanceof File || val instanceof Blob;
     const isFileList = (val) => val instanceof FileList;
-    
+
     const navigate = useNavigate();
     const sessionUserRole = sessionStorage.getItem("role");
     const formId = "permanent-staffing-dental-form";
 
-    const { id: contractId } = useParams();
+    const {id: contractId} = useParams();
     const [contract, setContract] = React.useState(null);
     const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:8000';
 
@@ -30,7 +34,7 @@ export const usePermanentStaffingDentalForm = () => {
         reset,
         watch,
         getValues,
-        formState: { errors },
+        formState: {errors},
     } = useForm({
         resolver: zodResolver(permanentStaffingDentalFormSchema),
         defaultValues: {
@@ -87,9 +91,9 @@ export const usePermanentStaffingDentalForm = () => {
             // Set default professional category to "Dental" or "Dentistry" or "Dental Care"
             const dentalCategory = professionalCategoriesData?.find(
                 cat => cat.name === "Dental" ||
-                       cat.name === "Dentistry" ||
-                       cat.name === "Dental Care" ||
-                       cat.name.toLowerCase().includes("dent")
+                    cat.name === "Dentistry" ||
+                    cat.name === "Dental Care" ||
+                    cat.name.toLowerCase().includes("dent")
             );
             if (dentalCategory) {
                 setValue("position_soughts.0.professional_category_id", dentalCategory.id);
@@ -99,18 +103,20 @@ export const usePermanentStaffingDentalForm = () => {
         }
     }
 
-    useEffect(() => { initLocalState() }, []);
+    useEffect(() => {
+        initLocalState()
+    }, []);
 
     const handleAddRow = () => {
         // Not needed for this form but keeping for compatibility
         const lastId = positionRows.length > 0 ? positionRows[positionRows.length - 1].id + 1 : 0;
-        const newId =  lastId + 1;
+        const newId = lastId + 1;
         setPositionRows([...positionRows, {id: newId, name: ""}]);
     };
 
     const handleRemoveRow = (id) => {
         // Not needed for this form but keeping for compatibility
-        const filteredRows = positionRows.filter(row => row.id!== id);
+        const filteredRows = positionRows.filter(row => row.id !== id);
         setPositionRows(filteredRows);
 
         // Also remove from form state
@@ -119,32 +125,53 @@ export const usePermanentStaffingDentalForm = () => {
         setValue("position_soughts", updated);
     };
 
-    const handleFiles = (formData, data, payload, fileKeys = []) => {
-        try {
-            if (!fileKeys || fileKeys.length === 0) return;
+    // const handleFiles = (formData, data, payload, fileKeys = []) => {
+    //     try {
+    //         if (!fileKeys || fileKeys.length === 0) return;
+    //
+    //         fileKeys.forEach((field) => {
+    //             let file = null;
+    //             if (data[field]?.length) file = data[field][0];
+    //             if (isFile(file) || isFileList(file)) {
+    //                 payload[field] = null;
+    //                 formData.append(field, file);
+    //             }
+    //         });
+    //     } catch (error) {
+    //         console.error("Error in handle files:", error);
+    //     }
+    // };
 
-            fileKeys.forEach((field) => {
-                let file = null;
-                if (data[field]?.length) file = data[field][0];
-                if (isFile(file) || isFileList(file)) {
-                    payload[field] = null;
+    const handleFiles = (formData, data, payload, fileKeys = []) => {
+        if (!Array.isArray(fileKeys) || fileKeys.length === 0) return;
+
+        fileKeys.forEach((field) => {
+            const value = data?.[field];
+
+            // Only handle if it's FileList from <input type="file">
+            if (value instanceof FileList && value.length > 0) {
+                const file = value[0];
+
+                if (file instanceof File || file instanceof Blob) {
+                    // Remove from JSON payload since file is sent via multipart
+                    delete payload[field];
                     formData.append(field, file);
                 }
-            });
-        } catch (error) {
-            console.error("Error in handle files:", error);
-        }
+            }
+        });
     };
+
 
     const onSubmit = async (data) => {
         try {
             console.log("=== SUBMIT STARTED ===");
-            console.log("contractId:", contractId);
-            console.log("contract state:", contract);
+            // console.log("contractId:", contractId);
+            // console.log("contract state:", contract);
             console.log("form data:", data);
 
-            const payload = { ...data };
+            const payload = {...data};
             let fileKeys = ["attachments"];
+            console.log(payload, fileKeys)
             const formData = new FormData();
 
             // Helper function to handle file upload and append to form data
