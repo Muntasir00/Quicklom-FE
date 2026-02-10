@@ -1,4 +1,4 @@
-import { Routes, Route } from 'react-router-dom';
+import {Routes, Route} from 'react-router-dom';
 
 // admin imports
 import Dashboard from '../pages/admin/dashboard/View';
@@ -68,6 +68,7 @@ import AdminCancellationDashboard from '@pages/admin/cancellations/CancellationD
 
 // user imports
 import UserLogin from '../pages/user/auth/Login';
+import UserRegister from '../pages/user/auth/Register';
 import UserEditAccount from '../pages/user/account/Edit';
 
 // Professional imports
@@ -132,145 +133,147 @@ import InstituteUpcomingContracts from '@pages/institute/upcoming_contracts/upco
 function MyRouter() {
     return (
         <Routes>
-            <Route path='/login' element={<UserLogin />} />
+            <Route path='/login' element={<UserLogin/>}/>
+            <Route path='/register' element={<UserRegister/>}/>
 
             <Route path='/admin' element="">
-                <Route path='login' element={<Login />} />
-                <Route path="dashboard" element={<Dashboard />} />
-                <Route path="account" element={<EditAccount />} />
-                <Route path="action-logs" element={<ViewLogs />} />
+                <Route path='login' element={<Login/>}/>
+                <Route path="dashboard" element={<Dashboard/>}/>
+                <Route path="account" element={<EditAccount/>}/>
+                <Route path="action-logs" element={<ViewLogs/>}/>
 
                 {/* User Management Routes */}
-                <Route path="users" element={<ViewUsers />} />
-                <Route path="users/create" element={<CreateUsers />} />
-                <Route path="users/:id/edit" element={<EditUsers />} />
+                <Route path="users" element={<ViewUsers/>}/>
+                <Route path="users/create" element={<CreateUsers/>}/>
+                <Route path="users/:id/edit" element={<EditUsers/>}/>
                 {/* User Profile Management Routes */}
-                <Route path="users/:id/profile/view" element={<ViewUserProfile />} />
-                <Route path="users/:id/profile/edit" element={<EditUserProfile />} />
+                <Route path="users/:id/profile/view" element={<ViewUserProfile/>}/>
+                <Route path="users/:id/profile/edit" element={<EditUserProfile/>}/>
 
-                <Route path="professional-categories" element={<AdminProfessionalCategories />} />
-                <Route path="professional-categories/create" element={<AdminCreateProfessionalCategories />} />
-                <Route path="professional-categories/:id/edit" element={<AdminEditProfessionalCategories />} />
+                <Route path="professional-categories" element={<AdminProfessionalCategories/>}/>
+                <Route path="professional-categories/create" element={<AdminCreateProfessionalCategories/>}/>
+                <Route path="professional-categories/:id/edit" element={<AdminEditProfessionalCategories/>}/>
 
-                <Route path="institute-categories" element={<AdminInstituteCategories />} />
-                <Route path="institute-categories/create" element={<AdminCreateInstituteCategories />} />
-                <Route path="institute-categories/:id/edit" element={<AdminEditInstituteCategories />} />
+                <Route path="institute-categories" element={<AdminInstituteCategories/>}/>
+                <Route path="institute-categories/create" element={<AdminCreateInstituteCategories/>}/>
+                <Route path="institute-categories/:id/edit" element={<AdminEditInstituteCategories/>}/>
 
-                <Route path="professional-roles" element={<AdminProfessionalRoles />} />
-                <Route path="professional-roles/create" element={<AdminCreateProfessionalRoles />} />
-                <Route path="professional-roles/:id/edit" element={<AdminEditProfessionalRoles />} />
+                <Route path="professional-roles" element={<AdminProfessionalRoles/>}/>
+                <Route path="professional-roles/create" element={<AdminCreateProfessionalRoles/>}/>
+                <Route path="professional-roles/:id/edit" element={<AdminEditProfessionalRoles/>}/>
 
-                <Route path="institute-specialties" element={<AdminInstituteSpecialties />} />
-                <Route path="institute-specialties/create" element={<AdminCreateInstituteSpecialties />} />
-                <Route path="institute-specialties/:id/edit" element={<AdminEditInstituteSpecialties />} />
+                <Route path="institute-specialties" element={<AdminInstituteSpecialties/>}/>
+                <Route path="institute-specialties/create" element={<AdminCreateInstituteSpecialties/>}/>
+                <Route path="institute-specialties/:id/edit" element={<AdminEditInstituteSpecialties/>}/>
 
-                <Route path="permissions" element={<AdminPermissions />} />
-                <Route path="permissions/create" element={<AdminCreatePermission />} />
-                <Route path="permissions/:id/edit" element={<AdminEditPermission />} />
+                <Route path="permissions" element={<AdminPermissions/>}/>
+                <Route path="permissions/create" element={<AdminCreatePermission/>}/>
+                <Route path="permissions/:id/edit" element={<AdminEditPermission/>}/>
 
-                <Route path="roles" element={<AdminRoles />} />
-                <Route path="roles/create" element={<AdminCreateRole />} />
-                <Route path="roles/:id/edit" element={<AdminEditRole />} />
+                <Route path="roles" element={<AdminRoles/>}/>
+                <Route path="roles/create" element={<AdminCreateRole/>}/>
+                <Route path="roles/:id/edit" element={<AdminEditRole/>}/>
 
-                <Route path="insurance-companies" element={<AdminInsuranceCompanies />} />
-                <Route path="insurance-companies/create" element={<AdminCreateInsuranceCompany />} />
-                <Route path="insurance-companies/:id/edit" element={<AdminEditInsuranceCompany  />} />
+                <Route path="insurance-companies" element={<AdminInsuranceCompanies/>}/>
+                <Route path="insurance-companies/create" element={<AdminCreateInsuranceCompany/>}/>
+                <Route path="insurance-companies/:id/edit" element={<AdminEditInsuranceCompany/>}/>
 
-                <Route path="contract-types" element={<AdminContractTypes />} />
-                <Route path="contract-types/create" element={<AdminCreateContractType />} />
-                <Route path="contract-types/:id/edit" element={<AdminEditContractType />} />
+                <Route path="contract-types" element={<AdminContractTypes/>}/>
+                <Route path="contract-types/create" element={<AdminCreateContractType/>}/>
+                <Route path="contract-types/:id/edit" element={<AdminEditContractType/>}/>
 
-                <Route path="contracts" element={<AdminContracts />} />
-                <Route path="contracts/create" element={<AdminCreateContract />} />
-                <Route path="contracts/:id/edit" element={<AdminEditContract />} />
+                <Route path="contracts" element={<AdminContracts/>}/>
+                <Route path="contracts/create" element={<AdminCreateContract/>}/>
+                <Route path="contracts/:id/edit" element={<AdminEditContract/>}/>
 
-                <Route path="position-soughts" element={<AdminPositionSoughts />} />
-                <Route path="position-soughts/create" element={<AdminCreatePositionSought />} />
-                <Route path="position-soughts/:id/edit" element={<AdminEditPositionSought />} />
+                <Route path="position-soughts" element={<AdminPositionSoughts/>}/>
+                <Route path="position-soughts/create" element={<AdminCreatePositionSought/>}/>
+                <Route path="position-soughts/:id/edit" element={<AdminEditPositionSought/>}/>
 
-                <Route path="messaging" element={<AdminCreateMessage />} />
-                <Route path="messaging/users" element={<AdminMessages />} />
-                <Route path="messaging/user/:id/create" element={<AdminCreateMessage />} />
-                <Route path="messaging/monitor/:user1Id/:user2Id" element={<AdminCreateMessage />} />
-                <Route path="messaging/:messageId/user/:id/edit" element={<AdminEditMessage />} />
-                <Route path="messaging/users/:receiverId/:senderId/show" element={<AdminShowMessage />} />
+                <Route path="messaging" element={<AdminCreateMessage/>}/>
+                <Route path="messaging/users" element={<AdminMessages/>}/>
+                <Route path="messaging/user/:id/create" element={<AdminCreateMessage/>}/>
+                <Route path="messaging/monitor/:user1Id/:user2Id" element={<AdminCreateMessage/>}/>
+                <Route path="messaging/:messageId/user/:id/edit" element={<AdminEditMessage/>}/>
+                <Route path="messaging/users/:receiverId/:senderId/show" element={<AdminShowMessage/>}/>
 
 
-                <Route path="contacts" element={<AdminContacts />} />
-                <Route path="notifications" element={<AdminNotifications />} />
+                <Route path="contacts" element={<AdminContacts/>}/>
+                <Route path="notifications" element={<AdminNotifications/>}/>
 
-                <Route path="billing/invoices" element={<AdminInvoiceDashboard />} />
-                <Route path="billing/commissions" element={<AdminCommissionDashboard />} />
-                <Route path="cancellations" element={<AdminCancellationDashboard />} />
-                <Route path="agreements" element={<AdminAgreementDashboard />} />
-                <Route path="upcoming-contracts" element={<AdminUpcomingContracts />} />
+                <Route path="billing/invoices" element={<AdminInvoiceDashboard/>}/>
+                <Route path="billing/commissions" element={<AdminCommissionDashboard/>}/>
+                <Route path="cancellations" element={<AdminCancellationDashboard/>}/>
+                <Route path="agreements" element={<AdminAgreementDashboard/>}/>
+                <Route path="upcoming-contracts" element={<AdminUpcomingContracts/>}/>
 
             </Route>
 
             <Route path='/professional' element="">
-                <Route path="dashboard" element={<ProfessionalDashboard />} />
-                <Route path="account" element={<UserEditAccount />} />
-                <Route path="profile" element={<ProfessionalProfile />} />
-                <Route path="profile/:id/edit" element={<ProfessionalEditProfile />} />
+                <Route path="dashboard" element={<ProfessionalDashboard/>}/>
+                <Route path="account" element={<UserEditAccount/>}/>
+                <Route path="profile" element={<ProfessionalProfile/>}/>
+                <Route path="profile/:id/edit" element={<ProfessionalEditProfile/>}/>
 
-                <Route path="published-contracts" element={<ProfessionalPublishedContracts />} />
-                <Route path="contract-applications" element={<ProfessionalContractApplications />} />
-                <Route path="cancellation-fees" element={<ProfessionalCancellationFees />} />
+                <Route path="published-contracts" element={<ProfessionalPublishedContracts/>}/>
+                <Route path="contract-applications" element={<ProfessionalContractApplications/>}/>
+                <Route path="cancellation-fees" element={<ProfessionalCancellationFees/>}/>
 
                 {/* Professional Agreement Routes */}
-                <Route path="agreements" element={<ProfessionalAgreementDashboard />} />
-                <Route path="agreements/:agreementId" element={<ProfessionalAgreementSignature />} />
-                <Route path="agreements/:agreementId/sign" element={<ProfessionalAgreementSignature />} />
+                <Route path="agreements" element={<ProfessionalAgreementDashboard/>}/>
+                <Route path="agreements/:agreementId" element={<ProfessionalAgreementSignature/>}/>
+                <Route path="agreements/:agreementId/sign" element={<ProfessionalAgreementSignature/>}/>
 
                 {/* Professional Upcoming Contracts Route */}
-                <Route path="upcoming-contracts" element={<ProfessionalUpcomingContracts />} />
+                <Route path="upcoming-contracts" element={<ProfessionalUpcomingContracts/>}/>
 
                 {/* Professional Availability Route */}
-                <Route path="availability" element={<ProfessionalAvailability />} />
+                <Route path="availability" element={<ProfessionalAvailability/>}/>
 
-                <Route path="messaging" element={<ProfessionalCreateMessage />} />
-                <Route path="messaging/user/:id/create" element={<ProfessionalCreateMessage />} />
-                <Route path="messaging/:messageId/user/:id/edit" element={<ProfessionalEditMessage />} />
+                <Route path="messaging" element={<ProfessionalCreateMessage/>}/>
+                <Route path="messaging/user/:id/create" element={<ProfessionalCreateMessage/>}/>
+                <Route path="messaging/:messageId/user/:id/edit" element={<ProfessionalEditMessage/>}/>
 
-                <Route path="contacts" element={<ProfessionalContacts />} />
-                <Route path="notifications" element={<ProfessionalNotifications />} />
-                <Route path="terms-of-use" element={<ProfessionalTermsOfUse />} />
+                <Route path="contacts" element={<ProfessionalContacts/>}/>
+                <Route path="notifications" element={<ProfessionalNotifications/>}/>
+                <Route path="terms-of-use" element={<ProfessionalTermsOfUse/>}/>
             </Route>
 
             <Route path='/institute' element="">
-                <Route path="dashboard" element={<InstituteDashboard />} />
-                <Route path="account" element={<UserEditAccount />} />
-                <Route path="profile/:id/edit" element={<InstituteEditProfile />} />
+                <Route path="dashboard" element={<InstituteDashboard/>}/>
+                <Route path="account" element={<UserEditAccount/>}/>
+                <Route path="profile/:id/edit" element={<InstituteEditProfile/>}/>
 
-                <Route path="contracts" element={<InstituteContracts />} />
-                <Route path="contracts/create" element={<InstituteCreateContract />} />
-                <Route path="contracts/:id/edit" element={<InstituteEditContract />} />
+                <Route path="contracts" element={<InstituteContracts/>}/>
+                <Route path="contracts/create" element={<InstituteCreateContract/>}/>
+                <Route path="contracts/:id/edit" element={<InstituteEditContract/>}/>
 
-                <Route path="published-contracts" element={<InstitutePublishedContracts />} />
-                <Route path="contract-applications" element={<InstituteContractApplications />} />
-                <Route path="contract-applicants" element={<InstituteContractApplicants />} />
+                <Route path="published-contracts" element={<InstitutePublishedContracts/>}/>
+                <Route path="contract-applications" element={<InstituteContractApplications/>}/>
+                <Route path="contract-applicants" element={<InstituteContractApplicants/>}/>
 
                 {/* Institute Upcoming Contracts Route */}
-                <Route path="upcoming-contracts" element={<InstituteUpcomingContracts />} />
+                <Route path="upcoming-contracts" element={<InstituteUpcomingContracts/>}/>
 
-                <Route path="messaging" element={<InstituteCreateMessage />} />
-                <Route path="messaging/user/:id/create" element={<InstituteCreateMessage />} />
-                <Route path="messaging/:messageId/user/:id/edit" element={<InstituteEditMessage />} />
+                <Route path="messaging" element={<InstituteCreateMessage/>}/>
+                <Route path="messaging/user/:id/create" element={<InstituteCreateMessage/>}/>
+                <Route path="messaging/:messageId/user/:id/edit" element={<InstituteEditMessage/>}/>
 
-                <Route path="contacts" element={<InstituteContacts />} />
-                <Route path="notifications" element={<InstituteNotifications />} />
-                <Route path="terms-of-use" element={<InstituteTermsOfUse />} />
+                <Route path="contacts" element={<InstituteContacts/>}/>
+                <Route path="notifications" element={<InstituteNotifications/>}/>
+                <Route path="terms-of-use" element={<InstituteTermsOfUse/>}/>
 
                 {/* Institute Billing & Agreement Routes */}
-                <Route path="billing" element={<BillingDashboard />} />
-                <Route path="billing/history" element={<PaymentHistory />} />
-                <Route path="billing/invoices" element={<InvoiceDashboard />} />
-                <Route path="agreements" element={<InstituteAgreementDashboard />} />
-                <Route path="agreements/:agreementId" element={<InstituteAgreementSignature />} />
-                <Route path="agreements/:agreementId/sign" element={<InstituteAgreementSignature />} />
-                <Route path="agreements/:agreementId/sign-fullwidth" element={<InstituteAgreementSignatureFullWidth />} />
+                <Route path="billing" element={<BillingDashboard/>}/>
+                <Route path="billing/history" element={<PaymentHistory/>}/>
+                <Route path="billing/invoices" element={<InvoiceDashboard/>}/>
+                <Route path="agreements" element={<InstituteAgreementDashboard/>}/>
+                <Route path="agreements/:agreementId" element={<InstituteAgreementSignature/>}/>
+                <Route path="agreements/:agreementId/sign" element={<InstituteAgreementSignature/>}/>
+                <Route path="agreements/:agreementId/sign-fullwidth" element={<InstituteAgreementSignatureFullWidth/>}/>
             </Route>
         </Routes>
-  );
+    );
 }
+
 export default MyRouter;
