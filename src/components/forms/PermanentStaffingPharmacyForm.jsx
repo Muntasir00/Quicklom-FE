@@ -7,7 +7,7 @@ import {
     MapPin, Search, Keyboard, Info,
     FileText, CalendarDays, Star, AlignLeft, CircleDollarSign, Gift, Trophy,
     AlertTriangle, Paperclip, UploadCloud, UserRound, CheckCircle2,
-    ChevronRight, Loader2, X, Download, Briefcase
+    ChevronRight, Loader2, X, Download, Briefcase, ChevronDown
 } from "lucide-react";
 
 // Shadcn UI components
@@ -567,61 +567,49 @@ const PermanentStaffingPharmacyForm = ({ContractFormHook}) => {
                                             Position Sought <span className="text-red-500">*</span>
                                         </Label>
 
-                                        <div
-                                            className="rounded-lg border border-slate-200 bg-white p-3 max-h-[220px] overflow-auto">
+                                        {/* Content Area */}
+                                        <div className="bg-white">
                                             {!provinceValue ? (
-                                                <div
-                                                    className="rounded-lg border border-amber-200 bg-amber-50 px-3 py-2 text-sm text-amber-900 flex items-start gap-2">
-                                                    <AlertTriangle className="h-4 w-4 mt-0.5"/>
-                                                    <div>Please select a province first.</div>
+                                                <div className="flex items-center gap-2 rounded-lg border border-amber-200 bg-amber-50 px-3 py-2.5 text-xs sm:text-sm text-amber-900">
+                                                    <AlertTriangle className="h-4 w-4 shrink-0" />
+                                                    <span>Please select a province first.</span>
                                                 </div>
                                             ) : positionsToShow.length === 0 ? (
-                                                <div
-                                                    className="rounded-lg border border-amber-200 bg-amber-50 px-3 py-2 text-sm text-amber-900 flex items-start gap-2">
-                                                    <AlertTriangle className="h-4 w-4 mt-0.5"/>
-                                                    <div>No positions available for {provinceValue}.</div>
+                                                <div className="flex items-center gap-2 rounded-lg border border-amber-200 bg-amber-50 px-3 py-2.5 text-xs sm:text-sm text-amber-900">
+                                                    <AlertTriangle className="h-4 w-4 shrink-0" />
+                                                    <span>No positions available for {provinceValue}.</span>
                                                 </div>
                                             ) : (
-                                                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                                                    {positionsToShow.map((p) => {
-                                                        const isChecked =
-                                                            selectedPositions?.includes(String(p.id)) || selectedPositions?.includes(Number(p.id));
+                                                <div className="relative group">
+                                                    <select
+                                                        className={`flex h-11 w-full rounded-md border bg-white px-3 py-2 text-sm transition-all cursor-pointer appearance-none outline-none focus:ring-2 ${
+                                                            errors?.position_soughts?.[index]?.position_ids
+                                                                ? "border-red-500 focus:ring-red-100"
+                                                                : "border-slate-200 focus:ring-blue-100 group-hover:border-slate-300"
+                                                        }`}
+                                                        value={selectedPositions?.[0] || ""}
+                                                        onChange={(e) => {
+                                                            const val = e.target.value;
+                                                            setValue(`position_soughts.${index}.position_ids`, val ? [String(val)] : [], {
+                                                                shouldValidate: true,
+                                                            });
+                                                        }}
+                                                    >
+                                                        <option value="">Select a position</option>
+                                                        {positionsToShow.map((p) => (
+                                                            <option key={p.id} value={p.id}>{p.name}</option>
+                                                        ))}
+                                                    </select>
 
-                                                        return (
-                                                            <label
-                                                                key={p.id}
-                                                                className={`flex items-center justify-between gap-3 rounded-lg border px-3 py-2 cursor-pointer transition ${
-                                                                    isChecked ? "border-blue-500 bg-blue-50" : "border-slate-200 hover:bg-slate-50"
-                                                                }`}
-                                                            >
-                                                                <div className="flex items-center gap-3">
-                                                                    <Checkbox
-                                                                        checked={isChecked}
-                                                                        onCheckedChange={(checked) => {
-                                                                            if (checked) {
-                                                                                setValue(`position_soughts.${index}.position_ids`, [String(p.id)], {
-                                                                                    shouldValidate: true,
-                                                                                });
-                                                                            } else {
-                                                                                setValue(`position_soughts.${index}.position_ids`, [], {
-                                                                                    shouldValidate: true,
-                                                                                });
-                                                                            }
-                                                                        }}
-                                                                        className="h-5 w-5 !rounded-xs"
-                                                                    />
-                                                                    <span
-                                                                        className="text-sm font-semibold text-slate-700 !mb-0">{p.name}</span>
-                                                                </div>
-                                                            </label>
-                                                        );
-                                                    })}
+                                                    <ChevronDown className="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400 pointer-events-none" />
                                                 </div>
                                             )}
                                         </div>
 
+                                        {/* Single Error Message Handler */}
                                         {errors?.position_soughts?.[index]?.position_ids && (
-                                            <p className="text-xs text-red-500">
+                                            <p className="text-[11px] sm:text-xs text-red-500 flex items-center gap-1 font-medium animate-in fade-in slide-in-from-top-1">
+                                                <AlertTriangle className="w-3 h-3" />
                                                 {errors.position_soughts[index].position_ids.message}
                                             </p>
                                         )}

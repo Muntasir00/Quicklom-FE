@@ -898,51 +898,43 @@ _latest_
                                         Position Sought <span className="text-red-700">*</span>
                                     </Label>
 
-                                    <div
-                                        className="grid grid-cols-1 sm:grid-cols-2 gap-y-3 sm:gap-y-4 gap-x-2 border border-[#E5E7EB] bg-[#FBFBFB] px-3 sm:px-[14px] py-3 sm:py-[10px] rounded-lg">
-                                        {categoryPositionsForRow.map((position) => {
-                                            const isChecked =
-                                                selectedPositions?.includes(String(position.id)) ||
-                                                selectedPositions?.includes(Number(position.id));
+                                    <div className="relative group">
+                                        <select
+                                            className={`flex h-11 w-full rounded-md border bg-white px-3 py-2 text-sm transition-all cursor-pointer appearance-none outline-none focus:ring-2 ${
+                                                errors?.position_soughts?.[index]?.position_ids
+                                                    ? "border-red-500 focus:ring-red-100"
+                                                    : "border-slate-200 focus:ring-blue-100 group-hover:border-slate-300"
+                                            }`}
+                                            value={selectedPositions?.[0] || ""}
+                                            onChange={(e) => {
+                                                const val = e.target.value;
 
-                                            return (
-                                                <div key={position.id} className="flex items-center space-x-3 gap-2">
-                                                    <Checkbox
-                                                        id={`pos-${index}-${position.id}`}
-                                                        checked={isChecked}
-                                                        onCheckedChange={(checked) => {
-                                                            if (checked) {
-                                                                setValue(`position_soughts.${index}.position_ids`, [String(position.id)], {
-                                                                    shouldValidate: true,
-                                                                });
-                                                            } else {
-                                                                setValue(`position_soughts.${index}.position_ids`, [], {shouldValidate: true});
-                                                            }
+                                                setValue(`position_soughts.${index}.position_ids`, val ? [String(val)] : [], {
+                                                    shouldValidate: true,
+                                                });
 
-                                                            // Specialist role clear if not selected
-                                                            const isSpecialist =
-                                                                specialistDentistPosition &&
-                                                                Number(position.id) === Number(specialistDentistPosition.id);
-                                                            if (!checked || !isSpecialist) {
-                                                                setValue(`position_soughts.${index}.specialist_dentist_role`, "");
-                                                            }
-                                                        }}
-                                                        className="w-5 h-5 border-[#E5E7EB] rounded data-[state=checked]:bg-blue-500"
-                                                    />
+                                                const isSpecialist = specialistDentistPosition && Number(val) === Number(specialistDentistPosition.id);
 
-                                                    <label
-                                                        htmlFor={`pos-${index}-${position.id}`}
-                                                        className="text-sm font-normal text-[#6B7280] cursor-pointer !mb-0"
-                                                    >
-                                                        {position.name}
-                                                    </label>
-                                                </div>
-                                            );
-                                        })}
+                                                if (!val || !isSpecialist) {
+                                                    setValue(`position_soughts.${index}.specialist_dentist_role`, "");
+                                                }
+                                            }}
+                                        >
+                                            <option value="">Select a position</option>
+                                            {categoryPositionsForRow.map((position) => (
+                                                <option key={position.id} value={position.id}>
+                                                    {position.name}
+                                                </option>
+                                            ))}
+                                        </select>
+
+                                        <ChevronDown className="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400 pointer-events-none" />
                                     </div>
 
+                                    {/* Error Message */}
                                     {errors?.position_soughts?.[index]?.position_ids && (
-                                        <p className="text-xs text-red-500 mt-2 italic">
+                                        <p className="text-[11px] sm:text-xs text-red-500 flex items-center gap-1 font-medium italic mt-2">
+                                            <AlertTriangle className="w-3 h-3" />
                                             {errors.position_soughts[index].position_ids.message}
                                         </p>
                                     )}
